@@ -1,0 +1,55 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://actors/scripts/actor.gd" type="Script" id=1]
+[ext_resource path="res://actors/scripts/idle.gd" type="Script" id=2]
+[ext_resource path="res://actors/scripts/move.gd" type="Script" id=3]
+[ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=4]
+[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=5]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 32, 32 )
+
+[sub_resource type="DynamicFontData" id=2]
+font_path = "res://assets/fonts/Roboto/Roboto-Bold.ttf"
+
+[sub_resource type="DynamicFont" id=3]
+outline_size = 1
+outline_color = Color( 0, 0, 0, 1 )
+use_filter = true
+font_data = SubResource( 2 )
+
+[node name="Actor" type="KinematicBody2D"]
+script = ExtResource( 1 )
+
+[node name="State" type="Node" parent="."]
+
+[node name="Idle" type="Node" parent="State"]
+script = ExtResource( 2 )
+
+[node name="Move" type="Node" parent="State"]
+script = ExtResource( 3 )
+
+[node name="Skin" type="Sprite" parent="."]
+texture = ExtResource( 4 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 1 )
+
+[node name="Debug" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="StateLabel" type="Label" parent="Debug" groups=[
+"debug",
+]]
+margin_left = -19.5067
+margin_top = -47.4787
+margin_right = 20.4933
+margin_bottom = -33.4787
+grow_horizontal = 2
+grow_vertical = 2
+custom_fonts/font = SubResource( 3 )
+text = "State Label"
+align = 1
+script = ExtResource( 5 )
+
