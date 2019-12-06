@@ -73,3 +73,17 @@ func _change_state(state_name):
 
 func perform_move(cell):
 	_current_state.move_to_cell(self, cell)
+
+################################################################################
+# SIGNAL HANDLING
+################################################################################
+
+func _on_TweenMove_tween_completed(object, key):
+	if not _current_state.has_method("_on_TweenMove_tween_completed"):
+		return
+
+	var state_name = _current_state._on_TweenMove_tween_completed(self, \
+		object, key)
+	
+	if state_name:
+		_change_state(state_name)

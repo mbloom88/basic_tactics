@@ -11,13 +11,17 @@ var _action_keys = {
 # VIRTUAL METHODS
 ################################################################################
 
-func _input(event):
-	var action = event.as_text()
-	
-	if action in _action_keys.keys():
+#func _input(event):
+#	var action = event.as_text()
+#
+#	if action in _action_keys.keys():
+#
+#		if Input.is_action_pressed(_action_keys[action]):
+#			print(action)
 
-		if Input.is_action_just_pressed(_action_keys[action]):
-			print(action)
+func _process(delta):
+	pass
+
 
 func _ready():
 	pass

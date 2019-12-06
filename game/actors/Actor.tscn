@@ -29,6 +29,8 @@ script = ExtResource( 2 )
 [node name="Move" type="Node" parent="State"]
 script = ExtResource( 3 )
 
+[node name="TweenMove" type="Tween" parent="."]
+
 [node name="Skin" type="Sprite" parent="."]
 texture = ExtResource( 4 )
 
@@ -53,3 +55,4 @@ text = "State Label"
 align = 1
 script = ExtResource( 5 )
 
+[connection signal="tween_completed" from="TweenMove" to="." method="_on_TweenMove_tween_completed"]

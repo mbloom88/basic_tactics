@@ -1,12 +1,6 @@
 extends "res://assets/state_scripts/state.gd"
 
-var _action_keys = {
-	'W': ['move_up', Vector2(0, -1)],
-	'A': ['move_left', Vector2(-1, 0)],
-	'S': ['move_down', Vector2(0, 1)],
-	'D': ['move_right', Vector2(1, 0)],
-	}
-
+# Movement
 export (float) var move_speed = 0.25
 
 ################################################################################
@@ -14,30 +8,72 @@ export (float) var move_speed = 0.25
 ################################################################################
 
 func _enter(host):
-	host.set_process_input(true)
+	host.set_process(true)
 
 #-------------------------------------------------------------------------------
 
-func _handle_input(host, event):
-	var action = event.as_text()
+func _update(host, delta):
+	var action = check_actions()
 	
-	if action in _action_keys.keys():
-		
-		if Input.is_action_pressed(_action_keys[action][0]):
-			host.set_process_input(false)
-			host.emit_signal('move_requested', host, _action_keys[action][1])
-			print('Move requested: %s' % _action_keys[action][1])
-			
-		elif Input.is_action_just_released(_action_keys[action][0]):
-			return 'idle'
+	if action:
+		match action[0]:
+			'move':
+				host.set_process(false)
+				host.emit_signal('move_requested', host, action[1])
+	else:
+		return 'idle'
 
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
 
-func move_to_cell(host, cell):
-	if host.position != cell:
-		host.position = cell
-		yield(get_tree().create_timer(move_speed), "timeout")
+func check_actions():
+	"""
+	Looks for user inputs corresponding to specific actions.
 	
-	host.set_process_input(true)
+	Returns:
+		- action (Array): Two element array. Element 0 is the action to be
+			performed. Element 1 is the value associated with that action. 
+	"""
+	var action = []
+	
+	if Input.is_action_pressed("move_up"):
+		action = ['move', Vector2(0, -1)]
+	elif Input.is_action_pressed("move_down"):
+		action = ['move', Vector2(0, 1)]
+	elif Input.is_action_pressed("move_left"):
+		action = ['move', Vector2(-1, 0)]
+	elif Input.is_action_pressed("move_right"):
+		action = ['move', Vector2(1, 0)]
+	
+	return action
+
+#-------------------------------------------------------------------------------
+
+func move_to_cell(host, cell):
+	"""
+	Moves the actor towards a cell corresponding with a move key.
+	
+	Args:
+		- host (Object): The actor object for this state.
+		- cell (Vector2): The next world cell to move into.
+	"""
+	if host.position != cell:
+		
+		host._tween_move.interpolate_property(
+			host,
+			"position",
+			host.position,
+			cell,
+			move_speed,
+			Tween.TRANS_LINEAR,
+			Tween.EASE_IN)
+		
+		host._tween_move.start()
+
+################################################################################
+# SIGNAL HANDLING
+################################################################################
+
+func _on_TweenMove_tween_completed(host, object, key):
+	host.set_process(true)
