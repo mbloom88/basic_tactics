@@ -4,6 +4,8 @@ Base 'Actor' scene.
 extends KinematicBody2D
 
 # Signals 
+signal camera_move_requested(location, move_speed)
+signal move_completed
 signal move_requested(actor, direction)
 signal state_changed(state)
 
@@ -16,9 +18,14 @@ var _current_state = null
 var _state_stack = []
 
 onready var _state_map = {
+	'inactive': $State/Inactive,
 	'idle': $State/Idle,
 	'move': $State/Move,
 }
+
+# Actor info
+export (String) var reference = ""
+var script_running = false setget set_script_running, get_script_running
 
 ################################################################################
 # VIRTUAL METHODS
@@ -43,7 +50,7 @@ func _process(delta):
 func _ready():
 	_state_stack.push_front($State/Idle)
 	_current_state = _state_stack[0]
-	_change_state('idle')
+	_change_state('inactive')
 
 ################################################################################
 # PRIVATE METHODS
@@ -71,8 +78,50 @@ func _change_state(state_name):
 # PUBLIC METHODS
 ################################################################################
 
+func activate():
+	_change_state('idle')
+
+#-------------------------------------------------------------------------------
+
+func deactivate():
+	_change_state('inactive')
+
+#-------------------------------------------------------------------------------
+
 func perform_move(cell):
 	_current_state.move_to_cell(self, cell)
+
+#-------------------------------------------------------------------------------
+
+func perform_scripted_move(next_direction, movement_type):
+	if not _current_state.has_method("determine_next_cell"):
+		return
+	
+	_current_state.determine_next_cell(self, next_direction, movement_type)
+
+#-------------------------------------------------------------------------------
+
+func scripted_state_change(new_state):
+	if new_state == 'inactive':
+		script_running = false
+	else:
+		script_running = true
+		
+	_change_state(new_state)
+
+################################################################################
+# SETTERS
+################################################################################
+
+func set_script_running(value):
+	script_running = value
+
+################################################################################
+# GETTERS
+################################################################################
+
+func get_script_running():
+	return script_running
 
 ################################################################################
 # SIGNAL HANDLING

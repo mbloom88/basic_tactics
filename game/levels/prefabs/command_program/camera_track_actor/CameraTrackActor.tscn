@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://levels/prefabs/command_program/camera_track_actor/camera_track_actor.gd" type="Script" id=1]
+
+[node name="CameraTrackActor" type="Node"]
+script = ExtResource( 1 )
+

@@ -1,14 +1,18 @@
-extends "res://assets/state_scripts/state.gd"
+extends "res://assets/scripts/state.gd"
 
 # Movement
-export (float) var move_speed = 0.25
+export (float) var run_speed = 0.25
+export (float) var walk_speed = 0.65
+export (String, 'run', 'walk') var move_type = 'run'
 
 ################################################################################
 # VIRTUAL METHODS
 ################################################################################
 
 func _enter(host):
-	host.set_process(true)
+	if not host.script_running:
+		host.set_process(true)
+		move_type = 'run'
 
 #-------------------------------------------------------------------------------
 
@@ -50,6 +54,12 @@ func check_actions():
 
 #-------------------------------------------------------------------------------
 
+func determine_next_cell(host, next_direction, movement_type):
+	move_type = movement_type
+	host.emit_signal('move_requested', host, next_direction)
+
+#-------------------------------------------------------------------------------
+
 func move_to_cell(host, cell):
 	"""
 	Moves the actor towards a cell corresponding with a move key.
@@ -59,6 +69,13 @@ func move_to_cell(host, cell):
 		- cell (Vector2): The next world cell to move into.
 	"""
 	if host.position != cell:
+		var move_speed = 0.0
+		
+		match move_type:
+			'run':
+				move_speed = run_speed
+			'walk':
+				move_speed = walk_speed
 		
 		host._tween_move.interpolate_property(
 			host,
@@ -70,10 +87,16 @@ func move_to_cell(host, cell):
 			Tween.EASE_IN)
 		
 		host._tween_move.start()
+		host.emit_signal('camera_move_requested', cell, move_speed)
+	else:
+		host.set_process(true)
 
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
 
 func _on_TweenMove_tween_completed(host, object, key):
-	host.set_process(true)
+	if not host.script_running:
+		host.set_process(true)
+	
+	host.emit_signal('move_completed')

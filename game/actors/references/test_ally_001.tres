@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://assets/sprites/test_ally.png" type="Texture" id=1]
+[ext_resource path="res://actors/references/actor_reference.gd" type="Script" id=2]
+
+[resource]
+script = ExtResource( 2 )
+id = "test_ally_001"
+first_name = "Test"
+nick_name = "Ally"
+last_name = "001"
+expressions = {
+"neutral": ExtResource( 1 )
+}
+

@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://core/scripts/game-handler.gd" type="Script" id=1]
+[ext_resource path="res://ui/menus/main_menu/MainMenu.tscn" type="PackedScene" id=2]
+[ext_resource path="res://sandbox/levels/test_level/TestLevel.tscn" type="PackedScene" id=3]
+[ext_resource path="res://core/scripts/actor-database.gd" type="Script" id=4]
+
+[node name="GameHandler" type="Node"]
+script = ExtResource( 1 )
+_main_menu = ExtResource( 2 )
+_new_game_level = ExtResource( 3 )
+
+[node name="ActorDatabase" type="Node" parent="."]
+script = ExtResource( 4 )
+_actor_reference_directory = "res://actors/references"
+
+[node name="Level" type="Node" parent="."]
+
+[node name="Menus" type="CanvasLayer" parent="."]
+

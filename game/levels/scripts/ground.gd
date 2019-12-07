@@ -59,8 +59,10 @@ func determine_move_path(actor, direction):
 			proper execution.
 	
 	Returns:
-		- move_path (Array): An array of world coordinates that the actor is
-			authorized to move over.
+		- new_world_cell (Vector2): An world (pixel) coordinate that the actor
+			is authorized to move into. Will return the actor's current position
+			if the new cell is outside of the allowable grid or if an obstacle
+			exists in that space.
 	"""
 	var new_world_cell = actor.position
 	var current_map_cell = world_to_map(actor.position)
@@ -71,7 +73,7 @@ func determine_move_path(actor, direction):
 		new_world_cell = map_to_world(new_map_cell)
 		
 		new_world_cell.x += cell_size.x * 0.50
-		new_world_cell.y += cell_size.y * 0.50
+		new_world_cell.y += cell_size.y * 0.25
 	
 	return new_world_cell
 

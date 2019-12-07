@@ -1,4 +1,4 @@
-extends "res://assets/state_scripts/state.gd"
+extends "res://assets/scripts/state.gd"
 
 ################################################################################
 # PUBLIC METHODS
