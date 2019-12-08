@@ -7,6 +7,7 @@ extends KinematicBody2D
 signal camera_move_requested(location, move_speed)
 signal move_completed
 signal move_requested(actor, direction)
+signal player_menu_requested(actor)
 signal state_changed(state)
 
 # Child nodes
@@ -21,6 +22,7 @@ onready var _state_map = {
 	'inactive': $State/Inactive,
 	'idle': $State/Idle,
 	'move': $State/Move,
+	'menu': $State/Menu
 }
 
 # Actor info
@@ -57,8 +59,9 @@ func _ready():
 ################################################################################
 
 func _change_state(state_name):
-	if _state_map[state_name] != _current_state:
-		_current_state._exit(self)
+	if state_name != 'previous':
+		if _state_map[state_name] != _current_state:
+			_current_state._exit(self)
 
 	if state_name == 'previous':
 		_state_stack.pop_front()
@@ -98,6 +101,11 @@ func perform_scripted_move(next_direction, movement_type):
 		return
 	
 	_current_state.determine_next_cell(self, next_direction, movement_type)
+
+#-------------------------------------------------------------------------------
+
+func resume_from_player_menu():
+	_change_state('idle')
 
 #-------------------------------------------------------------------------------
 

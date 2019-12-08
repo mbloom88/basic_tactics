@@ -29,7 +29,9 @@ func check_actions():
 	"""
 	var action = []
 	
-	if Input.is_action_pressed("move_up"):
+	if Input.is_action_just_pressed('player_menu'):
+		action = ['menu', null]
+	elif Input.is_action_pressed("move_up"):
 		action = ['move', Vector2(0, -1)]
 	elif Input.is_action_pressed("move_down"):
 		action = ['move', Vector2(0, 1)]

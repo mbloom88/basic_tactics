@@ -3,6 +3,10 @@ Base 'Level' scene.
 """
 extends Node2D
 
+# Signals 
+signal player_menu_requested(actor)
+
+# Child nodes
 onready var _camera = $Camera
 onready var _ground = $Ground
 onready var _actors = $Actors
@@ -17,7 +21,14 @@ func _ready():
 	_provide_debug_info()
 	
 	for actor in _actors.get_children():
-		actor.connect("move_requested", self, "_on_Actor_move_requested")
+		actor.connect(
+			"move_requested",
+			self,
+			"_on_Actor_move_requested")
+		actor.connect(
+			'player_menu_requested',
+			self,
+			'_on_Actor_player_menu_requested')
 		_ground.update_actor_list(actor, 'add')
 	
 	if _command.get_children():
@@ -31,6 +42,11 @@ func _on_Actor_move_requested(actor, direction):
 	var move_cell = _ground.determine_move_path(actor, direction)
 	
 	actor.perform_move(move_cell)
+
+#-------------------------------------------------------------------------------
+
+func _on_Actor_player_menu_requested(actor):
+	emit_signal('player_menu_requested', actor)
 
 ################################################################################
 # DEBUG

@@ -1,0 +1,88 @@
+{
+  "start": {
+    "type": "text",
+    "speaker": "test_enemy_001",
+    "expression": "neutral",
+    "screen_side": "bottom",
+    "portrait_align": "left",
+    "name_align": "bottom",
+    "enter_scene": true,
+    "enter_speed": "fade_in",
+    "exit_scene": false,
+    "exit_speed": "fade_out",
+    "content": "Test Ally 001. You bastard...you dare show your face around here?!",
+    "next": "path001_001"
+  },
+  "path001_001": {
+    "type": "text",
+    "speaker": "test_ally_001",
+    "expression": "neutral",
+    "screen_side": "top",
+    "portrait_align": "right",
+    "name_align": "top",
+    "enter_scene": true,
+    "enter_speed": "fade_in",
+    "exit_scene": false,
+    "exit_speed": "fade_out",
+    "content": "Shut up and let's do this...",
+    "next": "path001_002"
+  },
+  "path001_002": {
+    "type": "text",
+    "speaker": "test_enemy_001",
+    "expression": "neutral",
+    "screen_side": "bottom",
+    "portrait_align": "left",
+    "name_align": "bottom",
+    "enter_scene": false,
+    "enter_speed": "fade_in",
+    "exit_scene": false,
+    "exit_speed": "fade_out",
+    "content": "You sure you want to do this?",
+    "next": "path001_response001"
+  },
+  "path001_response001": {
+    "type": "response",
+    "speaker": "test_ally_001",
+    "expression": "neutral",
+    "screen_side": "top",
+    "portrait_align": "right",
+    "name_align": "top",
+    "enter_scene": true,
+    "enter_speed": "instant_in",
+    "exit_scene": true,
+    "exit_speed": "instant_out",
+    "values": {
+      "path001_003A": "You bet your ass.",
+	  "path001_003B": "Well, maybe not.",
+    }
+  },
+  "path001_003A": {
+    "type": "text",
+    "speaker": "test_enemy_001",
+    "expression": "neutral",
+    "screen_side": "bottom",
+    "portrait_align": "left",
+    "name_align": "bottom",
+    "enter_scene": false,
+    "enter_speed": "fade_in",
+    "exit_scene": false,
+    "exit_speed": "fade_out",
+    "content": "I'm going to mop the floor with you!",
+    "next": "end"
+  },
+  "path001_003B": {
+    "type": "text",
+    "speaker": "test_enemy_001",
+    "expression": "neutral",
+    "screen_side": "bottom",
+    "portrait_align": "left",
+    "name_align": "bottom",
+    "enter_scene": false,
+    "enter_speed": "fade_in",
+    "exit_scene": false,
+    "exit_speed": "fade_out",
+    "content": "Fine then...pussy...",
+    "next": "end"
+  }
+}

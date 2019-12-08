@@ -39,8 +39,9 @@ func _ready():
 ################################################################################
 
 func _change_state(state_name):
-	if _state_map[state_name] != _current_state:
-		_current_state._exit(self)
+	if state_name != 'previous':
+		if _state_map[state_name] != _current_state:
+			_current_state._exit(self)
 
 	if state_name == 'previous':
 		_state_stack.pop_front()

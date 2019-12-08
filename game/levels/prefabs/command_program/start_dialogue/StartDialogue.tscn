@@ -1,6 +1,7 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://levels/command_programs/start_dialogue/start-dialogue.gd" type="Script" id=1]
+[ext_resource path="res://levels/prefabs/command_program/start_dialogue/start-dialogue.gd" type="Script" id=1]
+
 
 
 

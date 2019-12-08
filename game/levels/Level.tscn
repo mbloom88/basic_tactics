@@ -1,10 +1,12 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://levels/scripts/level.gd" type="Script" id=1]
 [ext_resource path="res://levels/prefabs/camera/Camera.tscn" type="PackedScene" id=2]
 [ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=3]
 [ext_resource path="res://levels/scripts/ground.gd" type="Script" id=4]
-[ext_resource path="res://levels/scripts/cell-vectors.gd" type="Script" id=5]
+[ext_resource path="res://levels/prefabs/dialogue_handler/DialogueHandler.tscn" type="PackedScene" id=5]
+[ext_resource path="res://levels/prefabs/battle_handler/BattleHandler.tscn" type="PackedScene" id=6]
+[ext_resource path="res://levels/scripts/cell-vectors.gd" type="Script" id=7]
 
 [sub_resource type="TileSet" id=1]
 0/name = "greybox_tiles_spritesheet.png 0"
@@ -36,6 +38,12 @@ script = ExtResource( 4 )
 
 [node name="Actors" type="YSort" parent="."]
 
+[node name="GUIs" type="CanvasLayer" parent="."]
+
+[node name="DialogueHandler" parent="GUIs" instance=ExtResource( 5 )]
+
+[node name="BattleHandler" parent="GUIs" instance=ExtResource( 6 )]
+
 [node name="Debug" type="Control" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
@@ -45,7 +53,8 @@ margin_bottom = 40.0
 ]]
 margin_right = 40.0
 margin_bottom = 40.0
-script = ExtResource( 5 )
+script = ExtResource( 7 )
 
 [node name="CommandPrograms" type="Node" parent="."]
 
+[connection signal="request_active_allies" from="GUIs/BattleHandler" to="." method="_on_BattleHandler_request_active_allies"]

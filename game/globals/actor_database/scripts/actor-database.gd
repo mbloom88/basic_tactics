@@ -3,7 +3,7 @@ A database for looking up actor references.
 """
 extends Node
 
-# Character references
+# Actor references
 export (String, DIR) var _actor_reference_directory = ""
 var _actors = {}
 

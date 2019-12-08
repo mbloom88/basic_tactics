@@ -13,10 +13,3 @@ func _enter(host):
 		
 	if host._onready_activation:
 		host._change_state('interact')
-
-#-------------------------------------------------------------------------------
-
-func _exit(host):
-	for button in host._buttons.get_children():
-		button.disabled = false
-		button.focus_mode = Control.FOCUS_ALL

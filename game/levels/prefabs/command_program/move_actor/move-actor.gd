@@ -9,6 +9,7 @@ var _manager = null
 export (NodePath) var _actor_scene_path
 var _actor = null
 export (String, 'run', 'walk') var _movement_type = 'run'
+export (bool) var _quickrun_next_program = false
 var _move_path = []
 
 ################################################################################
@@ -60,7 +61,9 @@ func end():
 	
 	_actor.disconnect("move_completed", self, '_on_Actor_move_completed')
 	_actor.disconnect('state_changed', self, '_on_Actor_state_changed')
-	_manager.next_program_in_queue()
+	
+	if not _quickrun_next_program:
+		_manager.next_program_in_queue()
 
 #-------------------------------------------------------------------------------
 
@@ -72,6 +75,9 @@ func start(manager):
 	_actor = get_node(_actor_scene_path)
 	_actor.connect('move_completed', self, '_on_Actor_move_completed')
 	_actor.connect('state_changed', self, '_on_Actor_state_changed')
+	
+	if _quickrun_next_program:
+		_manager.next_program_in_queue()
 	
 	_state_change_request()
 
