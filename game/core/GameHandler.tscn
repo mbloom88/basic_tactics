@@ -1,25 +1,31 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://core/scripts/game-handler.gd" type="Script" id=1]
-[ext_resource path="res://sandbox/levels/test_player_menu/TestPlayerMenu.tscn" type="PackedScene" id=2]
-[ext_resource path="res://ui/menus/main_menu/MainMenu.tscn" type="PackedScene" id=3]
-[ext_resource path="res://ui/menus/player_menu/PlayerMenu.tscn" type="PackedScene" id=4]
-[ext_resource path="res://ui/menus/squad_loadout_menu/SquadLoadoutMenu.tscn" type="PackedScene" id=5]
+[ext_resource path="res://core/scripts/level.gd" type="Script" id=2]
+[ext_resource path="res://sandbox/levels/test_player_menu/TestPlayerMenu.tscn" type="PackedScene" id=3]
+[ext_resource path="res://core/scripts/menus.gd" type="Script" id=4]
+[ext_resource path="res://ui/menus/main_menu/MainMenu.tscn" type="PackedScene" id=5]
+[ext_resource path="res://ui/menus/player_menu/PlayerMenu.tscn" type="PackedScene" id=6]
+[ext_resource path="res://ui/menus/squad_loadout_menu/SquadLoadoutMenu.tscn" type="PackedScene" id=7]
 
 [node name="GameHandler" type="Node"]
 script = ExtResource( 1 )
-_new_game_level = ExtResource( 2 )
-_main_menu = ExtResource( 3 )
-_player_menu = ExtResource( 4 )
-_squad_loadout = ExtResource( 5 )
 
 [node name="Level" type="Node" parent="."]
+script = ExtResource( 2 )
+_new_game_level = ExtResource( 3 )
 
 [node name="Menus" type="CanvasLayer" parent="."]
 layer = 2
+script = ExtResource( 4 )
+_main_menu = ExtResource( 5 )
+_player_menu = ExtResource( 6 )
+_squad_loadout = ExtResource( 7 )
 
-[node name="MenuDeleteTimer" type="Timer" parent="."]
+[node name="MenuDeleteTimer" type="Timer" parent="Menus"]
 wait_time = 0.05
 one_shot = true
 
-[connection signal="timeout" from="MenuDeleteTimer" to="." method="_on_MenuDeleteTimer_timeout"]
+[connection signal="player_menu_requested" from="Level" to="." method="_on_Level_player_menu_requested"]
+[connection signal="new_game_requested" from="Menus" to="." method="_on_Menus_new_game_requested"]
+[connection signal="timeout" from="Menus/MenuDeleteTimer" to="Menus" method="_on_MenuDeleteTimer_timeout"]

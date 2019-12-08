@@ -21,9 +21,6 @@ onready var _state_map = {
 # Button handling
 var _current_focus = null
 
-# Independent scene editing
-export (bool) var _onready_activation = false
-
 ################################################################################
 # VIRTUAL METHODS
 ################################################################################
@@ -39,7 +36,7 @@ func _process(delta):
 func _ready():
 	_state_stack.push_front($State/Idle)
 	_current_state = _state_stack[0]
-	_change_state('idle')
+	_change_state('interact')
 
 ################################################################################
 # PRIVATE METHODS
