@@ -1,4 +1,7 @@
-extends NinePatchRect
+extends Control
+
+# Signals
+signal state_changed(menu, state)
 
 # Child nodes
 onready var _squad_names = $HBoxContainer/ScrollContainer/SquadNames
@@ -13,53 +16,64 @@ export (PackedScene) var _squad_button
 export (Texture) var green
 export (Texture) var red
 
+# State machine
+var _current_state = null
+var _state_stack = []
+
+onready var _state_map = {
+	'idle': $State/Idle,
+	'interact': $State/Interact,
+	'exit': $State/Exit,
+}
+
+# Independent scene editing
+export (bool) var _onready_activation = false
+
 ################################################################################
 # VIRTUAL METHODS
 ################################################################################
+
+func _process(delta):
+	var state_name = _current_state._update(self, delta)
+	
+	if state_name:
+		_change_state(state_name)
+
+#-------------------------------------------------------------------------------
 
 func _ready():
-	_configure_squadies()
+	_state_stack.push_front($State/Idle)
+	_current_state = _state_stack[0]
+	_change_state('idle')
 
 ################################################################################
-# VIRTUAL METHODS
+# PRIVATE METHODS
 ################################################################################
 
-func _configure_squadies():
-	for squadie in _squad_names.get_children():
-		squadie.queue_free()
+func _change_state(state_name):
+	if state_name != 'previous':
+		if _state_map[state_name] != _current_state:
+			_current_state._exit(self)
+
+	if state_name == 'previous':
+		_state_stack.pop_front()
+	else:
+		var new_state = _state_map[state_name]
+		_state_stack[0] = new_state
+
+	_current_state = _state_stack[0]
 	
-	var squad = PartyDatabase.provide_party()
+	if state_name != 'previous':
+		_current_state._enter(self)
 	
-	for squadie in squad.keys():
-		if squad[squadie]['hired']:
-			var new_button = _squad_button.instance()
-			var squadie_name = ActorDatabase.lookup_name(squadie)
-			
-			new_button.text = '%s "%s" %s' % [squadie_name[0], squadie_name[1],
-				squadie_name[2]]
-			new_button.update_actor_ref(squadie)
-			_squad_names.add_child(new_button)
-			
-			# Signal connections
-			new_button.connect(
-				'update_portrait',
-				 self,
-				'_on_Squadie_update_portrait')
-			new_button.connect('just_toggled', self, '_on_Squadie_just_toggled')
-			
-			# Set "in squad" indicators
-			if squad[squadie]['in_squad']:
-				new_button.icon = green
-			else:
-				new_button.icon = red
+	emit_signal("state_changed", self, state_name)
 
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
 
-func activate():
-	visible = true
-	_configure_squadies()
+func interact():
+	_change_state('interact')
 
 ################################################################################
 # SIGNAL HANDLING

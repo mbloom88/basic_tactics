@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://ui/menus/player_menu/themes/player-menu-theme.tres" type="Theme" id=1]
 [ext_resource path="res://ui/menus/player_menu/scripts/player-menu.gd" type="Script" id=2]
@@ -6,18 +6,16 @@
 [ext_resource path="res://ui/menus/player_menu/scripts/interact.gd" type="Script" id=4]
 [ext_resource path="res://ui/menus/player_menu/scripts/exit.gd" type="Script" id=5]
 [ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=6]
-[ext_resource path="res://ui/menus/player_menu/scripts/squad-loadout-panel.gd" type="Script" id=7]
-[ext_resource path="res://ui/menus/player_menu/prefabs/squad_name_button/SquadNameButton.tscn" type="PackedScene" id=8]
-[ext_resource path="res://assets/sprites/test_ally.png" type="Texture" id=9]
-[ext_resource path="res://assets/sprites/test_enemy.png" type="Texture" id=10]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 6 )
-region = Rect2( 0, 0, 64, 64 )
+region = Rect2( 128, 0, 64, 64 )
 
 [node name="PlayerMenu" type="Control"]
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
 theme = ExtResource( 1 )
 script = ExtResource( 2 )
 
@@ -33,106 +31,37 @@ script = ExtResource( 4 )
 script = ExtResource( 5 )
 
 [node name="Background" type="NinePatchRect" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 100.0
-margin_top = 100.0
-margin_right = -100.0
-margin_bottom = -100.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -100.0
+margin_top = 124.534
+margin_right = 100.0
+margin_bottom = 224.534
+rect_min_size = Vector2( 200, 100 )
 texture = SubResource( 1 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Background"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 10.0
-margin_top = 10.0
-margin_right = -10.0
-margin_bottom = -10.0
-custom_constants/separation = 100
+[node name="MenuButtons" type="VBoxContainer" parent="Background"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -73.5
+margin_top = -32.0
+margin_right = 73.5
+margin_bottom = 32.0
 
-[node name="MenuButtons" type="VBoxContainer" parent="Background/HBoxContainer"]
-margin_right = 156.0
-margin_bottom = 500.0
-
-[node name="SquadLoadout" type="Button" parent="Background/HBoxContainer/MenuButtons"]
-margin_right = 156.0
+[node name="SquadLoadout" type="Button" parent="Background/MenuButtons"]
+margin_right = 147.0
 margin_bottom = 30.0
 text = "Squad Loadout"
 
-[node name="Inventory" type="Button" parent="Background/HBoxContainer/MenuButtons"]
+[node name="Inventory" type="Button" parent="Background/MenuButtons"]
 margin_top = 34.0
-margin_right = 156.0
+margin_right = 147.0
 margin_bottom = 64.0
 text = "Inventory"
 
-[node name="ExitMenu" type="Button" parent="Background/HBoxContainer/MenuButtons"]
-margin_top = 68.0
-margin_right = 156.0
-margin_bottom = 98.0
-text = "Exit Menu (Tab)"
-
-[node name="SecondaryPanels" type="Control" parent="Background/HBoxContainer"]
-margin_left = 256.0
-margin_right = 1060.0
-margin_bottom = 500.0
-size_flags_horizontal = 3
-
-[node name="SquadLoadoutPanel" type="NinePatchRect" parent="Background/HBoxContainer/SecondaryPanels"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-size_flags_horizontal = 3
-script = ExtResource( 7 )
-_squad_button = ExtResource( 8 )
-green = ExtResource( 9 )
-red = ExtResource( 10 )
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[node name="ScrollContainer" type="ScrollContainer" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel/HBoxContainer"]
-margin_right = 300.0
-margin_bottom = 500.0
-rect_min_size = Vector2( 300, 0 )
-
-[node name="SquadNames" type="VBoxContainer" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel/HBoxContainer/ScrollContainer"]
-margin_right = 300.0
-margin_bottom = 500.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel/HBoxContainer"]
-margin_left = 304.0
-margin_right = 804.0
-margin_bottom = 500.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel/HBoxContainer/VBoxContainer"]
-margin_right = 500.0
-margin_bottom = 360.0
-
-[node name="NeutralPortrait" type="TextureRect" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel/HBoxContainer/VBoxContainer/HBoxContainer"]
-margin_right = 256.0
-margin_bottom = 360.0
-rect_min_size = Vector2( 256, 360 )
-size_flags_horizontal = 0
-size_flags_vertical = 0
-expand = true
-
-[node name="ActorStats" type="VBoxContainer" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel/HBoxContainer/VBoxContainer/HBoxContainer"]
-margin_left = 260.0
-margin_right = 500.0
-margin_bottom = 360.0
-rect_min_size = Vector2( 0, 360 )
-size_flags_horizontal = 3
-size_flags_vertical = 0
-
-[node name="SquadCapacity" type="Label" parent="Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel/HBoxContainer/VBoxContainer"]
-margin_top = 364.0
-margin_right = 500.0
-margin_bottom = 388.0
-text = "Squad Capacity: 1/6"
-
-[connection signal="pressed" from="Background/HBoxContainer/MenuButtons/SquadLoadout" to="." method="_on_SquadLoadout_pressed"]
-[connection signal="pressed" from="Background/HBoxContainer/MenuButtons/ExitMenu" to="." method="_on_ExitMenu_pressed"]
+[connection signal="pressed" from="Background/MenuButtons/SquadLoadout" to="." method="_on_SquadLoadout_pressed"]
+[connection signal="pressed" from="Background/MenuButtons/Inventory" to="." method="_on_Inventory_pressed"]

@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=3 format=2]
+[gd_resource type="Theme" load_steps=5 format=2]
 
 [sub_resource type="DynamicFontData" id=1]
 font_path = "res://assets/fonts/Roboto/Roboto-Black.ttf"
@@ -7,6 +7,14 @@ font_path = "res://assets/fonts/Roboto/Roboto-Black.ttf"
 size = 20
 use_filter = true
 font_data = SubResource( 1 )
+
+[sub_resource type="DynamicFontData" id=3]
+font_path = "res://assets/fonts/Roboto/Roboto-Black.ttf"
+
+[sub_resource type="DynamicFont" id=4]
+size = 20
+use_filter = true
+font_data = SubResource( 3 )
 
 [resource]
 Button/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
@@ -20,4 +28,13 @@ Button/styles/focus = null
 Button/styles/hover = null
 Button/styles/normal = null
 Button/styles/pressed = null
+Label/colors/font_color = Color( 1, 1, 1, 1 )
+Label/colors/font_color_shadow = Color( 0, 0, 0, 0 )
+Label/colors/font_outline_modulate = Color( 1, 1, 1, 1 )
+Label/constants/line_spacing = 3
+Label/constants/shadow_as_outline = 0
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1
+Label/fonts/font = SubResource( 4 )
+Label/styles/normal = null
 

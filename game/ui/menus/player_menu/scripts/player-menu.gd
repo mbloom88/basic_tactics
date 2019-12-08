@@ -1,13 +1,12 @@
 extends Control
 
 # Signals 
+signal menu_requested(menu)
 signal state_changed(menu, state)
 
 # Child nodes
-onready var _buttons = $Background/HBoxContainer/MenuButtons
-onready var _squad_button = $Background/HBoxContainer/MenuButtons/SquadLoadout
-onready var _secondary = $Background/HBoxContainer/SecondaryPanels
-onready var _squad = $Background/HBoxContainer/SecondaryPanels/SquadLoadoutPanel
+onready var _buttons = $Background/MenuButtons
+onready var _squad_button = $Background/MenuButtons/SquadLoadout
 
 # State machine
 var _current_state = null
@@ -29,18 +28,18 @@ export (bool) var _onready_activation = false
 # VIRTUAL METHODS
 ################################################################################
 
-func _ready():
-	_state_stack.push_front($State/Idle)
-	_current_state = _state_stack[0]
-	_change_state('idle')
-
-#-------------------------------------------------------------------------------
-
 func _process(delta):
 	var state_name = _current_state._update(self, delta)
 	
 	if state_name:
 		_change_state(state_name)
+
+#-------------------------------------------------------------------------------
+
+func _ready():
+	_state_stack.push_front($State/Idle)
+	_current_state = _state_stack[0]
+	_change_state('idle')
 
 ################################################################################
 # PRIVATE METHODS
@@ -68,12 +67,6 @@ func _change_state(state_name):
 # PUBLIC METHODS
 ################################################################################
 
-func hide_secondary_panels():
-	for panel in _secondary.get_children():
-		panel.visible = false
-
-#-------------------------------------------------------------------------------
-
 func interact():
 	_change_state('interact')
 
@@ -81,11 +74,11 @@ func interact():
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_ExitMenu_pressed():
-	_change_state('exit')
+func _on_Inventory_pressed():
+	pass # Replace with function body.
 
 #-------------------------------------------------------------------------------
 
 func _on_SquadLoadout_pressed():
-	hide_secondary_panels()
-	_squad.activate()
+	emit_signal('menu_requested', 'squad_loadout')
+	_change_state('idle')
