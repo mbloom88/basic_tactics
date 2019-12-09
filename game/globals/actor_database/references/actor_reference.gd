@@ -2,7 +2,7 @@ extends Resource
 
 class_name ActorReference
 
-export (String) var id = ""
+export (PackedScene) var actor_scene
 export (String) var first_name = ""
 export (String) var nick_name = ""
 export (String) var last_name = ""

@@ -26,7 +26,7 @@ onready var _state_map = {
 }
 
 # Actor info
-export (String) var reference = ""
+export (String) var reference = "" setget , get_reference
 var script_running = false setget set_script_running, get_script_running
 
 ################################################################################
@@ -50,7 +50,7 @@ func _process(delta):
 #-------------------------------------------------------------------------------
 
 func _ready():
-	_state_stack.push_front($State/Idle)
+	_state_stack.push_front($State/Inactive)
 	_current_state = _state_stack[0]
 	_change_state('inactive')
 
@@ -127,6 +127,11 @@ func set_script_running(value):
 ################################################################################
 # GETTERS
 ################################################################################
+
+func get_reference():
+	return reference
+
+#-------------------------------------------------------------------------------
 
 func get_script_running():
 	return script_running

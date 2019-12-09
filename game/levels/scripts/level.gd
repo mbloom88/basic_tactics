@@ -10,6 +10,8 @@ signal player_menu_requested(actor)
 onready var _camera = $Camera
 onready var _ground = $Ground
 onready var _actors = $Actors
+onready var _ally_positions = $AllyBattlePositions
+onready var _battle_handler = $GUIs/BattleHandler
 onready var _cell_vectors = $Debug/CellVectors
 onready var _command = $CommandPrograms
 
@@ -47,6 +49,21 @@ func _on_Actor_move_requested(actor, direction):
 
 func _on_Actor_player_menu_requested(actor):
 	emit_signal('player_menu_requested', actor)
+
+#-------------------------------------------------------------------------------
+
+func _on_BattleHandler_ally_positions_requested():
+	var cells = []
+	
+	for cell in _ally_positions.get_children():
+		cells.append(cell.position)
+	
+	_battle_handler.register_battle_positions(cells)
+
+#-------------------------------------------------------------------------------
+
+func _on_BattleHandler_blink_cells_requested(cells):
+	_ground.blink_cells(cells)
 
 ################################################################################
 # DEBUG

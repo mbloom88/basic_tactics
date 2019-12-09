@@ -13,8 +13,26 @@ var _current_actor = null
 
 # Action info
 export (float) var _camera_pan_speed = 0.25
+export(float) var _zoom_resolution = 0.25
+export (Vector2) var _zoom_min = Vector2(0.5, 0.5)
+export (Vector2) var _zoom_max = Vector2(1.5, 1.5)
 var _target_location = Vector2()
 var _current_action = ""
+
+################################################################################
+# VIRTUAL METHODS
+################################################################################
+
+func _input(event):
+	# zoom out
+	if Input.is_action_just_pressed('ui_page_up') and zoom < _zoom_max:
+		zoom.x += _zoom_resolution
+		zoom.y += _zoom_resolution
+		
+	# zoom in
+	elif Input.is_action_just_pressed('ui_page_down') and zoom > _zoom_min:
+		zoom.x -= _zoom_resolution
+		zoom.y -= _zoom_resolution
 
 ################################################################################
 # PUBLIC METHODS

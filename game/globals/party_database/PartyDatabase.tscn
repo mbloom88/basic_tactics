@@ -4,4 +4,5 @@
 
 [node name="PartyDatabase" type="Node"]
 script = ExtResource( 1 )
+squad_limit = 2
 

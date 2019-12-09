@@ -2,7 +2,7 @@
 
 [ext_resource path="res://core/scripts/game-handler.gd" type="Script" id=1]
 [ext_resource path="res://core/scripts/level.gd" type="Script" id=2]
-[ext_resource path="res://sandbox/levels/test_player_menu/TestPlayerMenu.tscn" type="PackedScene" id=3]
+[ext_resource path="res://levels/test_level/TestLevel.tscn" type="PackedScene" id=3]
 [ext_resource path="res://core/scripts/menus.gd" type="Script" id=4]
 [ext_resource path="res://ui/menus/main_menu/MainMenu.tscn" type="PackedScene" id=5]
 [ext_resource path="res://ui/menus/player_menu/PlayerMenu.tscn" type="PackedScene" id=6]

@@ -10,6 +10,16 @@ export (Dictionary) var squad_loadout = {
 		'in_squad': true,
 		'essential': true,
 	},
+		'test_ally_002': {
+		'hired': true,
+		'in_squad': false,
+		'essential': false,
+	},
+		'test_ally_003': {
+		'hired': true,
+		'in_squad': true,
+		'essential': false,
+	},
 }
 
 export (Dictionary) var inventory = {

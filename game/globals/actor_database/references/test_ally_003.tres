@@ -1,6 +1,6 @@
 [gd_resource type="Resource" load_steps=4 format=2]
 
-[ext_resource path="res://actors/npcs/TestNPC001.tscn" type="PackedScene" id=1]
+[ext_resource path="res://actors/allies/TestAlly003.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=2]
 [ext_resource path="res://globals/actor_database/references/actor_reference.gd" type="Script" id=3]
 
@@ -8,8 +8,8 @@
 script = ExtResource( 3 )
 actor_scene = ExtResource( 1 )
 first_name = "Test"
-nick_name = "NPC"
-last_name = "001"
+nick_name = "Ally"
+last_name = "003"
 expressions = {
 "neutral": ExtResource( 2 )
 }

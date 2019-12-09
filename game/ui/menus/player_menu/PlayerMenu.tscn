@@ -42,7 +42,9 @@ margin_bottom = 224.534
 rect_min_size = Vector2( 200, 100 )
 texture = SubResource( 1 )
 
-[node name="MenuButtons" type="VBoxContainer" parent="Background"]
+[node name="MenuButtons" type="VBoxContainer" parent="Background" groups=[
+"focus_objects",
+]]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5

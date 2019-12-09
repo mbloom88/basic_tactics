@@ -9,6 +9,7 @@ var _scene_focus = null
 func _enter(host):
 	host._prompt.focus_mode = Control.FOCUS_ALL
 	
+	# Determine which focus object to return focus to when exiting
 	for node in get_tree().get_nodes_in_group("focus_objects"):
 		if node.get_focus_owner():
 			_scene_focus = node.get_focus_owner()

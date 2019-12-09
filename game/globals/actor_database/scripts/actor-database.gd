@@ -92,3 +92,8 @@ func lookup_portrait(actor_ref, expression="neutral"):
 	var portrait = _actors[actor_ref].expressions[expression]
 	
 	return portrait
+
+#-------------------------------------------------------------------------------
+
+func provide_actor_object(actor_ref):
+	return _actors[actor_ref].actor_scene.instance()

@@ -4,10 +4,10 @@
 [ext_resource path="res://actors/jobs/test_job.tres" type="Resource" id=2]
 [ext_resource path="res://assets/sprites/test_ally.png" type="Texture" id=3]
 
-[node name="TestAlly001" index="0" groups=[
+[node name="TestAlly002" index="0" groups=[
 "party",
 ] instance=ExtResource( 1 )]
-reference = "test_ally_001"
+reference = "test_ally_002"
 
 [node name="Job" parent="." index="1"]
 job_loadout = ExtResource( 2 )

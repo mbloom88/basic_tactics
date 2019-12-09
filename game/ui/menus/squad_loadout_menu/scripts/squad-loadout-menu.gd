@@ -42,6 +42,8 @@ func _process(delta):
 #-------------------------------------------------------------------------------
 
 func _ready():
+	_update_squad_count()
+	
 	_state_stack.push_front($State/Idle)
 	_current_state = _state_stack[0]
 	_change_state('interact')
@@ -67,6 +69,12 @@ func _change_state(state_name):
 		_current_state._enter(self)
 	
 	emit_signal("state_changed", self, state_name)
+
+#-------------------------------------------------------------------------------
+
+func _update_squad_count():
+	_squad_cap.text = 'Squad Capacity: %d/%d' % [PartyDatabase.squad_count,
+		PartyDatabase.squad_limit]
 
 ################################################################################
 # PUBLIC METHODS
@@ -96,5 +104,4 @@ func _on_Squadie_just_toggled(button, actor_ref):
 			button.icon = red
 			PartyDatabase.update_squadie_status(actor_ref, 'remove')
 	
-	_squad_cap.text = 'Squad Capacity: %d/%d' % [PartyDatabase.squad_count,
-			PartyDatabase.squad_limit]
+	_update_squad_count()

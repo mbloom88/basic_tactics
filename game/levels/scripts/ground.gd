@@ -3,7 +3,11 @@ Base 'Ground' scene.
 """
 extends TileMap
 
+# Signals
+onready var _blinking_tiles = $BlinkingTiles
+
 # Tile info
+export (PackedScene) var blinking_tile
 var _used_map_cells = []
 var _used_world_cells = []
 
@@ -49,6 +53,19 @@ func _gather_cell_info():
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
+
+func blink_cells(cells):
+	for cell in cells:
+		var map_location = world_to_map(cell)
+		var world_location = map_to_world(map_location)
+		var blinking_cell = blinking_tile.instance()
+		
+		blinking_cell.position = world_location
+		_blinking_tiles.add_child(blinking_cell)
+		
+	get_tree().call_group('blinking_tiles', 'blink')
+
+#-------------------------------------------------------------------------------
 
 func determine_move_path(actor, direction):
 	"""

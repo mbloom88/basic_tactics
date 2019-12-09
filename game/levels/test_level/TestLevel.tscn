@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://levels/Level.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/tilesets/greybox_tiles.tres" type="TileSet" id=2]
@@ -10,21 +10,43 @@
 [ext_resource path="res://levels/prefabs/command_program/move_actor/MoveActor.tscn" type="PackedScene" id=8]
 [ext_resource path="res://levels/prefabs/command_program/configure_dialogue/ConfigureDialogue.tscn" type="PackedScene" id=9]
 [ext_resource path="res://levels/prefabs/command_program/start_dialogue/StartDialogue.tscn" type="PackedScene" id=10]
+[ext_resource path="res://levels/prefabs/command_program/trigger_battle/TriggerBattle.tscn" type="PackedScene" id=11]
 
-[node name="TestLevel" index="0" instance=ExtResource( 1 )]
+[node name="TestLevel" instance=ExtResource( 1 )]
 
-[node name="Camera" parent="." index="0"]
-position = Vector2( 0, 320 )
-
-[node name="Ground" parent="." index="1"]
+[node name="Ground" parent="." index="0"]
 tile_set = ExtResource( 2 )
 tile_data = PoolIntArray( 0, 0, 0, 1, 0, 1, 2, 0, 0, 3, 0, 1, 4, 0, 0, 65536, 0, 1, 65537, 0, 0, 65538, 0, 1, 65539, 0, 0, 65540, 0, 1, 131072, 0, 0, 131073, 0, 1, 131074, 0, 0, 131075, 0, 1, 131076, 0, 0, 196608, 0, 1, 196609, 0, 0, 196610, 0, 1, 196611, 0, 0, 196612, 0, 1, 262144, 0, 0, 262145, 0, 1, 262146, 0, 0, 262147, 0, 1, 262148, 0, 0 )
+
+[node name="Camera" parent="." index="1"]
+position = Vector2( 0, 320 )
+
+[node name="Actors" parent="." index="2"]
+editor/display_folded = true
 
 [node name="TestAlly001" parent="Actors" index="0" instance=ExtResource( 3 )]
 position = Vector2( 32, 272 )
 
 [node name="TestEnemy001" parent="Actors" index="1" instance=ExtResource( 4 )]
 position = Vector2( 288, 272 )
+
+[node name="Position001" type="Position2D" parent="AllyBattlePositions" index="0"]
+position = Vector2( 96, 16 )
+
+[node name="Position002" type="Position2D" parent="AllyBattlePositions" index="1"]
+position = Vector2( 224, 16 )
+
+[node name="Position003" type="Position2D" parent="AllyBattlePositions" index="2"]
+position = Vector2( 96, 80 )
+
+[node name="Position004" type="Position2D" parent="AllyBattlePositions" index="3"]
+position = Vector2( 160, 80 )
+
+[node name="Position005" type="Position2D" parent="AllyBattlePositions" index="4"]
+position = Vector2( 224, 80 )
+
+[node name="Debug" parent="." index="5"]
+editor/display_folded = true
 
 [node name="Intro" parent="CommandPrograms" index="0" instance=ExtResource( 5 )]
 _queue_free_on_completion = true
@@ -40,7 +62,7 @@ editor/display_folded = true
 _actor_scene_path = NodePath("../../../../TestLevel/Actors/TestAlly001")
 
 [node name="Position001" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 (001)" index="0"]
-position = Vector2( 32, 208 )
+position = Vector2( 32, 222.021 )
 
 [node name="Position002" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 (001)" index="1"]
 position = Vector2( 32, 144 )
@@ -77,7 +99,7 @@ _delay = 0.05
 
 [node name="Configure dialogue with TestEnemy001" parent="CommandPrograms/Intro" index="4" instance=ExtResource( 9 )]
 _dialogue_handler_scene_path = NodePath("../../../GUIs/DialogueHandler")
-_json_file = "res://sandbox/levels/test_level/dialogue/test_enemy_001.json"
+_json_file = "res://levels/test_level/dialogue/test_enemy_001.json"
 
 [node name="Delay 50 msec (002)" parent="CommandPrograms/Intro" index="5" instance=ExtResource( 7 )]
 _delay = 0.05
@@ -117,5 +139,9 @@ position = Vector2( 224, 16 )
 [node name="Position005" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 (002)" index="4"]
 position = Vector2( 160, 16 )
 
-[node name="Delay 1 sec (003)" parent="CommandPrograms/Intro" index="10" instance=ExtResource( 7 )]
+[node name="Delay 50 msec (003)" parent="CommandPrograms/Intro" index="10" instance=ExtResource( 7 )]
+_delay = 0.05
+
+[node name="Trigger battle with TestEnemy001" parent="CommandPrograms/Intro" index="11" instance=ExtResource( 11 )]
+_battle_handler_scene_path = NodePath("../../../GUIs/BattleHandler")
 
