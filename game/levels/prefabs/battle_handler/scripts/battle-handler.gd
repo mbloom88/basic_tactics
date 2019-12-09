@@ -5,13 +5,16 @@ signal ally_positions_requested()
 signal blink_cells_requested(cells)
 signal state_changed(state)
 
+# Child nodes
+onready var _active_panel = $ActiveActorPanel
+
 # State machine
 var _current_state = null
 var _state_stack = []
 
 onready var _state_map = {
 	'idle': $State/Idle,
-	'move_actors': $State/MoveActors,
+	'squad_placement': $State/SquadPlacement,
 }
 
 # Ally info
@@ -66,7 +69,7 @@ func _change_state(state_name):
 func register_battle_positions(positions):
 	_start_cells = positions
 	emit_signal('blink_cells_requested', _start_cells)
-	_change_state('move_actors')
+	_change_state('squad_placement')
 
 #-------------------------------------------------------------------------------
 

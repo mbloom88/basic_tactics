@@ -9,7 +9,9 @@ signal player_menu_requested(actor)
 # Child nodes
 onready var _camera = $Camera
 onready var _ground = $Ground
-onready var _actors = $Actors
+onready var _battlers = $Actors/Battlers
+onready var _non_battlers = $Actors/NonBattlers
+onready var _objects = $Actors/Objects
 onready var _ally_positions = $AllyBattlePositions
 onready var _battle_handler = $GUIs/BattleHandler
 onready var _cell_vectors = $Debug/CellVectors
@@ -22,16 +24,27 @@ onready var _command = $CommandPrograms
 func _ready():
 	_provide_debug_info()
 	
-	for actor in _actors.get_children():
-		actor.connect(
+	for battler in _battlers.get_children():
+		battler.connect(
 			"move_requested",
 			self,
 			"_on_Actor_move_requested")
-		actor.connect(
+		battler.connect(
 			'player_menu_requested',
 			self,
 			'_on_Actor_player_menu_requested')
-		_ground.update_actor_list(actor, 'add')
+		_ground.update_actor_list(battler, 'add')
+	
+	for non_battler in _non_battlers.get_children():
+		non_battler.connect(
+			"move_requested",
+			self,
+			"_on_Actor_move_requested")
+		non_battler.connect(
+			'player_menu_requested',
+			self,
+			'_on_Actor_player_menu_requested')
+		_ground.update_actor_list(non_battler, 'add')
 	
 	if _command.get_children():
 		_command.get_child(0).initialize()

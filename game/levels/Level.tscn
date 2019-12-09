@@ -42,6 +42,12 @@ blinking_tile = ExtResource( 4 )
 
 [node name="Actors" type="YSort" parent="."]
 
+[node name="Battlers" type="YSort" parent="Actors"]
+
+[node name="NonBattlers" type="YSort" parent="Actors"]
+
+[node name="Objects" type="YSort" parent="Actors"]
+
 [node name="AllyBattlePositions" type="Node2D" parent="."]
 
 [node name="GUIs" type="CanvasLayer" parent="."]

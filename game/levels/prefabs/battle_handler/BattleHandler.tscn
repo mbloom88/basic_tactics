@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://levels/prefabs/battle_handler/scripts/battle-handler.gd" type="Script" id=1]
 [ext_resource path="res://levels/prefabs/battle_handler/scripts/idle.gd" type="Script" id=2]
-[ext_resource path="res://levels/prefabs/battle_handler/scripts/move-actors.gd" type="Script" id=3]
+[ext_resource path="res://levels/prefabs/battle_handler/scripts/squad-placement.gd" type="Script" id=3]
 [ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=4]
-[ext_resource path="res://assets/gfx/test_portait.png" type="Texture" id=5]
+[ext_resource path="res://levels/prefabs/battle_handler/scripts/active-actor-panel.gd" type="Script" id=5]
+[ext_resource path="res://assets/gfx/test_portait.png" type="Texture" id=6]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 4 )
@@ -20,17 +21,17 @@ script = ExtResource( 1 )
 [node name="Idle" type="Node" parent="State"]
 script = ExtResource( 2 )
 
-[node name="MoveActors" type="Node" parent="State"]
+[node name="SquadPlacement" type="Node" parent="State"]
 script = ExtResource( 3 )
 
 [node name="ActiveActorPanel" type="NinePatchRect" parent="."]
-visible = false
 anchor_top = 1.0
 anchor_bottom = 1.0
 margin_top = -400.0
 margin_right = 600.0
 rect_min_size = Vector2( 600, 400 )
 texture = SubResource( 1 )
+script = ExtResource( 5 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ActiveActorPanel"]
 anchor_right = 1.0
@@ -42,7 +43,8 @@ margin_bottom = -10.0
 
 [node name="NeutralPortait" type="TextureRect" parent="ActiveActorPanel/HBoxContainer"]
 margin_right = 256.0
-margin_bottom = 380.0
+margin_bottom = 360.0
 rect_min_size = Vector2( 256, 360 )
-texture = ExtResource( 5 )
+texture = ExtResource( 6 )
+expand = true
 

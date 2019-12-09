@@ -11,7 +11,7 @@ first_name = "Test"
 nick_name = "Ally"
 last_name = "002"
 type = "ally"
-unlocked = false
+unlocked = true
 expressions = {
 "neutral": ExtResource( 2 )
 }
