@@ -10,6 +10,8 @@ actor_scene = ExtResource( 1 )
 first_name = "Test"
 nick_name = "Ally"
 last_name = "001"
+type = "ally"
+unlocked = true
 expressions = {
 "neutral": ExtResource( 2 )
 }

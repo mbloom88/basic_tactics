@@ -7,6 +7,7 @@ signal tracking_removed(actor)
 
 # Child nodes
 onready var _tween_move = $TweenMove
+onready var _cursor = $Cursor
 
 # Target info
 var _current_actor = null
@@ -41,7 +42,7 @@ func _input(event):
 func move_to_location(location, move_speed):
 	if not _current_action:
 		_current_action = 'move'
-		
+	
 	_tween_move.interpolate_property(
 		self,
 		'position',
@@ -62,9 +63,7 @@ func track_actor(actor):
 	_current_actor = actor
 	
 	_current_actor.connect(
-		'camera_move_requested',
-		self,
-		'_on_Actor_camera_move_requested')
+		'camera_move_requested', self, '_on_Actor_camera_move_requested')
 		
 	var location = _current_actor.position
 	_current_action = 'track'
@@ -73,13 +72,12 @@ func track_actor(actor):
 #-------------------------------------------------------------------------------
 
 func untrack_actor():
-	_current_actor.disconnect(
-		'camera_move_requested',
-		self,
-		'_on_Actor_camera_move_requested')
-	
+	if _current_actor:
+		_current_actor.disconnect(
+			'camera_move_requested', self, '_on_Actor_camera_move_requested')
+		_current_actor = null
+		
 	emit_signal('tracking_removed', _current_actor)
-	_current_actor = null
 
 ################################################################################
 # SIGNAL HANDLING

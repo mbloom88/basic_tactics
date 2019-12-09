@@ -22,7 +22,9 @@ outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
 font_data = SubResource( 2 )
 
-[node name="Actor" type="KinematicBody2D"]
+[node name="Actor" type="KinematicBody2D" groups=[
+"actors",
+]]
 script = ExtResource( 1 )
 
 [node name="State" type="Node" parent="."]

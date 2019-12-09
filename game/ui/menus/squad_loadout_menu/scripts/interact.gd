@@ -62,11 +62,5 @@ func _configure_squadies(host):
 				 host,
 				'_on_Squadie_update_portrait')
 			new_button.connect('just_toggled', host, '_on_Squadie_just_toggled')
-			
-			# Set "in squad" indicators
-			if squad[squadie]['in_squad']:
-				new_button.icon = host.green
-			else:
-				new_button.icon = host.red
 	
 	host._squad_names.get_child(0).grab_focus()

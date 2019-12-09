@@ -3,8 +3,8 @@ A database for looking up actor references.
 """
 extends Node
 
-# Actor references
-export (String, DIR) var _actor_reference_directory = ""
+# Ally references
+export (String, DIR) var _actor_ref_directory = ""
 var _actors = {}
 
 ################################################################################
@@ -25,10 +25,10 @@ func _load_actor_references():
 	actor information such as names and portraits.
 	"""
 	var dir = Directory.new()
-	assert dir.dir_exists(_actor_reference_directory)
+	assert dir.dir_exists(_actor_ref_directory)
 	
-	if not dir.open(_actor_reference_directory) == OK:
-		print("Could not read directory %s" % _actor_reference_directory)
+	if not dir.open(_actor_ref_directory) == OK:
+		print("Could not read directory %s" %_actor_ref_directory)
 	
 	dir.list_dir_begin()
 	var file_name = ""
@@ -43,7 +43,7 @@ func _load_actor_references():
 			continue
 		
 		_actors[file_name.get_basename()] = \
-			load(_actor_reference_directory.plus_file(file_name))
+			load(_actor_ref_directory.plus_file(file_name))
 
 ################################################################################
 # PUBLIC METHODS
@@ -95,5 +95,37 @@ func lookup_portrait(actor_ref, expression="neutral"):
 
 #-------------------------------------------------------------------------------
 
+func lookup_type(actor_ref):
+	return _actors[actor_ref]['type']
+
+#-------------------------------------------------------------------------------
+
+func lookup_unlocked(actor_ref):
+	return _actors[actor_ref]['unlocked']
+
+#-------------------------------------------------------------------------------
+
 func provide_actor_object(actor_ref):
 	return _actors[actor_ref].actor_scene.instance()
+
+#-------------------------------------------------------------------------------
+
+func provide_all_allies():
+	var allies = []
+	
+	for actor in _actors.keys():
+		if _actors[actor]['type'] == 'ally':
+			allies.append(actor)
+	
+	return allies
+
+#-------------------------------------------------------------------------------
+
+func provide_unlocked_allies():
+	var allies = []
+	
+	for actor in _actors.keys():
+		if _actors[actor]['type'] == 'ally' and _actors[actor]['unlocked']:
+			allies.append(actor)
+	
+	return allies

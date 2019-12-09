@@ -16,7 +16,6 @@ anchor_bottom = 1.0
 script = ExtResource( 1 )
 
 [node name="State" type="Node" parent="."]
-editor/display_folded = true
 
 [node name="Idle" type="Node" parent="State"]
 script = ExtResource( 2 )
@@ -25,6 +24,7 @@ script = ExtResource( 2 )
 script = ExtResource( 3 )
 
 [node name="ActiveActorPanel" type="NinePatchRect" parent="."]
+visible = false
 anchor_top = 1.0
 anchor_bottom = 1.0
 margin_top = -400.0

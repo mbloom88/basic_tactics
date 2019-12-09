@@ -7,7 +7,6 @@ signal state_changed(menu, state)
 onready var _squad_names = $HBoxContainer/ScrollContainer/SquadNames
 onready var _portrait = $HBoxContainer/VBoxContainer/HBoxContainer/NeutralPortrait
 onready var _stats = $HBoxContainer/VBoxContainer/HBoxContainer/ActorStats
-onready var _squad_cap = $HBoxContainer/VBoxContainer/SquadCapacity
 
 # Buttons
 export (PackedScene) var _squad_button
@@ -42,8 +41,6 @@ func _process(delta):
 #-------------------------------------------------------------------------------
 
 func _ready():
-	_update_squad_count()
-	
 	_state_stack.push_front($State/Idle)
 	_current_state = _state_stack[0]
 	_change_state('interact')
@@ -70,12 +67,6 @@ func _change_state(state_name):
 	
 	emit_signal("state_changed", self, state_name)
 
-#-------------------------------------------------------------------------------
-
-func _update_squad_count():
-	_squad_cap.text = 'Squad Capacity: %d/%d' % [PartyDatabase.squad_count,
-		PartyDatabase.squad_limit]
-
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
@@ -93,15 +84,4 @@ func _on_Squadie_update_portrait(actor_ref):
 #-------------------------------------------------------------------------------
 
 func _on_Squadie_just_toggled(button, actor_ref):
-	if PartyDatabase.provide_actor(actor_ref)['essential']:
-		return 
-	elif button.icon == red:
-		if PartyDatabase.squad_count < PartyDatabase.squad_limit:
-			button.icon = green
-			PartyDatabase.update_squadie_status(actor_ref, 'add')
-	else:
-		if PartyDatabase.squad_count > 0:
-			button.icon = red
-			PartyDatabase.update_squadie_status(actor_ref, 'remove')
-	
-	_update_squad_count()
+	pass

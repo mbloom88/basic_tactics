@@ -4,5 +4,5 @@
 
 [node name="ActorDatabase" type="Node"]
 script = ExtResource( 1 )
-_actor_reference_directory = "res://globals/actor_database/references"
+_actor_ref_directory = "res://globals/actor_database/references"
 
