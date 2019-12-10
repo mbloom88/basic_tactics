@@ -1,6 +1,7 @@
 extends Control
 
 # Signals 
+signal menu_requested(menu)
 signal new_game_requested
 signal state_changed(menu, state)
 

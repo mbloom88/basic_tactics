@@ -7,7 +7,6 @@ signal tracking_removed(actor)
 
 # Child nodes
 onready var _tween_move = $TweenMove
-onready var _cursor = $Cursor
 
 # Target info
 var _current_actor = null
