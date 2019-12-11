@@ -22,26 +22,26 @@ tile_data = PoolIntArray( 0, 0, 0, 1, 0, 1, 2, 0, 0, 3, 0, 1, 4, 0, 0, 65536, 0,
 [node name="Camera" parent="." index="1"]
 position = Vector2( 0, 320 )
 
+[node name="Battlers" parent="Actors" index="0"]
+editor/display_folded = true
+
 [node name="TestAlly001" parent="Actors/Battlers" index="0" instance=ExtResource( 3 )]
 position = Vector2( 32, 272 )
 
 [node name="TestEnemy001" parent="Actors/Battlers" index="1" instance=ExtResource( 4 )]
 position = Vector2( 288, 272 )
 
-[node name="AllyBattlePositions" parent="." index="3"]
-editor/display_folded = true
+[node name="KeyPosition" type="Position2D" parent="AllyBattlePositions" index="0"]
+position = Vector2( 160, 80 )
 
-[node name="Position001" type="Position2D" parent="AllyBattlePositions" index="0"]
-position = Vector2( 96, 16 )
+[node name="Position001" type="Position2D" parent="AllyBattlePositions" index="1"]
+position = Vector2( 96, 17 )
 
-[node name="Position002" type="Position2D" parent="AllyBattlePositions" index="1"]
+[node name="Position002" type="Position2D" parent="AllyBattlePositions" index="2"]
 position = Vector2( 224, 16 )
 
-[node name="Position003" type="Position2D" parent="AllyBattlePositions" index="2"]
+[node name="Position003" type="Position2D" parent="AllyBattlePositions" index="3"]
 position = Vector2( 96, 80 )
-
-[node name="Position004" type="Position2D" parent="AllyBattlePositions" index="3"]
-position = Vector2( 160, 80 )
 
 [node name="Position005" type="Position2D" parent="AllyBattlePositions" index="4"]
 position = Vector2( 224, 80 )

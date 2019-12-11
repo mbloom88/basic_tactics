@@ -35,13 +35,15 @@ func _check_actions(host):
 			_ally_index = _max_index
 		else:
 			_ally_index -= 1
+		host._active_panel.load_portrait(_active_allies[_ally_index])
 	elif Input.is_action_just_pressed("ui_right"):
 		if _ally_index == _max_index:
 			_ally_index = 0
 		else:
 			_ally_index += 1
-
-	host._active_panel.load_portrait(_active_allies[_ally_index])
+		host._active_panel.load_portrait(_active_allies[_ally_index])
+	elif Input.is_action_just_pressed("ui_accept"):
+		pass
 
 #-------------------------------------------------------------------------------
 

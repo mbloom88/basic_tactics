@@ -1,5 +1,8 @@
 extends Node
 
+# Signals
+signal stats_initialized
+
 # Stat info
 var max_health = 0
 var health = 0
@@ -28,6 +31,8 @@ func initialize(stats):
 	shields = stats.max_shields
 	aim = stats.aim
 	move = stats.move
+	
+	emit_signal('stats_initialized')
 
 #-------------------------------------------------------------------------------
 

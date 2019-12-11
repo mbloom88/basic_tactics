@@ -12,6 +12,11 @@ func hide_gui():
 
 #-------------------------------------------------------------------------------
 
+func load_actor_stats(actor_ref):
+	pass
+
+#-------------------------------------------------------------------------------
+
 func load_portrait(actor_ref):
 	_portrait.texture = ActorDatabase.lookup_portrait(actor_ref)
 
