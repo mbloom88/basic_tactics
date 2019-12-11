@@ -30,12 +30,12 @@ func _check_actions(host):
 			performed. Element 1 is the value associated with that action. 
 	"""
 	
-	if Input.is_action_just_pressed('menu_cycle_left'):
+	if Input.is_action_just_pressed('ui_left'):
 		if _ally_index == 0:
 			_ally_index = _max_index
 		else:
 			_ally_index -= 1
-	elif Input.is_action_just_pressed("menu_cycle_right"):
+	elif Input.is_action_just_pressed("ui_right"):
 		if _ally_index == _max_index:
 			_ally_index = 0
 		else:
