@@ -8,7 +8,8 @@ onready var _menu_delete_timer = $MenuDeleteTimer
 
 # Menu info
 export (PackedScene) var _main_menu
-export (PackedScene) var _player_menu
+export (PackedScene) var _player_world_menu
+export (PackedScene) var _player_battle_menu
 export (PackedScene) var _squad_loadout
 var _menu_queued_for_deletion = null
 
@@ -30,8 +31,11 @@ func _add_menu(menu):
 				self,
 				'_on_MainMenu_new_game_requested')
 			new_menu.connect('menu_requested', self, '_on_Menu_menu_requested')
-		'player':
-			new_menu = _player_menu.instance()
+		'player_world':
+			new_menu = _player_world_menu.instance()
+			new_menu.connect('menu_requested', self, '_on_Menu_menu_requested')
+		'player_battle':
+			new_menu = _player_battle_menu.instance()
 			new_menu.connect('menu_requested', self, '_on_Menu_menu_requested')
 		'squad_loadout':
 			new_menu = _squad_loadout.instance()
@@ -43,9 +47,19 @@ func _add_menu(menu):
 # PUBLIC METHODS
 ################################################################################
 
-func show_player_menu(actor):
+func show_player_menu(actor, type):
 	_actor_in_menu = actor
-	_add_menu('player')
+	match type:
+		'battle':
+			_add_menu('player_battle')
+		'world':
+			_add_menu('player_world')
+
+#-------------------------------------------------------------------------------
+
+func show_player_world_menu(actor):
+	_actor_in_menu = actor
+	_add_menu('player_world')
 
 #-------------------------------------------------------------------------------
 
@@ -67,10 +81,9 @@ func _on_Menu_menu_requested(menu):
 #-------------------------------------------------------------------------------
 
 func _on_Menu_state_changed(menu, state):
-	match state:
-		'exit':
-			_menu_queued_for_deletion = menu
-			_menu_delete_timer.start()
+	if state == 'exit':
+		_menu_queued_for_deletion = menu
+		_menu_delete_timer.start()
 
 #-------------------------------------------------------------------------------
 

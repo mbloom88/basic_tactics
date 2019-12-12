@@ -22,15 +22,13 @@ func hide_gui():
 
 #-------------------------------------------------------------------------------
 
-func load_actor_info(actor_ref):
-	var actor_name  = ActorDatabase.lookup_name(actor_ref)
-	var actors = get_tree().get_nodes_in_group('actors')
-	var info = {}
-	
-	for actor in actors:
-		if actor.reference == actor_ref:
-			info = actor.provide_job_info()
-			break
+func load_actor_info(actor):
+	"""
+	Args:
+		- actor (Object)
+	"""
+	var actor_name  = ActorDatabase.lookup_name(actor.reference)
+	var info = actor.provide_job_info()
 	
 	# Set name, level, job
 	if actor_name['nick']:
@@ -45,7 +43,7 @@ func load_actor_info(actor_ref):
 	_shields.update_info(info)
 	
 	# Set portrait
-	_portrait.texture = ActorDatabase.lookup_portrait(actor_ref)
+	_portrait.texture = ActorDatabase.lookup_portrait(actor.reference)
 
 #-------------------------------------------------------------------------------
 

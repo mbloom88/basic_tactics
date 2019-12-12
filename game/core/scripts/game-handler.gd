@@ -15,8 +15,8 @@ func _ready():
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Level_player_menu_requested(actor):
-	_menus.show_player_menu(actor)
+func _on_Level_player_menu_requested(actor, type):
+	_menus.show_player_menu(actor, type)
 
 #-------------------------------------------------------------------------------
 

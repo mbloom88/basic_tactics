@@ -28,6 +28,11 @@ func load_actor_info(actor_ref):
 
 #-------------------------------------------------------------------------------
 
+func show_active_ally_gui():
+	_active_panel.show_gui()
+
+#-------------------------------------------------------------------------------
+
 func show_ally_select_gui():
 	_active_panel.show_gui()
 	_squad_count.show_gui()

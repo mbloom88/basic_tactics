@@ -4,7 +4,7 @@ Base 'Level' scene.
 extends Node2D
 
 # Signals 
-signal player_menu_requested(actor)
+signal player_menu_requested(actor, type)
 
 # Child nodes
 onready var _camera = $Camera
@@ -55,8 +55,13 @@ func _on_Battleground_load_active_actor_info(actor_ref):
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_player_menu_requested(actor):
-	emit_signal("player_menu_requested", actor)
+func _on_Battleground_next_actor_in_turn():
+	_battle_gui.show_active_ally_gui()
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_player_menu_requested(actor, type):
+	emit_signal('player_menu_requested', actor, type)
 
 #-------------------------------------------------------------------------------
 

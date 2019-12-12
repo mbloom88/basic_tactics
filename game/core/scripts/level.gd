@@ -1,7 +1,7 @@
 extends Node
 
 # Signals
-signal player_menu_requested(actor)
+signal player_menu_requested(actor, type)
 
 # Level info
 export (PackedScene) var _new_game_level
@@ -31,5 +31,5 @@ func start_new_game():
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Level_player_menu_requested(actor):
-	emit_signal('player_menu_requested', actor)
+func _on_Level_player_menu_requested(actor, type):
+	emit_signal('player_menu_requested', actor, type)

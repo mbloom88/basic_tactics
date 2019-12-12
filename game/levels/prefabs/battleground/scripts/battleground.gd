@@ -8,7 +8,8 @@ signal allies_ready_for_placement
 signal ally_positions_requested
 signal begin_battle
 signal load_active_actor_info(actor_ref)
-signal player_menu_requested(actor)
+signal next_actor_in_turn
+signal player_menu_requested(actor, type)
 signal selection_update_requested(type)
 signal squad_update_requested
 signal state_changed(state)
@@ -160,12 +161,12 @@ func add_battle_camera(camera):
 
 #-------------------------------------------------------------------------------
 
-func add_battler(actor_ref):
+func add_battler(actor):
 	"""
 	Args:
-		- actor_ref (String)
+		- actor_ref (Object)
 	"""
-	_battlers.add_child(ActorDatabase.provide_actor_object(actor_ref))
+	_battlers.add_child(actor)
 
 #-------------------------------------------------------------------------------
 
@@ -305,7 +306,10 @@ func _on_Actor_move_requested(actor, direction):
 #-------------------------------------------------------------------------------
 
 func _on_Actor_player_menu_requested(actor):
-	emit_signal('player_menu_requested', actor)
+	if _current_state == _state_map['battle']:
+		emit_signal('player_menu_requested', actor, 'battle')
+	else:
+		emit_signal('player_menu_requested', actor, 'world')
 
 #-------------------------------------------------------------------------------
 

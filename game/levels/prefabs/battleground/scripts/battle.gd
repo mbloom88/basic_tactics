@@ -71,4 +71,6 @@ func _setup_for_next_turn(host):
 ################################################################################
 
 func _on_BattleCamera_tracking_added(host, actor):
+	host.emit_signal('load_active_actor_info', _current_battler)
+	host.emit_signal('next_actor_in_turn')
 	actor.activate()
