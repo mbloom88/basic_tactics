@@ -1,60 +1,26 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://levels/scripts/level.gd" type="Script" id=1]
-[ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=2]
-[ext_resource path="res://levels/scripts/ground.gd" type="Script" id=3]
-[ext_resource path="res://levels/prefabs/blinking_tile/BlinkingTile.tscn" type="PackedScene" id=4]
-[ext_resource path="res://levels/prefabs/camera/Camera.tscn" type="PackedScene" id=5]
-[ext_resource path="res://levels/prefabs/dialogue_handler/DialogueHandler.tscn" type="PackedScene" id=6]
-[ext_resource path="res://levels/prefabs/battle_handler/BattleHandler.tscn" type="PackedScene" id=7]
-[ext_resource path="res://levels/scripts/cell-vectors.gd" type="Script" id=8]
-
-[sub_resource type="TileSet" id=1]
-0/name = "greybox_tiles_spritesheet.png 0"
-0/texture = ExtResource( 2 )
-0/tex_offset = Vector2( 0, 0 )
-0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 192, 64 )
-0/tile_mode = 2
-0/autotile/icon_coordinate = Vector2( 0, 0 )
-0/autotile/tile_size = Vector2( 64, 64 )
-0/autotile/spacing = 0
-0/autotile/occluder_map = [  ]
-0/autotile/navpoly_map = [  ]
-0/autotile/z_index_map = [  ]
-0/occluder_offset = Vector2( 0, 0 )
-0/navigation_offset = Vector2( 0, 0 )
-0/shapes = [  ]
-0/z_index = 0
+[ext_resource path="res://levels/prefabs/battleground/Battleground.tscn" type="PackedScene" id=2]
+[ext_resource path="res://levels/prefabs/camera/Camera.tscn" type="PackedScene" id=3]
+[ext_resource path="res://levels/prefabs/dialogue_handler/DialogueHandler.tscn" type="PackedScene" id=4]
+[ext_resource path="res://levels/prefabs/battle_gui/BattleGUI.tscn" type="PackedScene" id=5]
+[ext_resource path="res://levels/scripts/cell-vectors.gd" type="Script" id=6]
 
 [node name="Level" type="Node2D"]
 script = ExtResource( 1 )
 
-[node name="Ground" type="TileMap" parent="."]
-tile_set = SubResource( 1 )
-format = 1
-script = ExtResource( 3 )
-blinking_tile = ExtResource( 4 )
+[node name="Battleground" parent="." instance=ExtResource( 2 )]
 
-[node name="BlinkingTiles" type="Node2D" parent="Ground"]
-
-[node name="Camera" parent="." instance=ExtResource( 5 )]
-
-[node name="Actors" type="YSort" parent="."]
-
-[node name="Battlers" type="YSort" parent="Actors"]
-
-[node name="NonBattlers" type="YSort" parent="Actors"]
-
-[node name="Objects" type="YSort" parent="Actors"]
+[node name="Camera" parent="." instance=ExtResource( 3 )]
 
 [node name="AllyBattlePositions" type="Node2D" parent="."]
 
 [node name="GUIs" type="CanvasLayer" parent="."]
 
-[node name="DialogueHandler" parent="GUIs" instance=ExtResource( 6 )]
+[node name="DialogueHandler" parent="GUIs" instance=ExtResource( 4 )]
 
-[node name="BattleHandler" parent="GUIs" instance=ExtResource( 7 )]
+[node name="BattleGUI" parent="GUIs" instance=ExtResource( 5 )]
 
 [node name="Debug" type="Control" parent="."]
 margin_right = 40.0
@@ -65,9 +31,13 @@ margin_bottom = 40.0
 ]]
 margin_right = 40.0
 margin_bottom = 40.0
-script = ExtResource( 8 )
+script = ExtResource( 6 )
 
 [node name="CommandPrograms" type="Node" parent="."]
 
-[connection signal="ally_positions_requested" from="GUIs/BattleHandler" to="." method="_on_BattleHandler_ally_positions_requested"]
-[connection signal="blink_cells_requested" from="GUIs/BattleHandler" to="." method="_on_BattleHandler_blink_cells_requested"]
+[connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]
+[connection signal="ally_positions_requested" from="Battleground" to="." method="_on_Battleground_ally_positions_requested"]
+[connection signal="load_active_actor_info" from="Battleground" to="." method="_on_Battleground_load_active_actor_info"]
+[connection signal="player_menu_requested" from="Battleground" to="." method="_on_Battleground_player_menu_requested"]
+
+[editable path="Battleground"]

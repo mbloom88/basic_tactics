@@ -39,6 +39,21 @@ func initialize(stats):
 func heal():
 	pass
 
+
+func provide_stats():
+	var stats = {
+		'max_health': max_health,
+		'health': health,
+		'max_armor': max_armor,
+		'armor': armor,
+		'max_shields': max_shields,
+		'shields': shields,
+		'aim': aim,
+		'move': move,
+	}
+	
+	return stats
+
 #-------------------------------------------------------------------------------
 
 func remove_modifier():

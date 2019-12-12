@@ -1,5 +1,6 @@
 extends "res://assets/scripts/state.gd"
 
+# Ally info
 var _active_allies = []
 var _ally_index = 0
 var _max_index = 0
@@ -10,12 +11,15 @@ var _max_index = 0
 
 func _enter(host):
 	host.set_process(false)
-	_gather_uninstantiated_allies(host)
+	_instantiate_selectable_allies(host)
 
 #-------------------------------------------------------------------------------
 
 func _update(host, delta):
-	_check_actions(host)
+	var action = _check_actions(host)
+	
+	if action:
+		return action
 
 ################################################################################
 # PRIVATE METHODS
@@ -23,31 +27,45 @@ func _update(host, delta):
 
 func _check_actions(host):
 	"""
-	Looks for user inputs corresponding to specific actions.
-	
-	Returns:
-		- action (Array): Two element array. Element 0 is the action to be
-			performed. Element 1 is the value associated with that action. 
+	Looks for user inputs corresponding to specific actions. 
 	"""
+	var action = ""
 	
 	if Input.is_action_just_pressed('ui_left'):
 		if _ally_index == 0:
 			_ally_index = _max_index
 		else:
 			_ally_index -= 1
-		host._active_panel.load_portrait(_active_allies[_ally_index])
+		host.emit_signal('load_active_actor_info', _active_allies[_ally_index])
 	elif Input.is_action_just_pressed("ui_right"):
 		if _ally_index == _max_index:
 			_ally_index = 0
 		else:
 			_ally_index += 1
-		host._active_panel.load_portrait(_active_allies[_ally_index])
+		host.emit_signal('load_active_actor_info', _active_allies[_ally_index])
 	elif Input.is_action_just_pressed("ui_accept"):
-		pass
+		var spawn = Vector2()
+	
+		for location in host._start_cells.keys():
+			if location == 'Spawn':
+				spawn = host._start_cells['Spawn']
+				break
+	
+		for actor in get_tree().get_nodes_in_group('actors'):
+			if actor.reference == _active_allies[_ally_index]:
+				actor.position = spawn
+				actor.modulate_alpha_channel('in', 'instant')
+				host._actor_to_place = actor
+				host.update_actors_on_grid(actor, 'remove')
+				break
+	
+		action = 'place'
+		
+	return action
 
 #-------------------------------------------------------------------------------
 
-func _gather_uninstantiated_allies(host):
+func _instantiate_selectable_allies(host):
 	var ally_refs = ActorDatabase.provide_unlocked_allies()
 	
 	for ally_ref in ally_refs:
@@ -60,11 +78,16 @@ func _gather_uninstantiated_allies(host):
 	
 	_active_allies = ally_refs
 	_max_index = len(_active_allies) - 1
-	_show_ally_select_gui(host)
+	
+	for ally_ref in _active_allies:
+		host.add_battler(ally_ref)
+	
+	host.emit_signal('allies_ready_for_placement')
 
-#-------------------------------------------------------------------------------
+################################################################################
+# PUBLIC METHODS
+################################################################################
 
-func _show_ally_select_gui(host):
-	host._active_panel.show_gui()
-	host._active_panel.load_portrait(_active_allies[0])
+func place_actors(host):
+	host.emit_signal('load_active_actor_info', _active_allies[0])
 	host.set_process(true)

@@ -1,8 +1,7 @@
 extends Node
 
 var _manager = null
-export (NodePath) var _battle_handler_scene_path
-var _battle_handler = null
+export (NodePath) var _battleground_scene_path
 
 ################################################################################
 # PUBLIC METHODS
@@ -21,6 +20,5 @@ func start(manager):
 	CommandConsole.update_command_log(text)
 	
 	_manager = manager
-	_battle_handler = get_node(_battle_handler_scene_path)	
-	_battle_handler.start_battle()
+	get_node(_battleground_scene_path).start_battle()
 	end()

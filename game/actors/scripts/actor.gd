@@ -4,6 +4,7 @@ Base 'Actor' scene.
 extends KinematicBody2D
 
 # Signals 
+signal alpha_modulate_completed
 signal camera_move_requested(location, move_speed)
 signal move_completed
 signal move_requested(actor, direction)
@@ -13,7 +14,7 @@ signal state_changed(state)
 # Child nodes
 onready var _job = $Job
 onready var _inv = $Inventory
-onready var _anim = $AnimationPlayer
+onready var _tween_alpha = $TweenAlpha
 onready var _tween_move = $TweenMove
 onready var _state_label = $Debug/StateLabel
 
@@ -30,6 +31,7 @@ onready var _state_map = {
 
 # Actor info
 export (String) var reference = "" setget , get_reference
+export (bool) var onready_invisible = true
 var script_running = false setget set_script_running, get_script_running
 
 ################################################################################
@@ -53,6 +55,9 @@ func _process(delta):
 #-------------------------------------------------------------------------------
 
 func _ready():
+	if onready_invisible:
+		modulate_alpha_channel('out', 'instant')
+	
 	_state_stack.push_front($State/Inactive)
 	_current_state = _state_stack[0]
 	_change_state('inactive')
@@ -101,19 +106,49 @@ func deactivate():
 
 #-------------------------------------------------------------------------------
 
-func fade_in():
+func modulate_alpha_channel(fade_type, mode, speed=0.5):
 	"""
-	Fades the actor into the scene.
+	Args:
+		- fade_type (String): The type of scene fade that the character will
+			perform.
+			* in: Character will fade into the scene.
+			* out: Character will fade out of the scene.
+		- mode (String): Determines whether the character will fade instantly
+			of over time.
+			* instant: Character fades instantly.
+			* slow: Character fades slowly over a set duration.
+		- speed (float): The speed at which the character fades into/from the
+			scene. Ignored if mode is set to 'instant.'
 	"""
-	_anim.play('fade-in')
-
-#-------------------------------------------------------------------------------
-
-func fade_out():
-	"""
-	Fades the actor out of the scene.
-	"""
-	_anim.play('fade-out')
+	var start_alpha = modulate
+	var end_alpha = modulate
+	
+	match [fade_type, mode]:
+		['in', 'instant']:
+			modulate.a = 1
+			emit_signal("alpha_modulate_completed")
+			return
+		['out', 'instant']:
+			modulate.a = 0
+			emit_signal("alpha_modulate_completed")
+			return
+		['in', 'slow']:
+			start_alpha.a = 0
+			end_alpha.a = 1
+		['out', 'slow']:
+			start_alpha.a = 1
+			end_alpha.a = 0
+	
+	_tween_alpha.interpolate_property(
+		self,
+		"modulate",
+		start_alpha,
+		end_alpha,
+		speed,
+		Tween.TRANS_LINEAR,
+		Tween.EASE_IN)
+	
+	_tween_alpha.start()
 
 #-------------------------------------------------------------------------------
 
@@ -140,6 +175,11 @@ func perform_scripted_move(next_direction, movement_type):
 		return
 	
 	_current_state.determine_next_cell(self, next_direction, movement_type)
+
+#-------------------------------------------------------------------------------
+
+func provide_job_info():
+	return _job.provide_job_info()
 
 #-------------------------------------------------------------------------------
 
@@ -203,3 +243,8 @@ func _on_TweenMove_tween_completed(object, key):
 	
 	if state_name:
 		_change_state(state_name)
+
+#-------------------------------------------------------------------------------
+
+func _on_TweenAlpha_tween_completed(object, key):
+	emit_signal("alpha_modulate_completed")

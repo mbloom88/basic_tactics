@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://actors/scripts/actor.gd" type="Script" id=1]
 [ext_resource path="res://actors/scripts/inactive.gd" type="Script" id=2]
@@ -7,11 +7,8 @@
 [ext_resource path="res://actors/scripts/menu.gd" type="Script" id=5]
 [ext_resource path="res://actors/scripts/job.gd" type="Script" id=6]
 [ext_resource path="res://actors/scripts/stats.gd" type="Script" id=7]
-[ext_resource path="res://actors/animations/SETUP.anim" type="Animation" id=8]
-[ext_resource path="res://actors/animations/fade-in.anim" type="Animation" id=9]
-[ext_resource path="res://actors/animations/fade-out.anim" type="Animation" id=10]
-[ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=11]
-[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=12]
+[ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=8]
+[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=9]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
@@ -54,15 +51,12 @@ script = ExtResource( 7 )
 
 [node name="Inventory" type="Node" parent="."]
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/SETUP = ExtResource( 8 )
-anims/fade-in = ExtResource( 9 )
-anims/fade-out = ExtResource( 10 )
+[node name="TweenAlpha" type="Tween" parent="."]
 
 [node name="TweenMove" type="Tween" parent="."]
 
 [node name="Skin" type="Sprite" parent="."]
-texture = ExtResource( 11 )
+texture = ExtResource( 8 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
@@ -83,7 +77,8 @@ grow_vertical = 2
 custom_fonts/font = SubResource( 3 )
 text = "State Label"
 align = 1
-script = ExtResource( 12 )
+script = ExtResource( 9 )
 
 [connection signal="stats_initialized" from="Job/Stats" to="Job" method="_on_Stats_stats_initialized"]
+[connection signal="tween_completed" from="TweenAlpha" to="." method="_on_TweenAlpha_tween_completed"]
 [connection signal="tween_completed" from="TweenMove" to="." method="_on_TweenMove_tween_completed"]

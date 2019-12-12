@@ -1,8 +1,10 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
-[ext_resource path="res://levels/prefabs/battle_handler/prefabs/active_actor_panel/scripts/active-actor-panel.gd" type="Script" id=1]
+[ext_resource path="res://levels/prefabs/battle_gui/prefabs/active_actor_panel/scripts/active-actor-panel.gd" type="Script" id=1]
 [ext_resource path="res://assets/gfx/test_portait.png" type="Texture" id=2]
 [ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=3]
+[ext_resource path="res://levels/prefabs/battle_gui/prefabs/active_actor_panel/scripts/stat-container.gd" type="Script" id=4]
+
 
 [sub_resource type="DynamicFontData" id=1]
 font_path = "res://assets/fonts/Roboto/Roboto-Black.ttf"
@@ -92,15 +94,16 @@ text = "ActorName"
 margin_top = 46.0
 margin_right = 480.0
 margin_bottom = 82.0
-text = "Level: 00 Job"
+text = "Level 00 -  Job"
 
 [node name="HPContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer"]
 margin_top = 92.0
 margin_right = 480.0
 margin_bottom = 132.0
 custom_constants/separation = 20
+script = ExtResource( 4 )
 
-[node name="HPLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/HPContainer"]
+[node name="StatLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/HPContainer"]
 margin_top = 2.0
 margin_right = 41.0
 margin_bottom = 38.0
@@ -116,7 +119,7 @@ texture_under = SubResource( 5 )
 texture_progress = SubResource( 6 )
 nine_patch_stretch = true
 
-[node name="HPValues" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/HPContainer"]
+[node name="ValueLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/HPContainer"]
 margin_left = 281.0
 margin_top = 2.0
 margin_right = 374.0
@@ -128,8 +131,10 @@ margin_top = 142.0
 margin_right = 480.0
 margin_bottom = 182.0
 custom_constants/separation = 20
+script = ExtResource( 4 )
+type = "armor"
 
-[node name="APLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ArmorContainer"]
+[node name="StatLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ArmorContainer"]
 margin_top = 2.0
 margin_right = 40.0
 margin_bottom = 38.0
@@ -145,7 +150,7 @@ texture_under = SubResource( 5 )
 texture_progress = SubResource( 6 )
 nine_patch_stretch = true
 
-[node name="APValues" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ArmorContainer"]
+[node name="ValueLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ArmorContainer"]
 margin_left = 280.0
 margin_top = 2.0
 margin_right = 373.0
@@ -157,8 +162,10 @@ margin_top = 192.0
 margin_right = 480.0
 margin_bottom = 232.0
 custom_constants/separation = 20
+script = ExtResource( 4 )
+type = "shields"
 
-[node name="SPLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ShieldContainer"]
+[node name="StatLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ShieldContainer"]
 margin_top = 2.0
 margin_right = 39.0
 margin_bottom = 38.0
@@ -174,7 +181,7 @@ texture_under = SubResource( 5 )
 texture_progress = SubResource( 6 )
 nine_patch_stretch = true
 
-[node name="ARValues" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ShieldContainer"]
+[node name="ValueLabel" type="Label" parent="HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ShieldContainer"]
 margin_left = 279.0
 margin_top = 2.0
 margin_right = 372.0

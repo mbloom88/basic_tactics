@@ -272,32 +272,28 @@ func _setup_dialogue_box():
 			_top_dialogue.box_alignment = _block_info['name_align']
 			_top_dialogue.portrait_alignment = _block_info['portrait_align']
 			_top_dialogue.update_portrait(portrait)
-			_top_dialogue.update_name_plate(name_info[0], name_info[2], \
-				name_info[1])
+			_top_dialogue.update_name_plate(name_info)
 			_top_dialogue.update_current_dialogue(_block_info['content'])
 			_play_dialogue()
 		['top', 'response']:
 			_top_response.box_alignment = _block_info['name_align']
 			_top_response.portrait_alignment = _block_info['portrait_align']
 			_top_response.update_portrait(portrait)
-			_top_response.update_name_plate(name_info[0], name_info[2], \
-				name_info[1])
+			_top_response.update_name_plate(name_info)
 			_top_response.update_responses(_responses)
 			_play_response()
 		['bottom', 'text']:
 			_bot_dialogue.box_alignment = _block_info['name_align']
 			_bot_dialogue.portrait_alignment = _block_info['portrait_align']
 			_bot_dialogue.update_portrait(portrait)
-			_bot_dialogue.update_name_plate(name_info[0], name_info[2], \
-				name_info[1])
+			_bot_dialogue.update_name_plate(name_info)
 			_bot_dialogue.update_current_dialogue(_block_info['content'])
 			_play_dialogue()
 		['bottom', 'response']:
 			_bot_response.box_alignment = _block_info['name_align']
 			_bot_response.portrait_alignment = _block_info['portrait_align']
 			_bot_response.update_portrait(portrait)
-			_bot_response.update_name_plate(name_info[0], name_info[2], \
-				name_info[1])
+			_bot_response.update_name_plate(name_info)
 			_bot_response.update_responses(_responses)
 			_play_response()
 

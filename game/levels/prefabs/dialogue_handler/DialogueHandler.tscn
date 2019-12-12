@@ -15,8 +15,6 @@ _character_display_speed = 0.025
 
 [node name="DialogueResponseTop" parent="." instance=ExtResource( 3 )]
 visible = false
-box_alignment = "top"
-portrait_alignment = "left"
 _button_spacing = 4
 
 [node name="DialogueBoxBot" parent="." instance=ExtResource( 2 )]
@@ -28,8 +26,6 @@ _character_display_speed = 0.025
 visible = false
 margin_top = 691.063
 margin_bottom = 1051.06
-box_alignment = "top"
-portrait_alignment = "left"
 _button_spacing = 4
 
 [connection signal="dialogue_finished" from="DialogueBoxTop" to="." method="_on_DialogueBox_dialogue_finished"]

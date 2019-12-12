@@ -45,11 +45,16 @@ func level_up():
 
 func provide_job_info():
 	var info = {
-		'name': job_loadout.name,
+		'job_name': job_loadout.name,
 		'level': level,
-		'current_exp': current_exp,
-		'exp_to_next_level': exp_to_next_level,
+		'exp_current_level': exp_current_level,
+		'exp_for_next_level': exp_for_next_level,
 	}
+	
+	var stats = _stats.provide_stats()
+	
+	for stat in stats:
+		info[stat] = stats[stat]
 	
 	return info
 

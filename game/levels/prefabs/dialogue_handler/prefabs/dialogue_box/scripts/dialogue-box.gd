@@ -123,11 +123,12 @@ func update_current_dialogue(dialogue):
 
 #-------------------------------------------------------------------------------
 
-func update_name_plate(first, last, nick=""):
-	if nick:
-		_name.text = "%s '%s' %s" % [first, nick, last]
+func update_name_plate(actor_name):
+	if actor_name['nick']:
+		_name.text = '%s "%s" %s' % [actor_name['first'], 
+			actor_name['nick'], actor_name['last']]
 	else:
-		_name.text = "%s %s" % [first, last]
+		_name.text = '%s %s' % [actor_name['first'], actor_name['last']]
 
 #-------------------------------------------------------------------------------
 

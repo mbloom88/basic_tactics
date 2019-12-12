@@ -54,21 +54,18 @@ func lookup_name(actor_ref):
 	Looks up an actor's name from its associated .tres file.
 	
 	Args:
-		- actor_ref (String): The actor's .tres file name.
+		- actor_ref (String): The Actor's .tres file name.
 	
 	Returns:
-		- name_info (Array): Contains the following Strings:
-			* name_info[0]: Actor's first name.
-			* name_info[1]: Actor's nick name.
-			* name_info[2]: Actor's last name.
+		- name_info (Dictionary): Actor name information.
 	"""
 	assert actor_ref in _actors
 	
-	var name_info = [
-		_actors[actor_ref].first_name,
-		_actors[actor_ref].nick_name,
-		_actors[actor_ref].last_name
-		]
+	var name_info = {
+		'first': _actors[actor_ref].first_name,
+		'nick': _actors[actor_ref].nick_name,
+		'last': _actors[actor_ref].last_name
+		}
 	
 	return name_info
 
