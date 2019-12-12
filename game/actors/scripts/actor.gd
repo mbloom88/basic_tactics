@@ -93,7 +93,10 @@ func activate():
 	"""
 	Sets the Actor to the 'idle' state. Doing so enables Actor input processing.
 	"""
-	_change_state('idle')
+	if ActorDatabase.lookup_type(reference) == 'enemy':
+		pass
+	else:
+		_change_state('idle')
 
 #-------------------------------------------------------------------------------
 

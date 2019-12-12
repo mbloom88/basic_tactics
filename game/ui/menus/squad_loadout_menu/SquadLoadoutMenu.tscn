@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://ui/menus/squad_loadout_menu/themes/squad-loadout-menu-theme.tres" type="Theme" id=1]
 [ext_resource path="res://ui/menus/squad_loadout_menu/scripts/squad-loadout-menu.gd" type="Script" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://ui/menus/squad_loadout_menu/scripts/interact.gd" type="Script" id=7]
 [ext_resource path="res://ui/menus/squad_loadout_menu/scripts/exit.gd" type="Script" id=8]
 [ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=9]
+[ext_resource path="res://assets/gfx/test_portait.png" type="Texture" id=10]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 9 )
@@ -84,6 +85,7 @@ margin_bottom = 360.0
 rect_min_size = Vector2( 256, 360 )
 size_flags_horizontal = 0
 size_flags_vertical = 0
+texture = ExtResource( 10 )
 expand = true
 
 [node name="ActorStats" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer"]

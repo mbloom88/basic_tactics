@@ -54,16 +54,9 @@ margin_top = -32.0
 margin_right = 73.5
 margin_bottom = 32.0
 
-[node name="SquadLoadout" type="Button" parent="Background/MenuButtons"]
+[node name="Inventory" type="Button" parent="Background/MenuButtons"]
 margin_right = 147.0
 margin_bottom = 30.0
-text = "Squad Loadout"
-
-[node name="Inventory" type="Button" parent="Background/MenuButtons"]
-margin_top = 34.0
-margin_right = 147.0
-margin_bottom = 64.0
 text = "Inventory"
 
-[connection signal="pressed" from="Background/MenuButtons/SquadLoadout" to="." method="_on_SquadLoadout_pressed"]
 [connection signal="pressed" from="Background/MenuButtons/Inventory" to="." method="_on_Inventory_pressed"]

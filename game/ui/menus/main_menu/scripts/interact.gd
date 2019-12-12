@@ -10,6 +10,6 @@ func _enter(host):
 		button.focus_mode = Control.FOCUS_ALL
 	
 	if host._current_focus == null:
-		host._current_focus = host._continue_button
+		host._current_focus = host._buttons.get_children()[0]
 
 	host._current_focus.grab_focus()

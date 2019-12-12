@@ -6,7 +6,6 @@ signal state_changed(menu, state)
 
 # Child nodes
 onready var _buttons = $Background/MenuButtons
-onready var _squad_button = $Background/MenuButtons/SquadLoadout
 
 # State machine
 var _current_state = null
@@ -73,9 +72,3 @@ func interact():
 
 func _on_Inventory_pressed():
 	pass # Replace with function body.
-
-#-------------------------------------------------------------------------------
-
-func _on_SquadLoadout_pressed():
-	emit_signal('menu_requested', 'squad_loadout')
-	_change_state('idle')

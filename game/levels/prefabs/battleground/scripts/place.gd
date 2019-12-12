@@ -23,6 +23,7 @@ func _check_actions(host):
 	var action = ""
 	var direction = Vector2()
 	
+	# Check user input actions
 	if Input.is_action_just_pressed('ui_up'):
 		direction = Vector2(0, -1)
 	elif Input.is_action_just_pressed('ui_down'):
@@ -33,14 +34,25 @@ func _check_actions(host):
 		direction = Vector2(1, 0)
 	elif Input.is_action_just_pressed("ui_accept"):
 		var map_position = host.world_to_map(host._actor_to_place.position)
-		if not host._check_obstacle(map_position):
+		var obstacle = host._check_obstacle(map_position)
+		if not obstacle:
 			host.update_actors_on_grid(host._actor_to_place, 'add')
+			PartyDatabase.allies_in_squad += 1
+			host.emit_signal('squad_update_requested')
 			action = 'previous'
 	elif Input.is_action_just_pressed('ui_cancel'):
 		host._actor_to_place.modulate_alpha_channel('out', 'instant')
 		host._actor_to_place.position = Vector2(0, 0)
+		
+		if host._actor_to_place in host._actors_on_grid:
+			PartyDatabase.allies_in_squad -= 1
+			host.emit_signal('squad_update_requested')
+			host.update_actors_on_grid(host._actor_to_place, 'remove')
+			host._actor_to_place = null
+		
 		action = 'previous'
 	
+	# If movement direction, move the actor
 	if direction:
 		var world_position = host._actor_to_place.position
 		var map_position = host.world_to_map(world_position)

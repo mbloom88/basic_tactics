@@ -37,7 +37,10 @@ script = ExtResource( 6 )
 
 [connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]
 [connection signal="ally_positions_requested" from="Battleground" to="." method="_on_Battleground_ally_positions_requested"]
+[connection signal="begin_battle" from="Battleground" to="." method="_on_Battleground_begin_battle"]
 [connection signal="load_active_actor_info" from="Battleground" to="." method="_on_Battleground_load_active_actor_info"]
 [connection signal="player_menu_requested" from="Battleground" to="." method="_on_Battleground_player_menu_requested"]
+[connection signal="selection_update_requested" from="Battleground" to="." method="_on_Battleground_selection_update_requested"]
+[connection signal="squad_update_requested" from="Battleground" to="." method="_on_Battleground_squad_update_requested"]
 
 [editable path="Battleground"]

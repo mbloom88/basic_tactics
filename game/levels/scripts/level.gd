@@ -44,6 +44,12 @@ func _on_Battleground_ally_positions_requested():
 
 #-------------------------------------------------------------------------------
 
+func _on_Battleground_begin_battle():
+	_battleground.add_battle_camera(_camera)
+	_battle_gui.hide_ally_select_gui()
+
+#-------------------------------------------------------------------------------
+
 func _on_Battleground_load_active_actor_info(actor_ref):
 	_battle_gui.load_actor_info(actor_ref)
 
@@ -51,6 +57,16 @@ func _on_Battleground_load_active_actor_info(actor_ref):
 
 func _on_Battleground_player_menu_requested(actor):
 	emit_signal("player_menu_requested", actor)
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_selection_update_requested(type):
+	_battle_gui.update_squad_status(type)
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_squad_update_requested():
+	_battle_gui.update_squad_count()
 
 ################################################################################
 # DEBUG

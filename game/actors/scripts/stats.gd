@@ -11,6 +11,7 @@ var armor = 0
 var max_shields = 0
 var shields = 0
 var aim = 0
+var speed = 0
 var move = 0
 
 ################################################################################
@@ -30,6 +31,7 @@ func initialize(stats):
 	max_shields = stats.max_shields
 	shields = stats.max_shields
 	aim = stats.aim
+	speed = stats.speed
 	move = stats.move
 	
 	emit_signal('stats_initialized')
@@ -49,6 +51,7 @@ func provide_stats():
 		'max_shields': max_shields,
 		'shields': shields,
 		'aim': aim,
+		'speed': speed,
 		'move': move,
 	}
 	

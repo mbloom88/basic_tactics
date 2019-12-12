@@ -4,11 +4,13 @@ Base 'Ground' scene.
 extends TileMap
 
 # Signals
-signal actor_placement_requested(actor_ref)
 signal allies_ready_for_placement
 signal ally_positions_requested
+signal begin_battle
 signal load_active_actor_info(actor_ref)
 signal player_menu_requested(actor)
+signal selection_update_requested(type)
+signal squad_update_requested
 signal state_changed(state)
 
 # Child nodes
@@ -25,6 +27,7 @@ onready var _state_map = {
 	'idle': $State/Idle,
 	'select': $State/Select,
 	'place': $State/Place,
+	'battle': $State/Battle,
 }
 
 # Tile info
@@ -36,6 +39,10 @@ var _used_world_cells = []
 var _actors_on_grid = []
 var _start_cells = {}
 var _actor_to_place = null
+
+# Battle parameters
+var _allowed_map_cells = []
+var _battle_camera = null
 
 ################################################################################
 # VIRTUAL METHODS
@@ -65,6 +72,22 @@ func _ready():
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
+
+func _add_blinking_tiles(cells):
+	"""
+	Args: 
+		- cells (Vector2): map coordinates
+	"""
+	for cell in cells:
+		var world_location = map_to_world(cell)
+		var blinking_cell = blinking_tile.instance()
+		
+		blinking_cell.position = world_location
+		_blinking_tiles.add_child(blinking_cell)
+		
+	get_tree().call_group('blinking_tiles', 'blink')
+
+#-------------------------------------------------------------------------------
 
 func _change_state(state_name):
 	if state_name != 'previous':
@@ -113,25 +136,36 @@ func _gather_cell_info():
 	for map_cell in _used_map_cells:
 		_used_world_cells.append(map_to_world(map_cell))
 
+#-------------------------------------------------------------------------------
+
+func _remove_blinking_tiles():
+	get_tree().call_group('blinking_tiles', 'stop_blinking')
+	
+	for tile in _blinking_tiles.get_children():
+		_blinking_tiles.remove_child(tile)
+		tile.queue_free()
+
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
 
-func add_battler(actor_ref):
-	_battlers.add_child(ActorDatabase.provide_actor_object(actor_ref))
+func add_battle_camera(camera):
+	"""
+	Args:
+		- camera (Camera2D)
+	"""
+	_battle_camera = camera
+	_battle_camera.connect('tracking_added', self, 
+		'_on_BattleCamera_tracking_added')
 
 #-------------------------------------------------------------------------------
 
-func blink_cells(cells):
-	for cell in cells:
-		var map_location = world_to_map(cell)
-		var world_location = map_to_world(map_location)
-		var blinking_cell = blinking_tile.instance()
-		
-		blinking_cell.position = world_location
-		_blinking_tiles.add_child(blinking_cell)
-		
-	get_tree().call_group('blinking_tiles', 'blink')
+func add_battler(actor_ref):
+	"""
+	Args:
+		- actor_ref (String)
+	"""
+	_battlers.add_child(ActorDatabase.provide_actor_object(actor_ref))
 
 #-------------------------------------------------------------------------------
 
@@ -153,12 +187,17 @@ func determine_move_path(actor, direction):
 	var current_map_cell = world_to_map(actor.position)
 	var new_map_cell = current_map_cell + direction
 	var obstacle = _check_obstacle(new_map_cell)
-		
-	if new_map_cell in _used_map_cells and not obstacle:
-		new_world_cell = map_to_world(new_map_cell)
-		
-		new_world_cell.x += cell_size.x * 0.50
-		new_world_cell.y += cell_size.y * 0.25
+	
+	if _current_state == _state_map['battle']:
+		if new_map_cell in _allowed_map_cells:
+			new_world_cell = map_to_world(new_map_cell)
+			new_world_cell.x += cell_size.x * 0.50
+			new_world_cell.y += cell_size.y * 0.25
+	else:
+		if new_map_cell in _used_map_cells and not obstacle:
+			new_world_cell = map_to_world(new_map_cell)
+			new_world_cell.x += cell_size.x * 0.50
+			new_world_cell.y += cell_size.y * 0.25
 	
 	return new_world_cell
 
@@ -167,6 +206,12 @@ func determine_move_path(actor, direction):
 func place_actors():
 	if _current_state.has_method('place_actors'):
 		_current_state.place_actors(self)
+
+#-------------------------------------------------------------------------------
+
+
+func provide_battlers():
+	return _battlers.get_children()
 
 #-------------------------------------------------------------------------------
 
@@ -192,16 +237,38 @@ func provide_used_cells(type):
 
 #-------------------------------------------------------------------------------
 
-func register_battle_positions(cells):
+func register_battle_positions(world_cells):
 	"""
 	Args:
-		- cells (Dictionary): Keys are the name of the world positions while 
-			values are the Vector2 world position values. Note that one of the
-			positions must be named 'Spawn'.
+		- world_cells (Dictionary): Keys are the name of the world coordinates
+			while values are the Vector2 world coordinate values. Note that one
+			of the positions must be named 'Spawn'.
 	"""
-	_start_cells = cells
-	blink_cells(_start_cells.values())
+	_start_cells = world_cells
+	var map_cells = []
+	
+	for world_cell in world_cells.values():
+		map_cells.append(world_to_map(world_cell))
+		
+	_add_blinking_tiles(map_cells)
 	_change_state('select')
+
+#-------------------------------------------------------------------------------
+
+func remove_battle_camera():
+	_battle_camera.disconnect('tracking_added', self,
+		'_on_BattleCamera_tracking_added')
+	_battle_camera = null
+
+#-------------------------------------------------------------------------------
+
+func remove_battler(actor):
+	"""
+	Args:
+		- actor (Object)
+	"""
+	_battlers.remove_child(actor)
+	actor.queue_free()
 
 #-------------------------------------------------------------------------------
 
@@ -239,3 +306,11 @@ func _on_Actor_move_requested(actor, direction):
 
 func _on_Actor_player_menu_requested(actor):
 	emit_signal('player_menu_requested', actor)
+
+#-------------------------------------------------------------------------------
+
+func _on_BattleCamera_tracking_added(actor):
+	if not _current_state.has_method('_on_BattleCamera_tracking_added'):
+		return
+
+	_current_state._on_BattleCamera_tracking_added(self, actor)
