@@ -49,6 +49,7 @@ script = ExtResource( 9 )
 [connection signal="actor_turn_finished" from="Battleground" to="." method="_on_Battleground_actor_turn_finished"]
 [connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]
 [connection signal="ally_positions_requested" from="Battleground" to="." method="_on_Battleground_ally_positions_requested"]
+[connection signal="battle_action_cancelled" from="Battleground" to="." method="_on_Battleground_battle_action_cancelled"]
 [connection signal="begin_battle" from="Battleground" to="." method="_on_Battleground_begin_battle"]
 [connection signal="load_active_actor_info" from="Battleground" to="." method="_on_Battleground_load_active_actor_info"]
 [connection signal="next_actor_in_turn" from="Battleground" to="." method="_on_Battleground_next_actor_in_turn"]

@@ -41,6 +41,7 @@ func initialize(stats):
 func heal():
 	pass
 
+#-------------------------------------------------------------------------------
 
 func provide_stats():
 	var stats = {
@@ -64,5 +65,5 @@ func remove_modifier():
 
 #-------------------------------------------------------------------------------
 
-func take_damage():
+func take_damage(weapon_stats):
 	pass

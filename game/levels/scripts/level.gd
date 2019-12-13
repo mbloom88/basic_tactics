@@ -47,6 +47,11 @@ func _on_Battleground_ally_positions_requested():
 
 #-------------------------------------------------------------------------------
 
+func _on_Battleground_battle_action_cancelled():
+	_guis.resume_last_menu()
+
+#-------------------------------------------------------------------------------
+
 func _on_Battleground_begin_battle():
 	_battleground.add_battle_camera(_camera)
 	_battle_gui.hide_ally_select_gui()

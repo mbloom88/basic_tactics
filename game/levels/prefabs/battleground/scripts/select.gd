@@ -82,7 +82,7 @@ func _check_actions(host):
 			action = 'place'
 	
 	elif Input.is_action_just_pressed('begin_battle'):
-		host._remove_blinking_tiles()
+		host._remove_blinking_cells()
 		
 		for actor in _active_allies:
 			if not actor in host._actors_on_grid:

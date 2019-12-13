@@ -6,6 +6,7 @@ extends TileMap
 # Signals
 signal allies_ready_for_placement
 signal ally_positions_requested
+signal battle_action_cancelled
 signal begin_battle
 signal load_active_actor_info(actor_ref)
 signal next_actor_in_turn
@@ -17,7 +18,7 @@ signal squad_update_requested
 signal state_changed(state)
 
 # Child nodes
-onready var _blinking_tiles = $BlinkingTiles
+onready var _blinking_cells = $BlinkingCells
 onready var _battlers = $Battlers
 onready var _non_battlers = $NonBattlers
 onready var _objects = $Objects
@@ -44,7 +45,8 @@ var _start_cells = {}
 var _actor_to_place = null
 
 # Battle parameters
-var _allowed_map_cells = []
+var _allowed_move_cells = []
+var _allowed_action_cells = []
 var _battle_camera = null
 
 ################################################################################
@@ -73,17 +75,17 @@ func _ready():
 # PRIVATE METHODS
 ################################################################################
 
-func _add_blinking_tiles(cells):
+func _add_blinking_cells(cells):
 	"""
 	Args: 
-		- cells (Vector2): map coordinates
+		- cells (Vector2): Map coordinates to place blinking cells at.
 	"""
 	for cell in cells:
 		var world_location = map_to_world(cell)
 		var blinking_cell = blinking_tile.instance()
 		
 		blinking_cell.position = world_location
-		_blinking_tiles.add_child(blinking_cell)
+		_blinking_cells.add_child(blinking_cell)
 		
 	get_tree().call_group('blinking_tiles', 'blink')
 
@@ -138,11 +140,11 @@ func _gather_cell_info():
 
 #-------------------------------------------------------------------------------
 
-func _remove_blinking_tiles():
+func _remove_blinking_cells():
 	get_tree().call_group('blinking_tiles', 'stop_blinking')
 	
-	for tile in _blinking_tiles.get_children():
-		_blinking_tiles.remove_child(tile)
+	for tile in _blinking_cells.get_children():
+		_blinking_cells.remove_child(tile)
 		tile.queue_free()
 
 ################################################################################
@@ -189,7 +191,7 @@ func determine_move_path(actor, direction):
 	var obstacle = _check_obstacle(new_map_cell)
 	
 	if _current_state == _state_map['battle']:
-		if new_map_cell in _allowed_map_cells:
+		if new_map_cell in _allowed_move_cells:
 			new_world_cell = map_to_world(new_map_cell)
 			new_world_cell.x += cell_size.x * 0.50
 			new_world_cell.y += cell_size.y * 0.25
@@ -204,13 +206,8 @@ func determine_move_path(actor, direction):
 #-------------------------------------------------------------------------------
 
 func next_battler():
-	emit_signal('actor_turn_finished')
-	_remove_blinking_tiles()
-	
-	if not _current_state.has_method('setup_for_next_turn'):
-		return
-	
-	_current_state.setup_for_next_turn(self)
+	if _current_state == _state_map['battle']:
+		_current_state.setup_for_next_turn(self)
 
 #-------------------------------------------------------------------------------
 
@@ -260,7 +257,7 @@ func register_battle_positions(world_cells):
 	for world_cell in world_cells.values():
 		map_cells.append(world_to_map(world_cell))
 		
-	_add_blinking_tiles(map_cells)
+	_add_blinking_cells(map_cells)
 	_change_state('select')
 
 #-------------------------------------------------------------------------------

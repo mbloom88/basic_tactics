@@ -39,6 +39,12 @@ func _add_menu(menu):
 # PUBLIC METHODS
 ################################################################################
 
+func resume_last_menu():
+	if _menus.get_child_count() > 0:
+		_menus.get_children().back().interact()
+
+#-------------------------------------------------------------------------------
+
 func show_player_battle_menu(actor):
 	_actor_in_menu = actor
 	_add_menu('player_battle')
@@ -97,5 +103,4 @@ func _on_Menu_state_changed(menu, state):
 		if _actor_in_menu:
 			_actor_in_menu.resume_from_player_menu()
 		
-		if _menus.get_child_count() > 0:
-			_menus.get_child(get_child_count() - 1).interact()
+		resume_last_menu()
