@@ -8,12 +8,12 @@ signal allies_ready_for_placement
 signal ally_positions_requested
 signal battle_action_cancelled
 signal begin_battle
+signal hide_active_actor_gui_requested
 signal load_active_actor_info(actor_ref)
-signal next_actor_in_turn
-signal actor_turn_finished
 signal player_battle_menu_requested(actor)
 signal player_world_menu_requested(actor)
 signal selection_update_requested(type)
+signal show_active_actor_gui_requested
 signal squad_update_requested
 signal state_changed(state)
 

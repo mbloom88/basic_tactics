@@ -46,16 +46,16 @@ script = ExtResource( 9 )
 
 [node name="CommandPrograms" type="Node" parent="."]
 
-[connection signal="actor_turn_finished" from="Battleground" to="." method="_on_Battleground_actor_turn_finished"]
 [connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]
 [connection signal="ally_positions_requested" from="Battleground" to="." method="_on_Battleground_ally_positions_requested"]
 [connection signal="battle_action_cancelled" from="Battleground" to="." method="_on_Battleground_battle_action_cancelled"]
 [connection signal="begin_battle" from="Battleground" to="." method="_on_Battleground_begin_battle"]
+[connection signal="hide_active_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_hide_active_actor_gui_requested"]
 [connection signal="load_active_actor_info" from="Battleground" to="." method="_on_Battleground_load_active_actor_info"]
-[connection signal="next_actor_in_turn" from="Battleground" to="." method="_on_Battleground_next_actor_in_turn"]
 [connection signal="player_battle_menu_requested" from="Battleground" to="." method="_on_Battleground_player_battle_menu_requested"]
 [connection signal="player_world_menu_requested" from="Battleground" to="." method="_on_Battleground_player_world_menu_requested"]
 [connection signal="selection_update_requested" from="Battleground" to="." method="_on_Battleground_selection_update_requested"]
+[connection signal="show_active_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_show_active_actor_gui_requested"]
 [connection signal="squad_update_requested" from="Battleground" to="." method="_on_Battleground_squad_update_requested"]
 [connection signal="player_attacking" from="GUIs" to="." method="_on_GUIs_player_attacking"]
 [connection signal="player_waiting" from="GUIs" to="." method="_on_GUIs_player_waiting"]

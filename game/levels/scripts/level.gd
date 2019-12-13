@@ -26,7 +26,7 @@ func _ready():
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Battleground_actor_turn_finished():
+func _on_Battleground_hide_active_actor_gui_requested():
 	_battle_gui.hide_active_actor_gui()
 
 #-------------------------------------------------------------------------------
@@ -63,11 +63,6 @@ func _on_Battleground_load_active_actor_info(actor_ref):
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_next_actor_in_turn():
-	_battle_gui.show_active_actor_gui()
-
-#-------------------------------------------------------------------------------
-
 func _on_Battleground_player_battle_menu_requested(actor):
 	_guis.show_player_battle_menu(actor)
 
@@ -80,6 +75,11 @@ func _on_Battleground_player_world_menu_requested(actor):
 
 func _on_Battleground_selection_update_requested(type):
 	_battle_gui.update_squad_status(type)
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_show_active_actor_gui_requested():
+	_battle_gui.show_active_actor_gui()
 
 #-------------------------------------------------------------------------------
 
