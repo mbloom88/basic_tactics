@@ -14,9 +14,10 @@ signal state_changed(state)
 
 # Child nodes
 onready var _job = $Job
-onready var _inv = $Inventory
+onready var _inventory = $Inventory
 onready var _tween_alpha = $TweenAlpha
 onready var _tween_move = $TweenMove
+onready var _cursor = $BattleCursor
 onready var _state_label = $Debug/StateLabel
 
 # State machine
@@ -56,6 +57,8 @@ func _process(delta):
 #-------------------------------------------------------------------------------
 
 func _ready():
+	hide_battle_cursor()
+	
 	if onready_invisible:
 		modulate_alpha_channel('out', 'instant')
 	
@@ -108,6 +111,11 @@ func deactivate():
 	processing.
 	"""
 	_change_state('inactive')
+
+#-------------------------------------------------------------------------------
+
+func hide_battle_cursor():
+	_cursor.visible = false
 
 #-------------------------------------------------------------------------------
 
@@ -188,6 +196,11 @@ func provide_job_info():
 
 #-------------------------------------------------------------------------------
 
+func provide_weapon():
+	return _inventory.provide_weapon()
+
+#-------------------------------------------------------------------------------
+
 func resume_from_player_menu():
 	"""
 	Commands the Actor to resume processing after exiting from the Player Menu.
@@ -210,6 +223,11 @@ func scripted_state_change(new_state):
 		script_running = true
 		
 	_change_state(new_state)
+
+#-------------------------------------------------------------------------------
+
+func show_battle_cursor():
+	_cursor.visible = true
 
 #-------------------------------------------------------------------------------
 

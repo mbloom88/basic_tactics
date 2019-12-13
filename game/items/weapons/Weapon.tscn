@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://items/weapons/scripts/weapon.gd" type="Script" id=1]
+[ext_resource path="res://items/weapons/scripts/stats.gd" type="Script" id=2]
+
+[node name="Weapon" type="Sprite"]
+script = ExtResource( 1 )
+
+[node name="Stats" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[connection signal="stats_initialized" from="Stats" to="." method="_on_Stats_stats_initialized"]

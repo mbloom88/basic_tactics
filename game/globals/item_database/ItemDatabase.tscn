@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://globals/item_database/scripts/item-database.gd" type="Script" id=1]
+
+[node name="ItemDatabase" type="Node"]
+script = ExtResource( 1 )
+_weapon_directory = "res://globals/item_database/weapons"
+

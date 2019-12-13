@@ -84,7 +84,7 @@ func _on_Battleground_squad_update_requested():
 #-------------------------------------------------------------------------------
 
 func _on_GUIs_player_attacking():
-	pass # Replace with function body.
+	_battleground.search_for_attack_targets()
 
 #-------------------------------------------------------------------------------
 

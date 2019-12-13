@@ -29,7 +29,7 @@ func check_actions():
 	"""
 	var action = []
 	
-	if Input.is_action_just_pressed('player_menu'):
+	if Input.is_action_just_pressed('ui_accept'):
 		action = ['menu', null]
 	elif Input.is_action_pressed("move_up"):
 		action = ['move', Vector2(0, -1)]

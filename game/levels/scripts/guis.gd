@@ -64,14 +64,38 @@ func _on_Menu_player_attacking():
 #-------------------------------------------------------------------------------
 
 func _on_Menu_player_waiting():
+	_actor_in_menu = null
 	emit_signal('player_waiting')
 
 #-------------------------------------------------------------------------------
 
 func _on_Menu_state_changed(menu, state):
+	match menu:
+		'player_world':
+			menu.disconnect('menu_requested', self, '_on_Menu_menu_requested')
+		'player_battle':
+			menu.disconnect('menu_requested', self, '_on_Menu_menu_requested')
+			menu.disconnect('player_attacking', self,
+				 '_on_Menu_player_attacking')
+			menu.disconnect('player_waiting', self, '_on_Menu_player_waiting')
+	
 	if state == 'exit':
+		match menu:
+			'player_world':
+				menu.disconnect('menu_requested', self,
+					'_on_Menu_menu_requested')
+			'player_battle':
+				menu.disconnect('menu_requested', self, 
+					'_on_Menu_menu_requested')
+				menu.disconnect('player_attacking', self,
+					 '_on_Menu_player_attacking')
+				menu.disconnect('player_waiting', self, 
+					'_on_Menu_player_waiting')
 		_menus.remove_child(menu)
 		menu.queue_free()
+		
+		if _actor_in_menu:
+			_actor_in_menu.resume_from_player_menu()
 		
 		if _menus.get_child_count() > 0:
 			_menus.get_child(get_child_count() - 1).interact()

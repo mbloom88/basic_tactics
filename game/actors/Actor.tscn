@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://actors/scripts/actor.gd" type="Script" id=1]
 [ext_resource path="res://actors/scripts/inactive.gd" type="Script" id=2]
@@ -7,8 +7,10 @@
 [ext_resource path="res://actors/scripts/menu.gd" type="Script" id=5]
 [ext_resource path="res://actors/scripts/job.gd" type="Script" id=6]
 [ext_resource path="res://actors/scripts/stats.gd" type="Script" id=7]
-[ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=8]
-[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=9]
+[ext_resource path="res://actors/scripts/inventory.gd" type="Script" id=8]
+[ext_resource path="res://assets/sprites/cursor.png" type="Texture" id=9]
+[ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=10]
+[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=11]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
@@ -50,13 +52,23 @@ script = ExtResource( 7 )
 [node name="Skills" type="Node" parent="Job"]
 
 [node name="Inventory" type="Node" parent="."]
+script = ExtResource( 8 )
+
+[node name="Weapon1" type="Node" parent="Inventory"]
+
+[node name="Weapon2" type="Node" parent="Inventory"]
 
 [node name="TweenAlpha" type="Tween" parent="."]
 
 [node name="TweenMove" type="Tween" parent="."]
 
+[node name="BattleCursor" type="Sprite" parent="."]
+position = Vector2( 0, 16 )
+scale = Vector2( 1.25, 1.25 )
+texture = ExtResource( 9 )
+
 [node name="Skin" type="Sprite" parent="."]
-texture = ExtResource( 8 )
+texture = ExtResource( 10 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
@@ -77,7 +89,7 @@ grow_vertical = 2
 custom_fonts/font = SubResource( 3 )
 text = "State Label"
 align = 1
-script = ExtResource( 9 )
+script = ExtResource( 11 )
 
 [connection signal="stats_initialized" from="Job/Stats" to="Job" method="_on_Stats_stats_initialized"]
 [connection signal="tween_completed" from="TweenAlpha" to="." method="_on_TweenAlpha_tween_completed"]

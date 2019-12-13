@@ -2,6 +2,10 @@ extends "res://assets/scripts/state.gd"
 
 var _turn_order = []
 var _current_battler = null
+var _current_weapon = null
+var _valid_targets = []
+var _max_target_index = 0
+var _target_index = 0
 
 ################################################################################
 # CLASSES
@@ -25,9 +29,36 @@ func _enter(host):
 	host.emit_signal('begin_battle')
 	_determine_turn_order(host)
 
+#-------------------------------------------------------------------------------
+
+func _update(host, delta):
+	_check_targets()
+
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
+
+func _check_targets():
+	var action = ""
+	
+	if Input.is_action_just_pressed("move_left"):
+		_valid_targets[_target_index].hide_battle_cursor()
+		if _target_index > 0:
+			_target_index -= 1
+		else:
+			_target_index = _max_target_index
+		_valid_targets[_target_index].show_battle_cursor()
+	elif Input.is_action_just_pressed("move_right"):
+		_valid_targets[_target_index].hide_battle_cursor()
+		if _target_index < _max_target_index:
+			_target_index += 1
+		else:
+			_target_index = 0
+		_valid_targets[_target_index].show_battle_cursor()
+	elif Input.is_action_just_pressed('ui_cancel'):
+		_valid_targets[_target_index].hide_battle_cursor()
+
+#-------------------------------------------------------------------------------
 
 func _determine_turn_order(host):
 	_turn_order = host.provide_battlers()
@@ -38,8 +69,23 @@ func _determine_turn_order(host):
 # PUBLIC METHODS
 ################################################################################
 
-func search_for_attack_targets():
-	pass
+func search_for_attack_targets(host, battlers):
+	"""
+	Args:
+		- battlers (Array): Array of Battler objects.
+	"""
+	var attack_range = _current_weapon.provide_stats()['attack_range']
+	for battler in battlers:
+		var battler_type = ActorDatabase.lookup_type(battler.reference)
+		if battler_type != _current_battler.reference:
+			_valid_targets.append(battler)
+	
+	_max_target_index = len(_valid_targets) - 1
+	_target_index = 0
+	
+	print(_valid_targets)
+	
+	host.set_process(true)
 
 #-------------------------------------------------------------------------------
 
@@ -47,12 +93,14 @@ func setup_for_next_turn(host):
 	if _current_battler:
 		_current_battler.deactivate()
 		_current_battler = null
+		_current_weapon = null
 	
 	if _turn_order.empty():
 		_determine_turn_order(host)
 		return
 	
 	_current_battler = _turn_order.pop_front()
+	_current_weapon = _current_battler.provide_weapon()
 	
 	# Determine allowed move cells
 	var move_stat = _current_battler.provide_job_info()['move']

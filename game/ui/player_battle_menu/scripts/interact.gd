@@ -13,6 +13,7 @@ func _enter(host):
 		host._current_focus = host._buttons.get_children()[0]
 
 	host._current_focus.grab_focus()
+	host.visible = true
 	host.set_process(true)
 
 #-------------------------------------------------------------------------------

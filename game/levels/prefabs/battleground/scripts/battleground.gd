@@ -283,10 +283,8 @@ func remove_battler(actor):
 #-------------------------------------------------------------------------------
 
 func search_for_attack_targets():
-	if not _current_state.has_method('search_for_attack_targets'):
-		return
-	
-	_current_state.search_for_attack_targets()
+	if _current_state == _state_map['battle']:
+		_current_state.search_for_attack_targets(self, _battlers.get_children())
 
 #-------------------------------------------------------------------------------
 
