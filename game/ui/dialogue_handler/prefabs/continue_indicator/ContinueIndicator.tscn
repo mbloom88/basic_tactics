@@ -1,0 +1,57 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=1]
+[ext_resource path="res://ui/dialogue_handler/prefabs/continue_indicator/animations/SETUP.anim" type="Animation" id=2]
+[ext_resource path="res://ui/dialogue_handler/prefabs/continue_indicator/animations/blink.anim" type="Animation" id=3]
+[ext_resource path="res://ui/dialogue_handler/prefabs/continue_indicator/animations/invisible.anim" type="Animation" id=4]
+
+
+
+
+
+
+
+
+[sub_resource type="AtlasTexture" id=1]
+atlas = ExtResource( 1 )
+region = Rect2( 64, 0, 64, 64 )
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends TextureRect
+
+# Child nodes
+onready var _anim = $AnimationPlayer
+
+################################################################################
+# VIRTUAL METHODS
+################################################################################
+
+func _ready():
+	invisible()
+
+################################################################################
+# PUBLIC METHODS
+################################################################################
+
+func blink():
+	_anim.play(\"blink\")
+
+#-------------------------------------------------------------------------------
+
+func invisible():
+	_anim.play(\"invisible\")
+"
+
+[node name="ContinueIndicator" type="TextureRect"]
+margin_right = 64.0
+margin_bottom = 64.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = SubResource( 1 )
+script = SubResource( 2 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/SETUP = ExtResource( 2 )
+anims/blink = ExtResource( 3 )
+anims/invisible = ExtResource( 4 )
+

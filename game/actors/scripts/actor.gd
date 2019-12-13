@@ -9,6 +9,7 @@ signal camera_move_requested(location, move_speed)
 signal move_completed
 signal move_requested(actor, direction)
 signal player_menu_requested(actor)
+signal enemy_ai_waiting
 signal state_changed(state)
 
 # Child nodes
@@ -94,7 +95,8 @@ func activate():
 	Sets the Actor to the 'idle' state. Doing so enables Actor input processing.
 	"""
 	if ActorDatabase.lookup_type(reference) == 'enemy':
-		pass
+		yield(get_tree().create_timer(1), 'timeout')
+		emit_signal('enemy_ai_waiting')
 	else:
 		_change_state('idle')
 

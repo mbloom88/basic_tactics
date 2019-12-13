@@ -9,7 +9,9 @@ signal ally_positions_requested
 signal begin_battle
 signal load_active_actor_info(actor_ref)
 signal next_actor_in_turn
-signal player_menu_requested(actor, type)
+signal actor_turn_finished
+signal player_battle_menu_requested(actor)
+signal player_world_menu_requested(actor)
 signal selection_update_requested(type)
 signal squad_update_requested
 signal state_changed(state)
@@ -61,9 +63,6 @@ func _ready():
 	_gather_cell_info()
 
 	for actor in get_tree().get_nodes_in_group('actors'):
-		actor.connect('move_requested', self, '_on_Actor_move_requested')
-		actor.connect('player_menu_requested', self, 
-			'_on_Actor_player_menu_requested')
 		update_actors_on_grid(actor, 'add')
 	
 	_state_stack.push_front($State/Idle)
@@ -204,12 +203,22 @@ func determine_move_path(actor, direction):
 
 #-------------------------------------------------------------------------------
 
+func next_battler():
+	emit_signal('actor_turn_finished')
+	_remove_blinking_tiles()
+	
+	if not _current_state.has_method('setup_for_next_turn'):
+		return
+	
+	_current_state.setup_for_next_turn(self)
+
+#-------------------------------------------------------------------------------
+
 func place_actors():
 	if _current_state.has_method('place_actors'):
 		_current_state.place_actors(self)
 
 #-------------------------------------------------------------------------------
-
 
 func provide_battlers():
 	return _battlers.get_children()
@@ -273,6 +282,14 @@ func remove_battler(actor):
 
 #-------------------------------------------------------------------------------
 
+func search_for_attack_targets():
+	if not _current_state.has_method('search_for_attack_targets'):
+		return
+	
+	_current_state.search_for_attack_targets()
+
+#-------------------------------------------------------------------------------
+
 func start_battle():
 	emit_signal('ally_positions_requested')
 
@@ -290,14 +307,31 @@ func update_actors_on_grid(actor, operation):
 	match operation:
 		'add':
 			if not actor in _actors_on_grid:
+				actor.connect('move_requested', self, 
+					'_on_Actor_move_requested')
+				actor.connect('player_menu_requested', self, 
+					'_on_Actor_player_menu_requested')
+				actor.connect('enemy_ai_waiting', self, 
+					'_on_Actor_enemy_ai_waiting')
 				_actors_on_grid.append(actor)
 		'remove':
 			if actor in _actors_on_grid:
+				actor.disconnect('move_requested', self, 
+					'_on_Actor_move_requested')
+				actor.disconnect('player_menu_requested', self, 
+					'_on_Actor_player_menu_requested')
+				actor.disconnect('enemy_ai_waiting', self, 
+					'_on_Actor_enemy_ai_waiting')
 				_actors_on_grid.erase(actor)
 
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
+
+func _on_Actor_enemy_ai_waiting():
+	next_battler()
+
+#-------------------------------------------------------------------------------
 
 func _on_Actor_move_requested(actor, direction):
 	var move_cell = determine_move_path(actor, direction)
@@ -307,9 +341,9 @@ func _on_Actor_move_requested(actor, direction):
 
 func _on_Actor_player_menu_requested(actor):
 	if _current_state == _state_map['battle']:
-		emit_signal('player_menu_requested', actor, 'battle')
+		emit_signal('player_battle_menu_requested', actor)
 	else:
-		emit_signal('player_menu_requested', actor, 'world')
+		emit_signal('player_world_menu_requested', actor)
 
 #-------------------------------------------------------------------------------
 

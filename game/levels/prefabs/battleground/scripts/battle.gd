@@ -1,7 +1,6 @@
 extends "res://assets/scripts/state.gd"
 
 var _turn_order = []
-var _first_turn = true
 var _current_battler = null
 
 ################################################################################
@@ -33,16 +32,25 @@ func _enter(host):
 func _determine_turn_order(host):
 	_turn_order = host.provide_battlers()
 	_turn_order.sort_custom(CustomSorter, 'speed_sorter')
-	
-	if _first_turn:
-		_first_turn = false
-		_setup_for_next_turn(host)
+	setup_for_next_turn(host)
+
+################################################################################
+# PUBLIC METHODS
+################################################################################
+
+func search_for_attack_targets():
+	pass
 
 #-------------------------------------------------------------------------------
 
-func _setup_for_next_turn(host):
+func setup_for_next_turn(host):
 	if _current_battler:
 		_current_battler.deactivate()
+		_current_battler = null
+	
+	if _turn_order.empty():
+		_determine_turn_order(host)
+		return
 	
 	_current_battler = _turn_order.pop_front()
 	
@@ -61,7 +69,7 @@ func _setup_for_next_turn(host):
 		var obstacle = host._check_obstacle(cell)
 		if obstacle:
 			if ActorDatabase.lookup_type(obstacle.reference) != actor_type:
-				host._allowed_map_cells.remove(cell)
+				host._allowed_map_cells.erase(cell)
 	
 	host._add_blinking_tiles(host._allowed_map_cells)
 	host._battle_camera.track_actor(_current_battler)
