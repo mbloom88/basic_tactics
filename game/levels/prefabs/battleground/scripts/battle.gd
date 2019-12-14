@@ -60,7 +60,7 @@ func _check_targets(host):
 		host.emit_signal('load_active_actor_info', _valid_targets[_target_index])
 		host.emit_signal('show_active_actor_gui_requested')
 	elif Input.is_action_just_pressed('ui_accept'):
-		pass
+		_valid_targets[_target_index].take_damage(_current_weapon.provide_stats())
 	elif Input.is_action_just_pressed('ui_cancel'):
 		host.set_process(false)
 		if _max_target_index >= 0:
