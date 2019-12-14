@@ -2,6 +2,7 @@ extends Control
 
 # Child nodes
 onready var _active_panel = $ActiveActorPanel
+onready var _target_panel = $TargetActorPanel
 onready var _squad_count = $SquadCount
 onready var _squad_status = $SquadStatus
 
@@ -10,7 +11,7 @@ onready var _squad_status = $SquadStatus
 ################################################################################
 
 func _ready():
-	hide_ally_select_gui()
+	_target_panel.box_alignment = 'right'
 
 ################################################################################
 # PUBLIC METHODS
@@ -28,8 +29,18 @@ func hide_ally_select_gui():
 
 #-------------------------------------------------------------------------------
 
-func load_actor_info(actor_ref):
-	_active_panel.load_actor_info(actor_ref)
+func hide_target_actor_gui():
+	_target_panel.hide_gui()
+
+#-------------------------------------------------------------------------------
+
+func load_active_actor_info(actor):
+	_active_panel.load_actor_info(actor)
+
+#-------------------------------------------------------------------------------
+
+func load_target_actor_info(actor):
+	_target_panel.load_actor_info(actor)
 
 #-------------------------------------------------------------------------------
 
@@ -42,6 +53,11 @@ func show_ally_select_gui():
 	_active_panel.show_gui()
 	_squad_count.show_gui()
 	_squad_status.show_gui()
+
+#-------------------------------------------------------------------------------
+
+func show_target_actor_gui():
+	_target_panel.show_gui()
 
 #-------------------------------------------------------------------------------
 

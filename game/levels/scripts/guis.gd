@@ -39,6 +39,14 @@ func _add_menu(menu):
 # PUBLIC METHODS
 ################################################################################
 
+func exit_all_menus():
+	var menu_list = _menus.get_children()
+	for menu in range(_menus.get_child_count()):
+		var exiting_menu = menu_list.pop_back()
+		exiting_menu.exit()
+
+#-------------------------------------------------------------------------------
+
 func resume_last_menu():
 	if _menus.get_child_count() > 0:
 		_menus.get_children().back().interact()

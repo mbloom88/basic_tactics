@@ -1,8 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://ui/battle_gui/prefabs/squad_count/themes/squad-count-theme.theme" type="Theme" id=1]
 [ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=2]
-
+[ext_resource path="res://ui/battle_gui/prefabs/squad_count/scripts/squad-count.gd" type="Script" id=3]
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 2 )
@@ -18,6 +18,7 @@ margin_bottom = 50.0
 rect_min_size = Vector2( 300, 50 )
 theme = ExtResource( 1 )
 texture = SubResource( 1 )
+script = ExtResource( 3 )
 
 [node name="Label" type="Label" parent="."]
 anchor_right = 1.0

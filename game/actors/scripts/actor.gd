@@ -6,10 +6,11 @@ extends KinematicBody2D
 # Signals 
 signal alpha_modulate_completed
 signal camera_move_requested(location, move_speed)
+signal enemy_ai_waiting
 signal move_completed
 signal move_requested(actor, direction)
 signal player_menu_requested(actor)
-signal enemy_ai_waiting
+signal reaction_completed
 signal state_changed(state)
 
 # Child nodes
@@ -18,6 +19,7 @@ onready var _inventory = $Inventory
 onready var _tween_alpha = $TweenAlpha
 onready var _tween_move = $TweenMove
 onready var _cursor = $BattleCursor
+onready var _skin = $Skin
 onready var _state_label = $Debug/StateLabel
 
 # State machine
@@ -233,6 +235,7 @@ func show_battle_cursor():
 
 func take_damage(weapon_stats):
 	_job.take_damage(weapon_stats)
+	_skin.take_damage()
 
 #-------------------------------------------------------------------------------
 
@@ -261,6 +264,11 @@ func get_script_running():
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
+
+func _on_Skin_animation_finished():
+	emit_signal('reaction_completed')
+
+#-------------------------------------------------------------------------------
 
 func _on_TweenMove_tween_completed(object, key):
 	if not _current_state.has_method("_on_TweenMove_tween_completed"):

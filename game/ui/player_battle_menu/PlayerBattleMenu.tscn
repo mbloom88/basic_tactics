@@ -36,11 +36,11 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -100.0
-margin_top = 124.534
-margin_right = 100.0
-margin_bottom = 224.534
-rect_min_size = Vector2( 200, 200 )
+margin_left = -135.0
+margin_top = 200.0
+margin_right = 135.0
+margin_bottom = 320.0
+rect_min_size = Vector2( 270, 120 )
 texture = SubResource( 1 )
 
 [node name="MenuButtons" type="VBoxContainer" parent="Background" groups=[
@@ -50,32 +50,66 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -73.5
-margin_top = -66.0
-margin_right = 73.5
-margin_bottom = 66.0
+margin_left = -122.0
+margin_top = -49.0
+margin_right = 122.0
+margin_bottom = 49.0
 
-[node name="Attack" type="Button" parent="Background/MenuButtons"]
-margin_right = 147.0
+[node name="Attack" type="Button" parent="Background/MenuButtons" groups=[
+"player_battle_menu_buttons",
+]]
+margin_left = 62.0
+margin_right = 182.0
 margin_bottom = 30.0
+rect_min_size = Vector2( 120, 0 )
+focus_neighbour_left = NodePath("../HBoxContainer/Skills")
+focus_neighbour_right = NodePath("../HBoxContainer/Items")
+focus_neighbour_bottom = NodePath("../Wait")
+size_flags_horizontal = 4
 text = "Attack"
 
-[node name="Skills" type="Button" parent="Background/MenuButtons"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Background/MenuButtons"]
 margin_top = 34.0
-margin_right = 147.0
+margin_right = 244.0
 margin_bottom = 64.0
+
+[node name="Skills" type="Button" parent="Background/MenuButtons/HBoxContainer" groups=[
+"player_battle_menu_buttons",
+]]
+margin_right = 120.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 120, 0 )
+focus_neighbour_top = NodePath("../../Attack")
+focus_neighbour_right = NodePath("../Items")
+focus_neighbour_bottom = NodePath("../../Wait")
+size_flags_horizontal = 4
 text = "Skills"
 
-[node name="Items" type="Button" parent="Background/MenuButtons"]
-margin_top = 68.0
-margin_right = 147.0
-margin_bottom = 98.0
+[node name="Items" type="Button" parent="Background/MenuButtons/HBoxContainer" groups=[
+"player_battle_menu_buttons",
+]]
+margin_left = 124.0
+margin_right = 244.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 120, 0 )
+focus_neighbour_left = NodePath("../Skills")
+focus_neighbour_top = NodePath("../../Attack")
+focus_neighbour_bottom = NodePath("../../Wait")
+size_flags_horizontal = 4
 text = "Items"
 
-[node name="Wait" type="Button" parent="Background/MenuButtons"]
-margin_top = 102.0
-margin_right = 147.0
-margin_bottom = 132.0
+[node name="Wait" type="Button" parent="Background/MenuButtons" groups=[
+"player_battle_menu_buttons",
+]]
+margin_left = 62.0
+margin_top = 68.0
+margin_right = 182.0
+margin_bottom = 98.0
+rect_min_size = Vector2( 120, 0 )
+focus_neighbour_left = NodePath("../HBoxContainer/Skills")
+focus_neighbour_top = NodePath("../Attack")
+focus_neighbour_right = NodePath("../HBoxContainer/Items")
+size_flags_horizontal = 4
 text = "Wait"
 
 [connection signal="pressed" from="Background/MenuButtons/Attack" to="." method="_on_Attack_pressed"]

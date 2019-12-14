@@ -67,3 +67,6 @@ func remove_modifier():
 
 func take_damage(weapon_stats):
 	health -= weapon_stats['attack_damage']
+	
+	if health <= 0:
+		health = 0

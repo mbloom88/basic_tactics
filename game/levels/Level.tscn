@@ -6,8 +6,8 @@
 [ext_resource path="res://levels/scripts/guis.gd" type="Script" id=4]
 [ext_resource path="res://ui/player_world_menu/PlayerWorldMenu.tscn" type="PackedScene" id=5]
 [ext_resource path="res://ui/player_battle_menu/PlayerBattleMenu.tscn" type="PackedScene" id=6]
-[ext_resource path="res://ui/battle_gui/BattleGUI.tscn" type="PackedScene" id=7]
-[ext_resource path="res://ui/dialogue_handler/DialogueHandler.tscn" type="PackedScene" id=8]
+[ext_resource path="res://ui/dialogue_handler/DialogueHandler.tscn" type="PackedScene" id=7]
+[ext_resource path="res://ui/battle_gui/BattleGUI.tscn" type="PackedScene" id=8]
 [ext_resource path="res://levels/scripts/cell-vectors.gd" type="Script" id=9]
 
 [node name="Level" type="Node2D"]
@@ -24,14 +24,14 @@ script = ExtResource( 4 )
 _player_world_menu = ExtResource( 5 )
 _player_battle_menu = ExtResource( 6 )
 
-[node name="BattleGUI" parent="GUIs" instance=ExtResource( 7 )]
-
 [node name="Menus" type="Control" parent="GUIs"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
 
-[node name="DialogueHandler" parent="GUIs" instance=ExtResource( 8 )]
+[node name="DialogueHandler" parent="GUIs" instance=ExtResource( 7 )]
+
+[node name="BattleGUI" parent="GUIs" instance=ExtResource( 8 )]
 
 [node name="Debug" type="Control" parent="."]
 margin_right = 40.0
@@ -49,13 +49,17 @@ script = ExtResource( 9 )
 [connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]
 [connection signal="ally_positions_requested" from="Battleground" to="." method="_on_Battleground_ally_positions_requested"]
 [connection signal="battle_action_cancelled" from="Battleground" to="." method="_on_Battleground_battle_action_cancelled"]
+[connection signal="battle_action_completed" from="Battleground" to="." method="_on_Battleground_battle_action_completed"]
 [connection signal="begin_battle" from="Battleground" to="." method="_on_Battleground_begin_battle"]
 [connection signal="hide_active_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_hide_active_actor_gui_requested"]
+[connection signal="hide_target_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_hide_target_actor_gui_requested"]
 [connection signal="load_active_actor_info" from="Battleground" to="." method="_on_Battleground_load_active_actor_info"]
+[connection signal="load_target_actor_info" from="Battleground" to="." method="_on_Battleground_load_target_actor_info"]
 [connection signal="player_battle_menu_requested" from="Battleground" to="." method="_on_Battleground_player_battle_menu_requested"]
 [connection signal="player_world_menu_requested" from="Battleground" to="." method="_on_Battleground_player_world_menu_requested"]
 [connection signal="selection_update_requested" from="Battleground" to="." method="_on_Battleground_selection_update_requested"]
 [connection signal="show_active_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_show_active_actor_gui_requested"]
+[connection signal="show_target_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_show_target_actor_gui_requested"]
 [connection signal="squad_update_requested" from="Battleground" to="." method="_on_Battleground_squad_update_requested"]
 [connection signal="player_attacking" from="GUIs" to="." method="_on_GUIs_player_attacking"]
 [connection signal="player_waiting" from="GUIs" to="." method="_on_GUIs_player_waiting"]

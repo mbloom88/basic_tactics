@@ -7,7 +7,7 @@ signal player_waiting
 signal state_changed(menu, state)
 
 # Child nodes
-onready var _buttons = $Background/MenuButtons
+onready var _attack_button = $Background/MenuButtons/Attack
 
 # State machine
 var _current_state = null
@@ -64,6 +64,11 @@ func _change_state(state_name):
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
+
+func exit():
+	_change_state('exit')
+
+#-------------------------------------------------------------------------------
 
 func interact():
 	_change_state('interact')

@@ -48,8 +48,8 @@ func _check_targets(host):
 		else:
 			_target_index = _max_target_index
 		_valid_targets[_target_index].show_battle_cursor()
-		host.emit_signal('load_active_actor_info', _valid_targets[_target_index])
-		host.emit_signal('show_active_actor_gui_requested')
+		host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
+		host.emit_signal('show_target_actor_gui_requested')
 	elif Input.is_action_just_pressed("move_right") and _max_target_index >= 0:
 		_valid_targets[_target_index].hide_battle_cursor()
 		if _target_index < _max_target_index:
@@ -57,18 +57,21 @@ func _check_targets(host):
 		else:
 			_target_index = 0
 		_valid_targets[_target_index].show_battle_cursor()
-		host.emit_signal('load_active_actor_info', _valid_targets[_target_index])
-		host.emit_signal('show_active_actor_gui_requested')
+		host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
+		host.emit_signal('show_target_actor_gui_requested')
 	elif Input.is_action_just_pressed('ui_accept'):
+		host.set_process(false)
+		_valid_targets[_target_index].hide_battle_cursor()
 		_valid_targets[_target_index].take_damage(_current_weapon.provide_stats())
+		host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
+		host.emit_signal('battle_action_completed')
 	elif Input.is_action_just_pressed('ui_cancel'):
 		host.set_process(false)
+		host.emit_signal('hide_target_actor_gui_requested')
 		if _max_target_index >= 0:
 			_valid_targets[_target_index].hide_battle_cursor()
 		host._remove_blinking_cells()
 		host._add_blinking_cells(host._allowed_move_cells)
-		host.emit_signal('load_active_actor_info', _current_battler)
-		host.emit_signal('show_active_actor_gui_requested')
 		host.emit_signal('battle_action_cancelled')
 
 #-------------------------------------------------------------------------------
@@ -129,8 +132,6 @@ func search_for_attack_targets(host, battlers):
 	var attacker_type = ActorDatabase.lookup_type(_current_battler.reference)
 	_valid_targets = []
 	
-	host.emit_signal('hide_active_actor_gui_requested')
-	
 	for battler in battlers:
 		var battler_type = ActorDatabase.lookup_type(battler.reference)
 		var target_map_cell = host.world_to_map(battler.position)
@@ -157,6 +158,7 @@ func setup_for_next_turn(host):
 		_current_weapon = null
 		host._remove_blinking_cells()
 		host.emit_signal('hide_active_actor_gui_requested')
+		host.emit_signal('hide_target_actor_gui_requested')
 	
 	if _turn_order.empty():
 		_determine_turn_order(host)

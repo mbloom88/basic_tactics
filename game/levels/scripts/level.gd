@@ -26,11 +26,6 @@ func _ready():
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Battleground_hide_active_actor_gui_requested():
-	_battle_gui.hide_active_actor_gui()
-
-#-------------------------------------------------------------------------------
-
 func _on_Battleground_allies_ready_for_placement():
 	_battle_gui.show_ally_select_gui()
 	_battleground.place_actors()
@@ -52,14 +47,34 @@ func _on_Battleground_battle_action_cancelled():
 
 #-------------------------------------------------------------------------------
 
+func _on_Battleground_battle_action_completed():
+	_guis.exit_all_menus()
+
+#-------------------------------------------------------------------------------
+
 func _on_Battleground_begin_battle():
 	_battleground.add_battle_camera(_camera)
 	_battle_gui.hide_ally_select_gui()
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_load_active_actor_info(actor_ref):
-	_battle_gui.load_actor_info(actor_ref)
+func _on_Battleground_hide_active_actor_gui_requested():
+	_battle_gui.hide_active_actor_gui()
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_hide_target_actor_gui_requested():
+	_battle_gui.hide_target_actor_gui()
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_load_active_actor_info(actor):
+	_battle_gui.load_active_actor_info(actor)
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_load_target_actor_info(actor):
+	_battle_gui.load_target_actor_info(actor)
 
 #-------------------------------------------------------------------------------
 
@@ -81,6 +96,11 @@ func _on_Battleground_selection_update_requested(type):
 func _on_Battleground_show_active_actor_gui_requested():
 	_battle_gui.show_active_actor_gui()
 
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_show_target_actor_gui_requested():
+	_battle_gui.show_target_actor_gui()
+	
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_squad_update_requested():

@@ -7,13 +7,17 @@ extends TileMap
 signal allies_ready_for_placement
 signal ally_positions_requested
 signal battle_action_cancelled
+signal battle_action_completed
 signal begin_battle
 signal hide_active_actor_gui_requested
-signal load_active_actor_info(actor_ref)
+signal hide_target_actor_gui_requested
+signal load_active_actor_info(actor)
+signal load_target_actor_info(actor)
 signal player_battle_menu_requested(actor)
 signal player_world_menu_requested(actor)
 signal selection_update_requested(type)
 signal show_active_actor_gui_requested
+signal show_target_actor_gui_requested
 signal squad_update_requested
 signal state_changed(state)
 
@@ -302,21 +306,25 @@ func update_actors_on_grid(actor, operation):
 	match operation:
 		'add':
 			if not actor in _actors_on_grid:
+				actor.connect('enemy_ai_waiting', self, 
+					'_on_Actor_enemy_ai_waiting')
 				actor.connect('move_requested', self, 
 					'_on_Actor_move_requested')
 				actor.connect('player_menu_requested', self, 
 					'_on_Actor_player_menu_requested')
-				actor.connect('enemy_ai_waiting', self, 
-					'_on_Actor_enemy_ai_waiting')
+				actor.connect('reaction_completed', self, 
+					'_on_Actor_reaction_completed')
 				_actors_on_grid.append(actor)
 		'remove':
 			if actor in _actors_on_grid:
+				actor.disconnect('enemy_ai_waiting', self, 
+					'_on_Actor_enemy_ai_waiting')
 				actor.disconnect('move_requested', self, 
 					'_on_Actor_move_requested')
 				actor.disconnect('player_menu_requested', self, 
 					'_on_Actor_player_menu_requested')
-				actor.disconnect('enemy_ai_waiting', self, 
-					'_on_Actor_enemy_ai_waiting')
+				actor.disconnect('reaction_completed', self, 
+					'_on_Actor_reaction_completed')
 				_actors_on_grid.erase(actor)
 
 ################################################################################
@@ -339,6 +347,12 @@ func _on_Actor_player_menu_requested(actor):
 		emit_signal('player_battle_menu_requested', actor)
 	else:
 		emit_signal('player_world_menu_requested', actor)
+
+#-------------------------------------------------------------------------------
+
+func _on_Actor_reaction_completed():
+	if _current_state == _state_map['battle']:
+		_current_state.setup_for_next_turn(self)
 
 #-------------------------------------------------------------------------------
 

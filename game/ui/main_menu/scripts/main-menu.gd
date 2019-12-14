@@ -6,7 +6,6 @@ signal new_game_requested
 signal state_changed(menu, state)
 
 # Child nodes 
-onready var _buttons = $MenuButtons
 onready var _continue_button = $MenuButtons/Continue
 onready var _version = $GameVersion
 
