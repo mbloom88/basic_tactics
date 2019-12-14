@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://actors/themes/reaction-numbers.theme" type="Theme" id=1]
+[ext_resource path="res://actors/prefabs/reaction_number/scripts/reaction-number.gd" type="Script" id=2]
+[ext_resource path="res://actors/prefabs/reaction_number/animations/SETUP.anim" type="Animation" id=3]
+[ext_resource path="res://actors/prefabs/reaction_number/animations/hide.anim" type="Animation" id=4]
+[ext_resource path="res://actors/prefabs/reaction_number/animations/show.anim" type="Animation" id=5]
+
+[node name="ReactionNumber" type="Label"]
+margin_left = -25.0
+margin_top = -20.0
+margin_right = 25.0
+margin_bottom = 20.0
+rect_pivot_offset = Vector2( 25, 20 )
+theme = ExtResource( 1 )
+text = "00"
+align = 1
+valign = 1
+script = ExtResource( 2 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/SETUP = ExtResource( 3 )
+anims/hide = ExtResource( 4 )
+anims/show = ExtResource( 5 )
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

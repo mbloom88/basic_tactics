@@ -20,6 +20,7 @@ onready var _tween_alpha = $TweenAlpha
 onready var _tween_move = $TweenMove
 onready var _cursor = $BattleCursor
 onready var _skin = $Skin
+onready var _reaction = $ReactionPoint/ReactionNumber
 onready var _state_label = $Debug/StateLabel
 
 # State machine
@@ -236,6 +237,7 @@ func show_battle_cursor():
 func take_damage(weapon_stats):
 	_job.take_damage(weapon_stats)
 	_skin.take_damage()
+	_reaction.take_damage(weapon_stats['attack_damage'])
 
 #-------------------------------------------------------------------------------
 
@@ -265,7 +267,7 @@ func get_script_running():
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Skin_animation_finished():
+func _on_ReactionNumber_animation_completed():
 	emit_signal('reaction_completed')
 
 #-------------------------------------------------------------------------------
@@ -284,3 +286,6 @@ func _on_TweenMove_tween_completed(object, key):
 
 func _on_TweenAlpha_tween_completed(object, key):
 	emit_signal("alpha_modulate_completed")
+
+
+

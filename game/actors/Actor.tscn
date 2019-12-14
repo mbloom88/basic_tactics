@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://actors/scripts/actor.gd" type="Script" id=1]
 [ext_resource path="res://actors/scripts/inactive.gd" type="Script" id=2]
@@ -13,7 +13,8 @@
 [ext_resource path="res://actors/scripts/skin.gd" type="Script" id=11]
 [ext_resource path="res://actors/animations/SETUP.anim" type="Animation" id=12]
 [ext_resource path="res://actors/animations/damaged.anim" type="Animation" id=13]
-[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=14]
+[ext_resource path="res://actors/prefabs/reaction_number/ReactionNumber.tscn" type="PackedScene" id=14]
+[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=15]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
@@ -78,6 +79,11 @@ script = ExtResource( 11 )
 anims/SETUP = ExtResource( 12 )
 anims/damaged = ExtResource( 13 )
 
+[node name="ReactionPoint" type="Node2D" parent="."]
+position = Vector2( 0, -48 )
+
+[node name="ReactionNumber" parent="ReactionPoint" instance=ExtResource( 14 )]
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 shape = SubResource( 1 )
@@ -98,10 +104,10 @@ grow_vertical = 2
 custom_fonts/font = SubResource( 3 )
 text = "State Label"
 align = 1
-script = ExtResource( 14 )
+script = ExtResource( 15 )
 
 [connection signal="stats_initialized" from="Job/Stats" to="Job" method="_on_Stats_stats_initialized"]
 [connection signal="tween_completed" from="TweenAlpha" to="." method="_on_TweenAlpha_tween_completed"]
 [connection signal="tween_completed" from="TweenMove" to="." method="_on_TweenMove_tween_completed"]
-[connection signal="animation_finished" from="Skin" to="." method="_on_Skin_animation_finished"]
 [connection signal="animation_finished" from="Skin/AnimationPlayer" to="Skin" method="_on_AnimationPlayer_animation_finished"]
+[connection signal="animation_completed" from="ReactionPoint/ReactionNumber" to="." method="_on_ReactionNumber_animation_completed"]
