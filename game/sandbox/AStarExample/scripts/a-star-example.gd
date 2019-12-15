@@ -18,4 +18,7 @@ func _ready():
 func _start_astar():
 	var astar = AStar.new()
 	var grid = _battleground.provide_used_cells('world')
-#	astar.add_point(
+	var id = 1
+	for cell in grid:
+		var new_vector3 = Vector3(cell.x, cell.y, 0)
+		astar.add_point(id, new_vector3, 1)
