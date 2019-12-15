@@ -1,5 +1,5 @@
 """
-Base 'Ground' scene.
+Base 'Battleground' scene.
 """
 extends TileMap
 
@@ -119,6 +119,8 @@ func _change_state(state_name):
 
 func _check_obstacle(cell):
 	"""
+	Checks for obstacles (actors, objects, etc.) in a target map cell.
+	
 	Args:
 		- cell (Vector2): Map cell vector to check for an obstacle.
 	
@@ -137,6 +139,9 @@ func _check_obstacle(cell):
 #-------------------------------------------------------------------------------
 
 func _gather_cell_info():
+	"""
+	Creates a list of all the active tiles in the Battleground TileMap.
+	"""
 	_used_map_cells = get_used_cells()
 	
 	for map_cell in _used_map_cells:
@@ -145,6 +150,9 @@ func _gather_cell_info():
 #-------------------------------------------------------------------------------
 
 func _remove_blinking_cells():
+	"""
+	Removes all blinking tiles that are assigned to Battleground map cells.
+	"""
 	get_tree().call_group('blinking_tiles', 'stop_blinking')
 	
 	for tile in _blinking_cells.get_children():
@@ -157,6 +165,8 @@ func _remove_blinking_cells():
 
 func add_battle_camera(camera):
 	"""
+	Assigns the Level's camera to the Battleground.
+	
 	Args:
 		- camera (Camera2D)
 	"""
@@ -168,6 +178,8 @@ func add_battle_camera(camera):
 
 func add_battler(actor):
 	"""
+	Adds an Actor to the Battleground as a battle combatant.
+	
 	Args:
 		- actor_ref (Object)
 	"""
@@ -177,6 +189,9 @@ func add_battler(actor):
 
 func determine_move_path(actor, direction):
 	"""
+	Determines whether an Actor is allowed to move in the direction that was 
+	requested.
+	
 	Args:
 		- actor (Object): The actor that is requesting the move.
 		- direction (Vector2): The direction the actor is trying to move in.
@@ -210,18 +225,27 @@ func determine_move_path(actor, direction):
 #-------------------------------------------------------------------------------
 
 func next_battler():
+	"""
+	Switches to the next Battler in the battle turn queue.
+	"""
 	if _current_state == _state_map['battle']:
 		_current_state.setup_for_next_turn(self)
 
 #-------------------------------------------------------------------------------
 
 func place_actors():
+	"""
+	Activates the Ally selection and placement phase of a battle.
+	"""
 	if _current_state.has_method('place_actors'):
 		_current_state.place_actors(self)
 
 #-------------------------------------------------------------------------------
 
 func provide_battlers():
+	"""
+	Returns a list of Battlers.
+	"""
 	return _battlers.get_children()
 
 #-------------------------------------------------------------------------------
@@ -233,6 +257,9 @@ func provide_cell_size():
 
 func provide_used_cells(type):
 	"""
+	Provides the list of all active tiles in the Battleground TileMap either as
+	world coordinates or map coordinates.
+	
 	Args:
 		- type (String): The type of used cells to be requested.
 			* map: Map cell vectors assigned to each tile. Primary use is
@@ -267,6 +294,9 @@ func register_battle_positions(world_cells):
 #-------------------------------------------------------------------------------
 
 func remove_battle_camera():
+	"""
+	Removes the Level's Camera from the Battleground.
+	"""
 	_battle_camera.disconnect('tracking_added', self,
 		'_on_BattleCamera_tracking_added')
 	_battle_camera = null
@@ -275,6 +305,8 @@ func remove_battle_camera():
 
 func remove_battler(actor):
 	"""
+	Removes the target Actor as a battle combatant.
+	
 	Args:
 		- actor (Object)
 	"""
@@ -284,18 +316,27 @@ func remove_battler(actor):
 #-------------------------------------------------------------------------------
 
 func search_for_attack_targets():
+	"""
+	Determines attack targets for the Battler whos turn it is.
+	"""
 	if _current_state == _state_map['battle']:
 		_current_state.search_for_attack_targets(self, _battlers.get_children())
 
 #-------------------------------------------------------------------------------
 
 func start_battle():
+	"""
+	Starts a battle on the Battleground.
+	"""
 	emit_signal('ally_positions_requested')
 
 #-------------------------------------------------------------------------------
 
 func update_actors_on_grid(actor, operation):
 	"""
+	Updates the list of registered Actors who can be manipulated within the 
+	Battleground.
+	
 	Args:
 		- actor (Object): The actor (character, object, etc.) to be updated.
 		- operation (String): Whether the actor will be added or removed from

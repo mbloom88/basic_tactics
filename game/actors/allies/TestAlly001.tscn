@@ -13,6 +13,6 @@ job_loadout = ExtResource( 2 )
 
 [node name="CombatKnife" parent="Inventory/Weapon1" index="0" instance=ExtResource( 3 )]
 
-[node name="Skin" parent="." index="5"]
+[node name="Skin" parent="." index="6"]
 texture = ExtResource( 4 )
 

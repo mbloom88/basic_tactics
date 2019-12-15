@@ -123,6 +123,7 @@ position = Vector2( 224, 272 )
 position = Vector2( 160, 272 )
 
 [node name="Move TestAlly001 002" parent="CommandPrograms/Intro" index="13" instance=ExtResource( 8 )]
+editor/display_folded = true
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 
 [node name="Position001" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 002" index="0"]

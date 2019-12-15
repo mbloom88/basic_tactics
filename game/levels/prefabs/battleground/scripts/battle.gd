@@ -1,11 +1,16 @@
 extends "res://assets/scripts/state.gd"
 
+# General battle parameters
 var _turn_order = []
 var _current_battler = null
 var _current_weapon = null
 var _valid_targets = []
 var _max_target_index = 0
 var _target_index = 0
+
+# AI parameters
+export (int) var _iteration_limit = 10
+var _move_list = []
 
 ################################################################################
 # CLASSES
@@ -14,6 +19,10 @@ var _target_index = 0
 class CustomSorter:
 	
 	static func speed_sorter(actor_a, actor_b):
+		"""
+		Sorts an Array of Actors by their Speed stat. Actors in the Array are
+		sorted by highest speed first.
+		"""
 		var actor_a_move = actor_a.provide_job_info()['speed']
 		var actor_b_move = actor_b.provide_job_info()['speed']
 		if actor_a_move > actor_b_move:
@@ -37,6 +46,47 @@ func _update(host, delta):
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
+
+func _act_as_aggressive_melee(host):
+	var battlers = host._provide_battlers()
+	var targets = []
+	var closest_target = {}
+	var current_type = ActorDatabase.lookup_type(_current_battler.reference)
+	
+	# Look for Allies and NPCs
+	if current_type == 'enemy':
+		for battler in battlers:
+			var target_type = ActorDatabase.lookup_type(battler.reference)
+			if target_type != 'enemy':
+				targets.append(battler)
+	
+	# Find the closest target from targets list
+	var origin_cell = host.world_to_map(_current_battler.position)
+	for target in targets:
+		var target_cell = host.world_to_map(target.position)
+		var distance = origin_cell.distance_to(target_cell)
+		if not closest_target:
+			closest_target['target'] = target
+			closest_target['distance'] = distance
+			closest_target['map_cell'] = target_cell
+		else:
+			if distance < closest_target['distance']:
+				closest_target['target'] = target
+				closest_target['distance'] = distance
+				closest_target['map_cell'] = target_cell
+	
+	# Simulate possible paths to target
+	var iterations = 1
+	var map_distance = closest_target['map_cell'] - origin_cell
+	var paths = []
+	while iterations <= _iteration_limit:
+		var path = []
+		for x_move in range(map_distance.x):
+			pass
+		for y_move in range(map_distance.y):
+			pass
+
+#-------------------------------------------------------------------------------
 
 func _check_targets(host):
 	var action = ""
@@ -77,6 +127,10 @@ func _check_targets(host):
 #-------------------------------------------------------------------------------
 
 func _determine_attack_cells(host):
+	"""
+	Determines the attack range for the current Battler and then displays the
+	allowable range.
+	"""
 	var origin_map_cell = host.world_to_map(_current_battler.position)
 	var attack_range = _current_weapon.provide_stats()['attack_range']
 	var used_cells = host.provide_used_cells('map')
@@ -91,7 +145,22 @@ func _determine_attack_cells(host):
 
 #-------------------------------------------------------------------------------
 
+func _determine_battle_ai(host):
+	"""
+	Determines the type of behavioral battle AI that will be used to control
+	the current Enemy or NPC Battler.
+	"""
+	match _current_battler.battle_ai_behavior:
+		'aggressive_melee':
+			_act_as_aggressive_melee(host)
+
+#-------------------------------------------------------------------------------
+
 func _determine_move_cells(host):
+	"""
+	Determines what cells the current Battler will be allowed to move into
+	during its turn and then displays the allowable cells.
+	"""
 	var move_stat = _current_battler.provide_job_info()['move']
 	var mover_type = ActorDatabase.lookup_type(_current_battler.reference)
 	var origin_map_cell = host.world_to_map(_current_battler.position)
@@ -114,6 +183,10 @@ func _determine_move_cells(host):
 #-------------------------------------------------------------------------------
 
 func _determine_turn_order(host):
+	"""
+	Determines a new battle turn order for all Battlers that are registered
+	on the Battleground's grid.
+	"""
 	_turn_order = host.provide_battlers()
 	_turn_order.sort_custom(CustomSorter, 'speed_sorter')
 	setup_for_next_turn(host)
@@ -124,6 +197,8 @@ func _determine_turn_order(host):
 
 func search_for_attack_targets(host, battlers):
 	"""
+	Determines attack targets for the Battler whos turn it is.
+	
 	Args:
 		- battlers (Array): Array of Battler objects.
 	"""
@@ -152,6 +227,11 @@ func search_for_attack_targets(host, battlers):
 #-------------------------------------------------------------------------------
 
 func setup_for_next_turn(host):
+	"""
+	Preparation for the next Battler's turn. Registers the next battle in the
+	turn order and its inventory before directing the battle Camera to the 
+	Battler.
+	"""
 	if _current_battler:
 		_current_battler.deactivate()
 		_current_battler = null
@@ -174,6 +254,19 @@ func setup_for_next_turn(host):
 ################################################################################
 
 func _on_BattleCamera_tracking_added(host, actor):
+	"""
+	Signal response after the battle Camera focuses on the next Battler in the
+	turn order. The method then requests the ActiveActor GUI and activates the
+	next Battler for its battle turn. If the next Battler is an Enemy or NPC, 
+	the Battleground will assume control of the non-playable Battler.
+	"""
 	host.emit_signal('load_active_actor_info', _current_battler)
 	host.emit_signal('show_active_actor_gui_requested')
-	actor.activate()
+	var type = ActorDatabase.lookup_type(_current_battler.reference)
+	if type in ['enemy', 'npc']:
+		# AI SCRIPT CURRENT A WIP
+		yield(get_tree().create_timer(1), 'timeout')
+		setup_for_next_turn(host)
+#		_determine_battle_ai(host)
+	else:
+		_current_battler.activate_for_battle()

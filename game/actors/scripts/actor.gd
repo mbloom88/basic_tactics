@@ -31,11 +31,12 @@ onready var _state_map = {
 	'inactive': $State/Inactive,
 	'idle': $State/Idle,
 	'move': $State/Move,
-	'menu': $State/Menu
+	'menu': $State/Menu,
 }
 
 # Actor info
 export (String) var reference = "" setget , get_reference
+export (String, 'aggressive_melee') var battle_ai_behavior = 'aggressive_melee'
 export (bool) var onready_invisible = true
 var script_running = false setget set_script_running, get_script_running
 
@@ -96,13 +97,20 @@ func _change_state(state_name):
 # PUBLIC METHODS
 ################################################################################
 
-func activate():
+func activate_for_battle():
 	"""
-	Sets the Actor to the 'idle' state. Doing so enables Actor input processing.
+	Sets the Actor to the 'idle' state. Doing so enables Actor input processing
+	by the Player. Note that Enemy and NPC actions are handled by a Level's
+	Battleground node.
 	"""
-	if ActorDatabase.lookup_type(reference) == 'enemy':
-		yield(get_tree().create_timer(1), 'timeout')
-		emit_signal('enemy_ai_waiting')
+	if ActorDatabase.lookup_type(reference) == 'ally':
+		_change_state('idle')
+
+#-------------------------------------------------------------------------------
+
+func activate_for_world():
+	if ActorDatabase.lookup_type(reference) in ['enemy', 'npc']:
+		pass
 	else:
 		_change_state('idle')
 
