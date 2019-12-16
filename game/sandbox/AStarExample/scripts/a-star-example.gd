@@ -1,8 +1,6 @@
 extends "res://levels/scripts/level.gd"
 
 # Child nodes
-onready var _start = $Battleground/Battlers/TestEnemy001
-onready var _target = $Battleground/Battlers/TestAlly001
 onready var _astar = AStar.new()
 
 ################################################################################
@@ -28,6 +26,7 @@ class CustomSorter:
 
 func _ready():
 	var _start = $Battleground/Battlers/TestEnemy001
+	var start_type = ActorDatabase.lookup_type(_start.reference)
 	var vector2_point = _battleground.world_to_map(_start.position)
 	var start_point = Vector3(vector2_point.x, vector2_point.y, 0)
 	var start_id = _calculate_point_index(start_point)
@@ -36,7 +35,7 @@ func _ready():
 	vector2_point = _battleground.world_to_map(_target.position)
 	var target_point = Vector3(vector2_point.x, vector2_point.y, 0)
 	
-	_set_astar_points()
+	_set_astar_points(start_type)
 	var goal_point = _find_closest_cell_to_target(target_point)
 	var goal_id = _calculate_point_index(goal_point)
 	_connect_astar_points(start_point, goal_point)
@@ -45,7 +44,7 @@ func _ready():
 
 	for cell in path_v3:
 		path_v2.append(Vector2(cell.x, cell.y))
-
+	
 	_battleground._add_blinking_cells(path_v2)
 	
 ################################################################################
@@ -109,7 +108,7 @@ func _connect_astar_points(start_point, goal_point):
 
 func _find_closest_cell_to_target(target_point):
 	"""
-	Find the closest cell in an AStar grid next to the target.
+	Find the closest cell to a Battler target on the Battleground.
 	
 	Args:
 		- target_point (Vector3): The target point that will be used to scan
@@ -139,13 +138,12 @@ func _find_closest_cell_to_target(target_point):
 
 #-------------------------------------------------------------------------------
 
-func _set_astar_points():
+func _set_astar_points(start_type):
 	"""
 	Provides points to the AStar algorithm for pathing consideration.
 	"""
 	var map_points = _battleground.provide_used_cells('map')
 	var edited_points = []
-	var origin_type = ActorDatabase.lookup_type(_start.reference)
 	
 	# Remove cells that are blocked by opposing actor types, non-battlers, and
 	# objects.
@@ -153,7 +151,7 @@ func _set_astar_points():
 		var obstacle = _battleground._check_obstacle(point)
 		if obstacle:
 			var obstacle_type = ActorDatabase.lookup_type(obstacle.reference)
-			if obstacle_type != origin_type:
+			if obstacle_type != start_type:
 				continue
 			else:
 				edited_points.append(point)

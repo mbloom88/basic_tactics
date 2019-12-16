@@ -74,17 +74,6 @@ func _act_as_aggressive_melee(host):
 				closest_target['target'] = target
 				closest_target['distance'] = distance
 				closest_target['map_cell'] = target_cell
-	
-	# Simulate possible paths to target
-	var iterations = 1
-	var map_distance = closest_target['map_cell'] - origin_cell
-	var paths = []
-	while iterations <= _iteration_limit:
-		var path = []
-		for x_move in range(map_distance.x):
-			pass
-		for y_move in range(map_distance.y):
-			pass
 
 #-------------------------------------------------------------------------------
 
