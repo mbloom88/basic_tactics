@@ -42,6 +42,7 @@ onready var _state_map = {
 export (PackedScene) var blinking_tile
 var _used_map_cells = []
 var _used_world_cells = []
+var _map_size = Vector2()
 
 # Actors
 var _actors_on_grid = []
@@ -67,6 +68,7 @@ func _process(delta):
 
 func _ready():
 	_gather_cell_info()
+	_determine_map_size()
 
 	for actor in get_tree().get_nodes_in_group('actors'):
 		update_actors_on_grid(actor, 'add')
@@ -135,6 +137,23 @@ func _check_obstacle(cell):
 			obstacle = actor
 	
 	return obstacle
+
+#-------------------------------------------------------------------------------
+
+func _determine_map_size():
+	var map_cells = provide_used_cells('map')
+	var max_x = 0
+	var max_y = 0
+	
+	for cell in map_cells:
+		if cell.x > max_x:
+			max_x = cell.x
+	
+	for cell in map_cells:
+		if cell.y > max_y:
+			max_y = cell.y
+	
+	_map_size = Vector2(max_x, max_y)
 
 #-------------------------------------------------------------------------------
 

@@ -27,29 +27,61 @@ class CustomSorter:
 ################################################################################
 
 func _ready():
+	var _start = $Battleground/Battlers/TestEnemy001
 	var vector2_point = _battleground.world_to_map(_start.position)
 	var start_point = Vector3(vector2_point.x, vector2_point.y, 0)
-	var ids = _set_astar_points()
-	var target_point = _find_closest_cell_to_target()
-#	_connect_astar_points(ids, target_point)
-	print(_astar.get_point_path(ids[start_point], ids[target_point]))
+	var start_id = _calculate_point_index(start_point)
+	
+	var _target = $Battleground/Battlers/TestAlly001
+	vector2_point = _battleground.world_to_map(_target.position)
+	var target_point = Vector3(vector2_point.x, vector2_point.y, 0)
+	
+	_set_astar_points()
+	var goal_point = _find_closest_cell_to_target(target_point)
+	var goal_id = _calculate_point_index(goal_point)
+	_connect_astar_points(start_point, goal_point)
+	var path_v3 = _astar.get_point_path(start_id, goal_id)
+	var path_v2 = []
 
+	for cell in path_v3:
+		path_v2.append(Vector2(cell.x, cell.y))
+
+	_battleground._add_blinking_cells(path_v2)
+	
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
 
-func _connect_astar_points(ids, target_cell):
-	var vector2_point = _battleground.world_to_map(_start.position)
-	var start_point = Vector3(vector2_point.x, vector2_point.y, 0)
+func _calculate_point_index(point):
+	"""
+	Returns a unique ID for a point in the AStar grid. Uses a Cantor pairing 
+	function to create the unique ID using the x and y points.
+	
+	NOTE: Cannot be used for negative integers!
+	"""
+	return (((point.x + point.y) * (point.x + point.y + 1)) / 2) + point.y
+
+#-------------------------------------------------------------------------------
+
+func _connect_astar_points(start_point, goal_point):
 	var frontier = []
 	var visited = []
+	
+	var map_cells_v2 = _battleground.provide_used_cells('map')
+	var map_cells_v3 = []
+	for map_cell in map_cells_v2:
+		map_cells_v3.append(Vector3(map_cell.x, map_cell.y, 0))
 	
 	frontier.append([start_point, 0])
 	
 	while not frontier.empty():
 		frontier.sort_custom(CustomSorter, 'priority_sorter')
-		
 		var current_point = frontier.pop_front()[0]
+		
+		if current_point == goal_point:
+			break
+		
+		var current_id = _calculate_point_index(current_point)
 		var neighbors = [
 			Vector3(current_point.x, current_point.y - 1, 0), # up
 			Vector3(current_point.x, current_point.y + 1, 0), # down
@@ -59,66 +91,77 @@ func _connect_astar_points(ids, target_cell):
 		visited.append(current_point)
 		
 		for neighbor in neighbors:
-			if neighbor == target_cell:
-				break
-			if not neighbor in _astar.get_points():
+			var neighbor_id = _calculate_point_index(neighbor)
+			if not neighbor in map_cells_v3:
 				continue
-			if neighbor in visited:
+			elif not neighbor_id in _astar.get_points():
+				continue
+			elif neighbor in visited:
 				continue
 			
 			# Manhattan distance
-			var cost = abs(target_cell.x - neighbor.x) + \
-				abs(target_cell.y - neighbor.y)
+			var cost = abs(goal_point.x - neighbor.x) + \
+				abs(goal_point.y - neighbor.y)
 			frontier.append([neighbor, cost])
-			_astar.connect_points(ids[current_point], ids[neighbor], false)
-			
-			print(frontier) # TEST PRINT
-			
+			_astar.connect_points(current_id, neighbor_id, false)
+
 #-------------------------------------------------------------------------------
 
-func _find_closest_cell_to_target():
+func _find_closest_cell_to_target(target_point):
 	"""
-	Find the closest cell next to the target.
+	Find the closest cell in an AStar grid next to the target.
+	
+	Args:
+		- target_point (Vector3): The target point that will be used to scan
+			neighboring points for open spaces.
 	
 	Returns:
-		- closest_cell (Vector2) the closest cell next to the target that is
-			also the closest to the current Battler.
+		- closest_point (Vector3): The closest, open point to the target point.
+			Will return Null if no neighboring spaces to the target are open.
 	"""
-	var target_cell = _battleground.world_to_map(_target.position)
-	var vector_3_cell = Vector3(target_cell.x, target_cell.y, 0)
-	var closest_id = _astar.get_closest_point(vector_3_cell)
-	var closest_cell = _astar.get_point_position(closest_id)
+	var used_map_cells = _battleground.provide_used_cells('map')
+	var closest_point = null
+	var neighbors = [
+			Vector2(target_point.x, target_point.y - 1), # up
+			Vector2(target_point.x, target_point.y + 1), # down
+			Vector2(target_point.x - 1, target_point.y), # left
+			Vector2(target_point.x + 1, target_point.y)] # right
 	
-	return closest_cell
+	for neighbor in neighbors:
+		if not neighbor in used_map_cells:
+			continue
+		elif _battleground._check_obstacle(neighbor):
+			continue
+		else:
+			closest_point = Vector3(neighbor.x, neighbor.y, 0)
+	
+	return closest_point
 
 #-------------------------------------------------------------------------------
 
 func _set_astar_points():
 	"""
 	Provides points to the AStar algorithm for pathing consideration.
-	
-	Returns:
-		- ids (Dictionary): Vector3 (key) and ID (value) pairs.
 	"""
-	var points = _battleground.provide_used_cells('map')
+	var map_points = _battleground.provide_used_cells('map')
+	var edited_points = []
 	var origin_type = ActorDatabase.lookup_type(_start.reference)
-	var ids = {}
-	var id = 0
 	
 	# Remove cells that are blocked by opposing actor types, non-battlers, and
 	# objects.
-	for point in points:
+	for point in map_points:
 		var obstacle = _battleground._check_obstacle(point)
 		if obstacle:
 			var obstacle_type = ActorDatabase.lookup_type(obstacle.reference)
-			if origin_type != obstacle_type:
-				points.erase(point)
+			if obstacle_type != origin_type:
+				continue
+			else:
+				edited_points.append(point)
+		else:
+			edited_points.append(point)
 	
 	# Add points to AStar
-	for point in points:
+	for point in edited_points:
+		var id = _calculate_point_index(point)
 		var new_vector3 = Vector3(point.x, point.y, 0)
 		_astar.add_point(id, new_vector3, 1)
-		ids[new_vector3] = id
-		id += 1
-		
-	return ids
