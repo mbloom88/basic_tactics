@@ -10,6 +10,7 @@ var _target_index = 0
 
 # AI parameters
 export (int) var _iteration_limit = 10
+var _action_list = []
 var _move_list = []
 
 ################################################################################
@@ -46,36 +47,6 @@ func _update(host, delta):
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
-
-func _act_as_aggressive_melee(host):
-	var battlers = host._provide_battlers()
-	var targets = []
-	var closest_target = {}
-	var current_type = ActorDatabase.lookup_type(_current_battler.reference)
-	
-	# Look for Allies and NPCs
-	if current_type == 'enemy':
-		for battler in battlers:
-			var target_type = ActorDatabase.lookup_type(battler.reference)
-			if target_type != 'enemy':
-				targets.append(battler)
-	
-	# Find the closest target from targets list
-	var origin_cell = host.world_to_map(_current_battler.position)
-	for target in targets:
-		var target_cell = host.world_to_map(target.position)
-		var distance = origin_cell.distance_to(target_cell)
-		if not closest_target:
-			closest_target['target'] = target
-			closest_target['distance'] = distance
-			closest_target['map_cell'] = target_cell
-		else:
-			if distance < closest_target['distance']:
-				closest_target['target'] = target
-				closest_target['distance'] = distance
-				closest_target['map_cell'] = target_cell
-
-#-------------------------------------------------------------------------------
 
 func _check_targets(host):
 	var action = ""
@@ -134,14 +105,17 @@ func _determine_attack_cells(host):
 
 #-------------------------------------------------------------------------------
 
-func _determine_battle_ai(host):
+func _determine_behavioral_ai_actions(host):
 	"""
-	Determines the type of behavioral battle AI that will be used to control
-	the current Enemy or NPC Battler.
+	Determines the type of battle actions that the current Enemy or NPC
+	Battler will take based on their behavioral profile.
 	"""
-	match _current_battler.battle_ai_behavior:
-		'aggressive_melee':
-			_act_as_aggressive_melee(host)
+	if _action_list.empty():
+		match _current_battler.battle_ai_behavior:
+			'aggressive_melee':
+				_action_list = ['move_to_attack', 'attack_target']
+	
+	_next_ai_battle_action(host)
 
 #-------------------------------------------------------------------------------
 
@@ -180,13 +154,58 @@ func _determine_turn_order(host):
 	_turn_order.sort_custom(CustomSorter, 'speed_sorter')
 	setup_for_next_turn(host)
 
+#-------------------------------------------------------------------------------
+
+func _find_attack_target_for_ai(host):
+	"""
+	"""
+	var battlers = host._provide_battlers()
+	var targets = []
+	var closest_target = {}
+	var current_type = ActorDatabase.lookup_type(_current_battler.reference)
+	
+	# Look for Allies and NPCs
+	if current_type == 'enemy':
+		for battler in battlers:
+			var target_type = ActorDatabase.lookup_type(battler.reference)
+			if target_type != 'enemy':
+				targets.append(battler)
+	
+	# Find the closest target from targets list
+	var origin_cell = host.world_to_map(_current_battler.position)
+	for target in targets:
+		var target_cell = host.world_to_map(target.position)
+		var distance = origin_cell.distance_to(target_cell)
+		if not closest_target:
+			closest_target['target'] = target
+			closest_target['distance'] = distance
+		else:
+			if distance < closest_target['distance']:
+				closest_target['target'] = target
+				closest_target['distance'] = distance
+	
+	return closest_target['target']
+
+#-------------------------------------------------------------------------------
+
+func _next_ai_battle_action(host):
+	if _action_list.empty():
+		pass
+	
+	var next_action = _action_list.pop_front()
+	match next_action:
+		'attack':
+			pass
+		'move_to_attack':
+			var target = _find_attack_target_for_ai(host)
+
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
 
-func search_for_attack_targets(host, battlers):
+func find_player_attack_targets(host, battlers):
 	"""
-	Determines attack targets for the Battler whos turn it is.
+	Determines attack targets for for the player's Battler.
 	
 	Args:
 		- battlers (Array): Array of Battler objects.

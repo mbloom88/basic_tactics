@@ -109,7 +109,7 @@ func _on_Battleground_squad_update_requested():
 #-------------------------------------------------------------------------------
 
 func _on_GUIs_player_attacking():
-	_battleground.search_for_attack_targets()
+	_battleground.find_player_attack_targets()
 
 #-------------------------------------------------------------------------------
 

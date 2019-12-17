@@ -103,18 +103,22 @@ func calculate_astar_path():
 	Calculates a pathway between the starting and goal points. 
 	
 	Returns:
-		- pathway (Array): A list of Vector2 map cells between the starting and
-			goal points. Returns as Empty if no pathway is found.
+		- directions (Array): A list of Vector2 directions between the starting
+			and goal points. Returns as Empty if no pathway is found.
 	"""
 	_set_astar_points()
 	_connect_astar_points()
 	var pathway_vector3 = get_point_path(_start_id, _goal_id)
-	var pathway = []
+	var directions = []
+	var previous_point = pathway_vector3.pop_front()
 	
+	# Converts map cells to directions
 	for point in pathway_vector3:
-		pathway.append(Vector2(pathway_vector3.x, pathway_vector3.y))
+		var x = int(sign(point.x - previous_point.x))
+		var y = int(sign(point.y - previous_point.y))
+		directions.append(Vector2(x, y))
 	
-	return pathway
+	return directions
 
 #-------------------------------------------------------------------------------
 

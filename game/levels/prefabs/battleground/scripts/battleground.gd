@@ -334,12 +334,12 @@ func remove_battler(actor):
 
 #-------------------------------------------------------------------------------
 
-func search_for_attack_targets():
+func find_player_attack_targets():
 	"""
 	Determines attack targets for the Battler whos turn it is.
 	"""
 	if _current_state == _state_map['battle']:
-		_current_state.search_for_attack_targets(self, _battlers.get_children())
+		_current_state.find_player_attack_targets(self, _battlers.get_children())
 
 #-------------------------------------------------------------------------------
 
