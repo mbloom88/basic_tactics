@@ -1,10 +1,14 @@
-extends AStar
+extends Node
 
 # Signals
 signal initialized(astar_node)
+signal pathing_completed(astar_node, path, actor)
+
+# AStar
+onready var _astar = AStar.new()
 
 # Point info
-var _actor_ref = ""
+var _actor = null
 var _start_point = null
 var _start_type = ""
 var _start_id = -1
@@ -73,7 +77,7 @@ func _connect_astar_points():
 			var neighbor_id = _calculate_point_index(neighbor)
 			if not neighbor in _walkable_points:
 				continue
-			elif not neighbor_id in get_points():
+			elif not neighbor_id in _astar.get_points():
 				continue
 			elif neighbor in visited:
 				continue
@@ -82,7 +86,7 @@ func _connect_astar_points():
 			var cost = abs(_goal_point.x - neighbor.x) + \
 				abs(_goal_point.y - neighbor.y)
 			frontier.append([neighbor, cost])
-			connect_points(current_id, neighbor_id, false)
+			_astar.connect_points(current_id, neighbor_id, false)
 
 #-------------------------------------------------------------------------------
 
@@ -92,7 +96,7 @@ func _set_astar_points():
 	"""
 	for point in _walkable_points:
 		var id = _calculate_point_index(point)
-		add_point(id, point, 1)
+		_astar.add_point(id, point, 1)
 
 ################################################################################
 # PUBLIC METHODS
@@ -108,7 +112,7 @@ func calculate_astar_path():
 	"""
 	_set_astar_points()
 	_connect_astar_points()
-	var pathway_vector3 = get_point_path(_start_id, _goal_id)
+	var pathway_vector3 = Array(_astar.get_point_path(_start_id, _goal_id))
 	var directions = []
 	var previous_point = pathway_vector3.pop_front()
 	
@@ -117,8 +121,9 @@ func calculate_astar_path():
 		var x = int(sign(point.x - previous_point.x))
 		var y = int(sign(point.y - previous_point.y))
 		directions.append(Vector2(x, y))
+		previous_point = point
 	
-	return directions
+	emit_signal('pathing_completed', self, directions, _actor)
 
 #-------------------------------------------------------------------------------
 
@@ -126,13 +131,10 @@ func initialize(pathing_info):
 	"""
 	Initializes the AStar node with the following Dictionary information.
 	
-	- pathing_info['actor_ref']: The reference of the Actor.
+	- pathing_info['actor']: The Actor the AStar instance is dedicated to.
 	
 	- pathing_info['actor_cell']: The Vector2 map cell that current Actor is
 		standing in.
-	
-	- pathing_info['actor_type']: The Actor's type (String) from the 
-		ActorDatabase, which is determine from the Actor's reference.
 	
 	- pathing_info['goal_cell']: The Vector2 map cell that the goal is located
 		in.
@@ -143,12 +145,12 @@ func initialize(pathing_info):
 		to work accurately.
 	"""
 	# Actor info
-	var _actor_ref = pathing_info['actor_ref']
+	var _actor = pathing_info['actor']
 	
 	# Start info
 	var start_vector2 = pathing_info['actor_cell']
 	_start_point = Vector3(start_vector2.x, start_vector2.y, 0)
-	_start_type = pathing_info['actor_type']
+	_start_type = ActorDatabase.lookup_type(_actor.reference)
 	_start_id = _calculate_point_index(_start_point)
 	
 	# Goal info
@@ -159,9 +161,6 @@ func initialize(pathing_info):
 	# Battleground grid info
 	var walkable_points_vector2 = pathing_info['walkable_cells']
 	for point in walkable_points_vector2:
-		_walkable_points.append(
-			walkable_points_vector2.x,
-			walkable_points_vector2.y,
-			0)
+		_walkable_points.append(Vector3(point.x, point.y, 0))
 	
 	emit_signal('initialized', self)

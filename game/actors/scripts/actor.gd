@@ -6,8 +6,7 @@ extends KinematicBody2D
 # Signals 
 signal alpha_modulate_completed
 signal camera_move_requested(location, move_speed)
-signal enemy_ai_waiting
-signal move_completed
+signal move_completed(actor)
 signal move_requested(actor, direction)
 signal player_menu_requested(actor)
 signal reaction_completed
@@ -105,6 +104,8 @@ func activate_for_battle():
 	"""
 	if ActorDatabase.lookup_type(reference) == 'ally':
 		_change_state('idle')
+	elif ActorDatabase.lookup_type(reference) in ['enemy', 'npc']:
+		_change_state('battle_ai')
 
 #-------------------------------------------------------------------------------
 
@@ -294,6 +295,3 @@ func _on_TweenMove_tween_completed(object, key):
 
 func _on_TweenAlpha_tween_completed(object, key):
 	emit_signal("alpha_modulate_completed")
-
-
-

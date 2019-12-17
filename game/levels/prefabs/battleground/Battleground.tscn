@@ -1,30 +1,32 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://levels/prefabs/battleground/scripts/battleground.gd" type="Script" id=1]
 [ext_resource path="res://levels/prefabs/blinking_tile/BlinkingTile.tscn" type="PackedScene" id=2]
-[ext_resource path="res://levels/prefabs/battleground/scripts/idle.gd" type="Script" id=3]
-[ext_resource path="res://levels/prefabs/battleground/scripts/select.gd" type="Script" id=4]
-[ext_resource path="res://levels/prefabs/battleground/scripts/place.gd" type="Script" id=5]
-[ext_resource path="res://levels/prefabs/battleground/scripts/battle.gd" type="Script" id=6]
+[ext_resource path="res://levels/prefabs/astar_instance/AStarInstance.tscn" type="PackedScene" id=3]
+[ext_resource path="res://levels/prefabs/battleground/scripts/idle.gd" type="Script" id=4]
+[ext_resource path="res://levels/prefabs/battleground/scripts/select.gd" type="Script" id=5]
+[ext_resource path="res://levels/prefabs/battleground/scripts/place.gd" type="Script" id=6]
+[ext_resource path="res://levels/prefabs/battleground/scripts/battle.gd" type="Script" id=7]
 
 [node name="Battleground" type="TileMap"]
 format = 1
 script = ExtResource( 1 )
 blinking_tile = ExtResource( 2 )
+astar_instance = ExtResource( 3 )
 
 [node name="State" type="Node" parent="."]
 
 [node name="Idle" type="Node" parent="State"]
-script = ExtResource( 3 )
-
-[node name="Select" type="Node" parent="State"]
 script = ExtResource( 4 )
 
-[node name="Place" type="Node" parent="State"]
+[node name="Select" type="Node" parent="State"]
 script = ExtResource( 5 )
 
-[node name="Battle" type="Node" parent="State"]
+[node name="Place" type="Node" parent="State"]
 script = ExtResource( 6 )
+
+[node name="Battle" type="Node" parent="State"]
+script = ExtResource( 7 )
 
 [node name="Pathing" type="Node" parent="."]
 

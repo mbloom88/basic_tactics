@@ -22,6 +22,7 @@ signal squad_update_requested
 signal state_changed(state)
 
 # Child nodes
+onready var _pathing = $Pathing
 onready var _blinking_cells = $BlinkingCells
 onready var _battlers = $Battlers
 onready var _non_battlers = $NonBattlers
@@ -51,8 +52,10 @@ var _actor_to_place = null
 
 # Battle parameters
 var _allowed_move_cells = []
-var _allowed_action_cells = []
 var _battle_camera = null
+
+# AStar
+export (PackedScene) var astar_instance
 
 ################################################################################
 # VIRTUAL METHODS
@@ -80,6 +83,35 @@ func _ready():
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
+
+func _add_astar_instance(actor, goal_cell):
+	var walkable_cells = []
+	var actor_type = ActorDatabase.lookup_type(actor.reference)
+	
+	for map_cell in provide_used_cells('map'):
+		var obstacle = _check_obstacle(map_cell)
+		if obstacle:
+			var obstacle_type = ActorDatabase.lookup_type(obstacle.reference)
+			if actor_type == obstacle_type:
+				walkable_cells.append(map_cell)
+		else:
+			walkable_cells.append(map_cell)
+	
+	var pathing_info = {
+		'actor': actor,
+		'actor_cell': world_to_map(actor.position),
+		'goal_cell': goal_cell,
+		'walkable_cells': walkable_cells,
+	}
+	
+	var astar_node = astar_instance.instance()
+	_pathing.add_child(astar_node)
+	astar_node.connect('initialized', self, '_on_AStarInstance_initialized')
+	astar_node.connect('pathing_completed', self, 
+		'_on_AStarInstance_pathing_completed')
+	astar_node.initialize(pathing_info)
+
+#-------------------------------------------------------------------------------
 
 func _add_blinking_cells(cells):
 	"""
@@ -366,8 +398,8 @@ func update_actors_on_grid(actor, operation):
 	match operation:
 		'add':
 			if not actor in _actors_on_grid:
-				actor.connect('enemy_ai_waiting', self, 
-					'_on_Actor_enemy_ai_waiting')
+				actor.connect('move_completed', self, 
+					'_on_Actor_move_completed')
 				actor.connect('move_requested', self, 
 					'_on_Actor_move_requested')
 				actor.connect('player_menu_requested', self, 
@@ -377,8 +409,8 @@ func update_actors_on_grid(actor, operation):
 				_actors_on_grid.append(actor)
 		'remove':
 			if actor in _actors_on_grid:
-				actor.disconnect('enemy_ai_waiting', self, 
-					'_on_Actor_enemy_ai_waiting')
+				actor.disconnect('move_completed', self, 
+					'_on_Actor_move_completed')
 				actor.disconnect('move_requested', self, 
 					'_on_Actor_move_requested')
 				actor.disconnect('player_menu_requested', self, 
@@ -391,8 +423,10 @@ func update_actors_on_grid(actor, operation):
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Actor_enemy_ai_waiting():
-	next_battler()
+func _on_Actor_move_completed(actor):
+	var actor_type = ActorDatabase.lookup_type(actor.reference)
+	if _current_state == _state_map['battle'] and actor_type != 'ally':
+		_current_state._on_Actor_move_completed(self, actor)
 
 #-------------------------------------------------------------------------------
 
@@ -413,6 +447,23 @@ func _on_Actor_player_menu_requested(actor):
 func _on_Actor_reaction_completed():
 	if _current_state == _state_map['battle']:
 		_current_state.setup_for_next_turn(self)
+
+#-------------------------------------------------------------------------------
+
+func _on_AStarInstance_initialized(astar_node):
+	astar_node.calculate_astar_path()
+
+#-------------------------------------------------------------------------------
+
+func _on_AStarInstance_pathing_completed(astar_node, path, actor):
+	astar_node.disconnect('initialized', self, '_on_AStarInstance_initialized')
+	astar_node.disconnect('pathing_completed', self, 
+		'_on_AStarInstance_pathing_completed')
+	_pathing.remove_child(astar_node)
+	astar_node.queue_free()
+	
+	if _current_state == _state_map['battle']:
+		_current_state._on_AStarInstance_pathing_completed(self, path)
 
 #-------------------------------------------------------------------------------
 

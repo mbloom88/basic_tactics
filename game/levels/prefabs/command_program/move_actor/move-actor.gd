@@ -85,7 +85,7 @@ func start(manager):
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Actor_move_completed():
+func _on_Actor_move_completed(actor):
 	if _move_path:
 		_move_request()
 	else:

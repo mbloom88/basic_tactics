@@ -7,11 +7,12 @@ var _current_weapon = null
 var _valid_targets = []
 var _max_target_index = 0
 var _target_index = 0
+var _allowed_action_cells = []
 
 # AI parameters
-export (int) var _iteration_limit = 10
 var _action_list = []
 var _move_list = []
+var _target = null
 
 ################################################################################
 # CLASSES
@@ -48,6 +49,19 @@ func _update(host, delta):
 # PRIVATE METHODS
 ################################################################################
 
+func _ai_attack_target(host):
+	_determine_attack_cells(host)
+	yield(get_tree().create_timer(0.25), 'timeout')
+	host.emit_signal('load_target_actor_info', _target)
+	host.emit_signal('show_target_actor_gui_requested')
+	_target.show_battle_cursor()
+	yield(get_tree().create_timer(0.75), 'timeout')
+	_target.hide_battle_cursor()
+	_target.take_damage(_current_weapon.provide_stats())
+	host.emit_signal('load_target_actor_info', _target)
+
+#-------------------------------------------------------------------------------
+
 func _check_targets(host):
 	var action = ""
 	
@@ -70,11 +84,12 @@ func _check_targets(host):
 		host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
 		host.emit_signal('show_target_actor_gui_requested')
 	elif Input.is_action_just_pressed('ui_accept'):
-		host.set_process(false)
-		_valid_targets[_target_index].hide_battle_cursor()
-		_valid_targets[_target_index].take_damage(_current_weapon.provide_stats())
-		host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
-		host.emit_signal('battle_action_completed')
+		if _max_target_index > -1:
+			host.set_process(false)
+			_valid_targets[_target_index].hide_battle_cursor()
+			_valid_targets[_target_index].take_damage(_current_weapon.provide_stats())
+			host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
+			host.emit_signal('battle_action_completed')
 	elif Input.is_action_just_pressed('ui_cancel'):
 		host.set_process(false)
 		host.emit_signal('hide_target_actor_gui_requested')
@@ -94,14 +109,14 @@ func _determine_attack_cells(host):
 	var origin_map_cell = host.world_to_map(_current_battler.position)
 	var attack_range = _current_weapon.provide_stats()['attack_range']
 	var used_cells = host.provide_used_cells('map')
-	host._allowed_action_cells = []
+	_allowed_action_cells = []
 	
 	for cell in used_cells:
 		if cell.distance_to(origin_map_cell) <= attack_range:
-			host._allowed_action_cells.append(cell)
+			_allowed_action_cells.append(cell)
 	
 	host._remove_blinking_cells()
-	host._add_blinking_cells(host._allowed_action_cells)
+	host._add_blinking_cells(_allowed_action_cells)
 
 #-------------------------------------------------------------------------------
 
@@ -113,7 +128,7 @@ func _determine_behavioral_ai_actions(host):
 	if _action_list.empty():
 		match _current_battler.battle_ai_behavior:
 			'aggressive_melee':
-				_action_list = ['move_to_attack', 'attack_target']
+				_action_list = ['move_to_attack', 'attack']
 	
 	_next_ai_battle_action(host)
 
@@ -157,18 +172,22 @@ func _determine_turn_order(host):
 #-------------------------------------------------------------------------------
 
 func _find_attack_target_for_ai(host):
-	"""
-	"""
-	var battlers = host._provide_battlers()
+	var battlers = host.provide_battlers()
 	var targets = []
 	var closest_target = {}
 	var current_type = ActorDatabase.lookup_type(_current_battler.reference)
 	
-	# Look for Allies and NPCs
+	# Look for Allies and NPCs if Enemy
 	if current_type == 'enemy':
 		for battler in battlers:
 			var target_type = ActorDatabase.lookup_type(battler.reference)
-			if target_type != 'enemy':
+			if target_type in ['ally', 'npc']:
+				targets.append(battler)
+	# Look for Enemies if NPC
+	elif current_type == 'npc':
+		for battler in battlers:
+			var target_type = ActorDatabase.lookup_type(battler.reference)
+			if target_type == 'enemy':
 				targets.append(battler)
 	
 	# Find the closest target from targets list
@@ -184,20 +203,94 @@ func _find_attack_target_for_ai(host):
 				closest_target['target'] = target
 				closest_target['distance'] = distance
 	
-	return closest_target['target']
+	_target = closest_target['target']
+
+#-------------------------------------------------------------------------------
+
+func _find_closest_cell_near_target(host, action):
+	var action_range = 0
+	var origin_cell = host.world_to_map(_current_battler.position)
+	var target_cell = host.world_to_map(_target.position)
+	var used_map_cells = host.provide_used_cells('map')
+	var closest_cell = {}
+	var neighbors = [
+			Vector2(target_cell.x, target_cell.y - 1), # up
+			Vector2(target_cell.x, target_cell.y + 1), # down
+			Vector2(target_cell.x - 1, target_cell.y), # left
+			Vector2(target_cell.x + 1, target_cell.y)] # right
+	
+	match action:
+		'attack':
+			action_range = _current_weapon.provide_stats()['attack_range']
+	
+	if origin_cell.distance_to(target_cell) > action_range:
+		for neighbor in neighbors:
+			# Manhattan distance calculation for grid
+			var cost = abs(neighbor.x - origin_cell.x) + \
+				abs(neighbor.y - origin_cell.y)
+			if not neighbor in used_map_cells:
+				continue
+			elif host._check_obstacle(neighbor):
+				continue
+			else:
+				if closest_cell.empty():
+					closest_cell['neighbor'] = neighbor
+					closest_cell['cost'] = cost
+				elif cost < closest_cell['cost']:
+					closest_cell['neighbor'] = neighbor
+					closest_cell['cost'] = cost
+	else:
+		closest_cell['neighbor'] = origin_cell
+	
+	return closest_cell['neighbor']
 
 #-------------------------------------------------------------------------------
 
 func _next_ai_battle_action(host):
 	if _action_list.empty():
-		pass
+		_current_battler.script_running = false
+		setup_for_next_turn(host)
 	
 	var next_action = _action_list.pop_front()
+	yield(get_tree().create_timer(0.50), 'timeout') # Slows the ai down
+	
 	match next_action:
 		'attack':
-			pass
+			var attack_range = _current_weapon.provide_stats()['attack_range']
+			var current_cell = host.world_to_map(_current_battler.position)
+			var target_cell = host.world_to_map(_target.position)
+			var distance = current_cell.distance_to(target_cell)
+			if distance <= attack_range:
+				_ai_attack_target(host)
+			else:
+				_next_ai_battle_action(host)
 		'move_to_attack':
-			var target = _find_attack_target_for_ai(host)
+			_find_attack_target_for_ai(host)
+			var closest_cell = _find_closest_cell_near_target(host, 'attack')
+			if closest_cell == host.world_to_map(_current_battler.position):
+				_next_ai_battle_action(host)
+			else:
+				_current_battler.scripted_state_change('move')
+				host._add_astar_instance(_current_battler, closest_cell)
+
+#-------------------------------------------------------------------------------
+
+func _perform_next_ai_move(host):
+	
+	print(_move_list)
+	
+	if _move_list.empty():
+		_current_battler.deactivate()
+		_next_ai_battle_action(host)
+		return
+	
+	var direction = _move_list.pop_front()
+	var origin_cell = host.world_to_map(_current_battler.position)
+	var next_cell = origin_cell + direction
+	if next_cell in host._allowed_move_cells:
+		_current_battler.perform_scripted_move(direction, 'run')
+	else:
+		_next_ai_battle_action(host)
 
 ################################################################################
 # PUBLIC METHODS
@@ -261,6 +354,17 @@ func setup_for_next_turn(host):
 # SIGNAL HANDLING
 ################################################################################
 
+func _on_Actor_move_completed(host, actor):
+	_perform_next_ai_move(host)
+
+#-------------------------------------------------------------------------------
+
+func _on_AStarInstance_pathing_completed(host, path):
+	_move_list = path
+	_perform_next_ai_move(host)
+
+#-------------------------------------------------------------------------------
+
 func _on_BattleCamera_tracking_added(host, actor):
 	"""
 	Signal response after the battle Camera focuses on the next Battler in the
@@ -272,9 +376,7 @@ func _on_BattleCamera_tracking_added(host, actor):
 	host.emit_signal('show_active_actor_gui_requested')
 	var type = ActorDatabase.lookup_type(_current_battler.reference)
 	if type in ['enemy', 'npc']:
-		# AI SCRIPT CURRENT A WIP
-		yield(get_tree().create_timer(1), 'timeout')
-		setup_for_next_turn(host)
-#		_determine_battle_ai(host)
+		_current_battler.script_running = true
+		_determine_behavioral_ai_actions(host)
 	else:
 		_current_battler.activate_for_battle()

@@ -89,7 +89,8 @@ func move_to_cell(host, cell):
 		host._tween_move.start()
 		host.emit_signal('camera_move_requested', cell, move_speed)
 	else:
-		host.set_process(true)
+		if not host.script_running:
+			host.set_process(true)
 
 ################################################################################
 # SIGNAL HANDLING
@@ -99,4 +100,4 @@ func _on_TweenMove_tween_completed(host, object, key):
 	if not host.script_running:
 		host.set_process(true)
 	
-	host.emit_signal('move_completed')
+	host.emit_signal('move_completed', host)
