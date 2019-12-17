@@ -45,6 +45,8 @@ func _ready():
 	for cell in path_v3:
 		path_v2.append(Vector2(cell.x, cell.y))
 	
+	print(path_v3)
+	
 	_battleground._add_blinking_cells(path_v2)
 	
 ################################################################################

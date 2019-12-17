@@ -65,15 +65,23 @@ onready_invisible = false
 position = Vector2( 416, 80 )
 onready_invisible = false
 
-[node name="TestEnemy001" parent="Battleground/Battlers" index="13" instance=ExtResource( 5 )]
+[node name="TestAlly001-013" parent="Battleground/Battlers" index="13" instance=ExtResource( 4 )]
+position = Vector2( 479.493, 464 )
+onready_invisible = false
+
+[node name="TestAlly001-014" parent="Battleground/Battlers" index="14" instance=ExtResource( 4 )]
+position = Vector2( 544, 464 )
+onready_invisible = false
+
+[node name="TestEnemy001" parent="Battleground/Battlers" index="15" instance=ExtResource( 5 )]
 position = Vector2( 32, 528 )
 onready_invisible = false
 
-[node name="TestEnemy001-001" parent="Battleground/Battlers" index="14" instance=ExtResource( 5 )]
+[node name="TestEnemy001-001" parent="Battleground/Battlers" index="16" instance=ExtResource( 5 )]
 position = Vector2( 32, 464 )
 onready_invisible = false
 
-[node name="TestEnemy001-002" parent="Battleground/Battlers" index="15" instance=ExtResource( 5 )]
+[node name="TestEnemy001-002" parent="Battleground/Battlers" index="17" instance=ExtResource( 5 )]
 position = Vector2( 480, 336 )
 onready_invisible = false
 
