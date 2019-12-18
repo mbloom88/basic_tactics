@@ -17,6 +17,7 @@ anchor_top = 1.0
 anchor_bottom = 1.0
 margin_top = -400.0
 margin_bottom = 0.0
+box_alignment = "left"
 
 [node name="TargetActorPanel" parent="." instance=ExtResource( 2 )]
 anchor_left = 1.0
@@ -27,6 +28,7 @@ margin_left = -700.0
 margin_top = -400.0
 margin_right = 0.0
 margin_bottom = 0.0
+box_alignment = "left"
 
 [node name="SquadCount" parent="." instance=ExtResource( 3 )]
 

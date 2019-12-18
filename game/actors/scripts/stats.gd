@@ -1,8 +1,5 @@
 extends Node
 
-# Signals
-signal stats_initialized
-
 # Stat info
 var max_health = 0
 var health = 0
@@ -33,8 +30,6 @@ func initialize(stats):
 	aim = stats.aim
 	speed = stats.speed
 	move = stats.move
-	
-	emit_signal('stats_initialized')
 
 #-------------------------------------------------------------------------------
 
@@ -65,8 +60,8 @@ func remove_modifier():
 
 #-------------------------------------------------------------------------------
 
-func take_damage(weapon_stats):
-	health -= weapon_stats['attack_damage']
+func take_damage(weapon):
+	health -= weapon.provide_stats()['attack_damage']
 	
 	if health <= 0:
 		health = 0

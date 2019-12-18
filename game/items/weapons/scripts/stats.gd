@@ -13,6 +13,11 @@ var ammo_per_attack
 # PUBLIC METHODS
 ################################################################################
 
+func consume_ammo():
+	ammo -= ammo_per_attack
+
+#-------------------------------------------------------------------------------
+
 func initialize(loadout):
 	weapon_type = loadout.weapon_type
 	damage_type = loadout.damage_type

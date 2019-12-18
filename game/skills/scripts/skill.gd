@@ -1,27 +1,32 @@
-extends Sprite
+extends Node
 
-# Child nodes
-onready var _stats = $Stats
-
-# Weapon info
+# Skill info
 export (String) var reference = ""
-export (Resource) var weapon_loadout
+export (Resource) var skill_loadout
+var resouce_type = ""
+var resource_per_use = -1
 
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
 
 func _ready():
-	_stats.initialize(weapon_loadout)
+	initialize(skill_loadout)
 
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
 
-func consume_ammo():
-	_stats.consume_ammo()
+func initialize(skill_loadout):
+	resouce_type = skill_loadout.resource_type
+	resource_per_use = skill_loadout.resource_per_use
 
 #-------------------------------------------------------------------------------
 
-func provide_stats():
-	return _stats.provide_stats()
+func provide_skill():
+	return self
+
+#-------------------------------------------------------------------------------
+
+func use_skill():
+	pass

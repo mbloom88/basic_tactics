@@ -1,14 +1,14 @@
 [gd_resource type="Resource" load_steps=2 format=2]
 
-[ext_resource path="res://actors/jobs/job-template.gd" type="Script" id=1]
+[ext_resource path="res://jobs/job-template.gd" type="Script" id=1]
 
 [resource]
 script = ExtResource( 1 )
-name = "Test Job 1"
+name = "Test Job 3"
 max_health = 3
 max_armor = 0
 max_shields = 0
-aim = 5
-speed = 2
+aim = 2
+speed = 6
 move = 2
 

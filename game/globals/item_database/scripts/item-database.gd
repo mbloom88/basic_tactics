@@ -9,15 +9,15 @@ var _items = {}
 # VIRTUAL METHODS
 ################################################################################
 
-func _ready() -> void:
-	_load_item_references(_melee_weapon_directory, 'weapon')
-	_load_item_references(_ranged_weapon_directory, 'weapon')
+func _ready():
+	_load_item_references(_melee_weapon_directory)
+	_load_item_references(_ranged_weapon_directory)
 
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
 
-func _load_item_references(directory, type):
+func _load_item_references(directory):
 	"""
 	Loads item .tres files and stores them in a local dictionary for
 	reference purposes. Afterwards, the database can be called upon to provide

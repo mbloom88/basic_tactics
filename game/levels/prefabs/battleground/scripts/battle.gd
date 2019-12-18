@@ -4,6 +4,7 @@ extends "res://assets/scripts/state.gd"
 var _turn_order = []
 var _current_battler = null
 var _current_weapon = null
+var _current_action = ""
 var _valid_targets = []
 var _max_target_index = 0
 var _target_index = 0
@@ -56,7 +57,7 @@ func _enter(host):
 #-------------------------------------------------------------------------------
 
 func _update(host, delta):
-	_check_targets(host)
+	_check_targets_for_player(host)
 
 ################################################################################
 # PRIVATE METHODS
@@ -64,20 +65,18 @@ func _update(host, delta):
 
 func _ai_attack_target(host):
 	_determine_attack_cells(host)
-	yield(get_tree().create_timer(0.25), 'timeout')
+	yield(get_tree().create_timer(0.25), 'timeout') # Slows the ai down
 	host.emit_signal('load_target_actor_info', _target)
 	host.emit_signal('show_target_actor_gui_requested')
 	_target.show_battle_cursor()
-	yield(get_tree().create_timer(0.75), 'timeout')
+	yield(get_tree().create_timer(0.75), 'timeout') # Slows the ai down
 	_target.hide_battle_cursor()
-	_target.take_damage(_current_weapon.provide_stats())
+	_target.take_damage(_current_weapon)
 	host.emit_signal('load_target_actor_info', _target)
 
 #-------------------------------------------------------------------------------
 
-func _check_targets(host):
-	var action = ""
-	
+func _check_targets_for_player(host):
 	if Input.is_action_just_pressed("move_left") and _max_target_index >= 0:
 		_valid_targets[_target_index].hide_battle_cursor()
 		if _target_index > 0:
@@ -96,15 +95,14 @@ func _check_targets(host):
 		_valid_targets[_target_index].show_battle_cursor()
 		host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
 		host.emit_signal('show_target_actor_gui_requested')
+	# Affect target with item
 	elif Input.is_action_just_pressed('ui_accept'):
-		if _max_target_index > -1:
-			host.set_process(false)
-			_valid_targets[_target_index].hide_battle_cursor()
-			_valid_targets[_target_index].take_damage(_current_weapon.provide_stats())
-			host.emit_signal('load_target_actor_info', _valid_targets[_target_index])
-			host.emit_signal('battle_action_completed')
+		if _current_action == 'attack':
+			_player_attack_target(host)
+	# Cancel action
 	elif Input.is_action_just_pressed('ui_cancel'):
 		host.set_process(false)
+		_current_action = ""
 		host.emit_signal('hide_target_actor_gui_requested')
 		if _max_target_index >= 0:
 			_valid_targets[_target_index].hide_battle_cursor()
@@ -338,6 +336,35 @@ func _perform_next_ai_move(host):
 	else:
 		_next_ai_battle_action(host)
 
+#-------------------------------------------------------------------------------
+
+func _player_attack_target(host):
+	"""
+	Allows the player Battler to attack a target if the Battler's Weapon has
+	enough ammo.
+	"""
+	var ammo = _current_weapon.provide_stats()['ammo']
+	var max_ammo = _current_weapon.provide_stats()['max_ammo']
+	var ammo_per_attack = _current_weapon.provide_stats()['ammo_per_attack']
+	if _max_target_index > -1 and max_ammo == -1:
+		_current_battler.deactivate()
+		host.set_process(false)
+		host.emit_signal('battle_action_completed')
+		_valid_targets[_target_index].hide_battle_cursor()
+		_valid_targets[_target_index].take_damage(_current_weapon)
+		host.emit_signal('load_target_actor_info', 
+			_valid_targets[_target_index])
+	elif _max_target_index > -1 and ammo >= ammo_per_attack:
+		_current_battler.deactivate()
+		host.set_process(false)
+		host.emit_signal('battle_action_completed')
+		_current_weapon.consume_ammo()
+		host.emit_signal('load_weapon_info', _current_weapon)
+		_valid_targets[_target_index].hide_battle_cursor()
+		_valid_targets[_target_index].take_damage(_current_weapon)
+		host.emit_signal('load_target_actor_info', 
+			_valid_targets[_target_index])
+
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
@@ -353,6 +380,7 @@ func find_player_attack_targets(host, battlers):
 	var origin_map_cell = host.world_to_map(_current_battler.position)
 	var attacker_type = ActorDatabase.lookup_type(_current_battler.reference)
 	_valid_targets = []
+	_current_action = 'attack'
 	
 	for battler in battlers:
 		var battler_type = ActorDatabase.lookup_type(battler.reference)

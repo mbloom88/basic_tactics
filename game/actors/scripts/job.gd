@@ -60,8 +60,8 @@ func provide_job_info():
 
 #-------------------------------------------------------------------------------
 
-func take_damage(weapon_stats):
-	_stats.take_damage(weapon_stats)
+func take_damage(weapon):
+	_stats.take_damage(weapon)
 
 ################################################################################
 # SETTERS
@@ -69,10 +69,3 @@ func take_damage(weapon_stats):
 
 func set_level(value):
 	level = value
-
-################################################################################
-# SIGNAL HANDLING
-################################################################################
-
-func _on_Stats_stats_initialized():
-	pass # Replace with function body.

@@ -243,10 +243,10 @@ func show_battle_cursor():
 
 #-------------------------------------------------------------------------------
 
-func take_damage(weapon_stats):
-	_job.take_damage(weapon_stats)
+func take_damage(weapon):
+	_job.take_damage(weapon)
 	_skin.take_damage()
-	_reaction.take_damage(weapon_stats['attack_damage'])
+	_reaction.take_damage(weapon.provide_stats()['attack_damage'])
 
 #-------------------------------------------------------------------------------
 
