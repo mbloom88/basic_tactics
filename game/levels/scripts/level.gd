@@ -68,6 +68,11 @@ func _on_Battleground_hide_target_actor_gui_requested():
 
 #-------------------------------------------------------------------------------
 
+func _on_Battleground_hide_weapon_status_requested():
+	_battle_gui.hide_weapon_status()
+
+#-------------------------------------------------------------------------------
+
 func _on_Battleground_load_active_actor_info(actor):
 	_battle_gui.load_active_actor_info(actor)
 
@@ -75,6 +80,11 @@ func _on_Battleground_load_active_actor_info(actor):
 
 func _on_Battleground_load_target_actor_info(actor):
 	_battle_gui.load_target_actor_info(actor)
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_load_weapon_info(weapon):
+	_battle_gui.load_weapon_info(weapon)
 
 #-------------------------------------------------------------------------------
 
@@ -100,7 +110,12 @@ func _on_Battleground_show_active_actor_gui_requested():
 
 func _on_Battleground_show_target_actor_gui_requested():
 	_battle_gui.show_target_actor_gui()
-	
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_show_weapon_status_requested():
+	_battle_gui.show_weapon_status()
+
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_squad_update_requested():

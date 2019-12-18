@@ -4,6 +4,7 @@ extends Sprite
 onready var _stats = $Stats
 
 # Weapon info
+export (String) var reference = ""
 export (Resource) var weapon_loadout
 
 ################################################################################

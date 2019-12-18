@@ -8,6 +8,6 @@ weapon_type = "ranged"
 damage_type = "physical"
 attack_damage = 1
 attack_range = 3
-max_ammo = 0
-ammo_per_attack = 0
+max_ammo = 6
+ammo_per_attack = 1
 

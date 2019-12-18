@@ -386,6 +386,7 @@ func setup_for_next_turn(host):
 		host._remove_blinking_cells()
 		host.emit_signal('hide_active_actor_gui_requested')
 		host.emit_signal('hide_target_actor_gui_requested')
+		host.emit_signal('hide_weapon_status_requested')
 	
 	if _turn_order.empty():
 		_determine_turn_order(host)
@@ -425,4 +426,6 @@ func _on_BattleCamera_tracking_added(host, actor):
 		_current_battler.script_running = true
 		_determine_behavioral_ai_actions(host)
 	else:
+		host.emit_signal('load_weapon_info', _current_weapon)
+		host.emit_signal('show_weapon_status_requested')
 		_current_battler.activate_for_battle()

@@ -11,13 +11,16 @@ signal battle_action_completed
 signal begin_battle
 signal hide_active_actor_gui_requested
 signal hide_target_actor_gui_requested
+signal hide_weapon_status_requested
 signal load_active_actor_info(actor)
 signal load_target_actor_info(actor)
+signal load_weapon_info(weapon)
 signal player_battle_menu_requested(actor)
 signal player_world_menu_requested(actor)
 signal selection_update_requested(type)
 signal show_active_actor_gui_requested
 signal show_target_actor_gui_requested
+signal show_weapon_status_requested
 signal squad_update_requested
 signal state_changed(state)
 

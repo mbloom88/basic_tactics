@@ -5,6 +5,7 @@ onready var _active_panel = $ActiveActorPanel
 onready var _target_panel = $TargetActorPanel
 onready var _squad_count = $SquadCount
 onready var _squad_status = $SquadStatus
+onready var _weapon_status = $WeaponStatus
 
 ################################################################################
 # VIRTUAL METHODS
@@ -34,6 +35,11 @@ func hide_target_actor_gui():
 
 #-------------------------------------------------------------------------------
 
+func hide_weapon_status():
+	_weapon_status.hide_gui()
+
+#-------------------------------------------------------------------------------
+
 func load_active_actor_info(actor):
 	_active_panel.load_actor_info(actor)
 
@@ -41,6 +47,11 @@ func load_active_actor_info(actor):
 
 func load_target_actor_info(actor):
 	_target_panel.load_actor_info(actor)
+
+#-------------------------------------------------------------------------------
+
+func load_weapon_info(weapon):
+	_weapon_status.load_weapon_info(weapon)
 
 #-------------------------------------------------------------------------------
 
@@ -58,6 +69,11 @@ func show_ally_select_gui():
 
 func show_target_actor_gui():
 	_target_panel.show_gui()
+
+#-------------------------------------------------------------------------------
+
+func show_weapon_status():
+	_weapon_status.show_gui()
 
 #-------------------------------------------------------------------------------
 

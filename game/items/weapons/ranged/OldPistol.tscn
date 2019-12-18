@@ -4,5 +4,6 @@
 [ext_resource path="res://items/weapons/ranged/old_pistol.tres" type="Resource" id=2]
 
 [node name="OldPistol" index="0" instance=ExtResource( 1 )]
+reference = "old_pistol"
 weapon_loadout = ExtResource( 2 )
 

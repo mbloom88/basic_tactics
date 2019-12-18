@@ -3,7 +3,7 @@ extends Node
 # Item references
 export (String, DIR) var _melee_weapon_directory = ""
 export (String, DIR) var _ranged_weapon_directory = ""
-var _weapons = {}
+var _items = {}
 
 ################################################################################
 # VIRTUAL METHODS
@@ -39,7 +39,42 @@ func _load_item_references(directory, type):
 		if not file_name.ends_with(".tres"):
 			continue
 		
-		match type:
-			'weapon':
-				_weapons[file_name.get_basename()] = \
-					load(directory.plus_file(file_name))
+		_items[file_name.get_basename()] = load(directory.plus_file(file_name))
+
+################################################################################
+# PUBLIC METHODS
+################################################################################
+
+func lookup_icon(item_ref):
+	"""
+	Looks up an Items's icon from its associated .tres file.
+	
+	Args:
+		- item_ref (String): The Item's .tres file name.
+	
+	Returns:
+		- icon (Texture): The Item's icon.
+	"""
+	assert item_ref in _items
+	assert _items[item_ref].icon
+	
+	var icon = _items[item_ref].icon
+	
+	return icon
+
+#-------------------------------------------------------------------------------
+
+func lookup_name(item_ref):
+	"""
+	Looks up an item's name from its associated .tres file.
+	
+	Args:
+		- item_ref (String): The Items's .tres file name.
+	
+	Returns:
+		- item_name (String): Item name.
+	"""
+	assert item_ref in _items
+	var item_name = _items[item_ref].item_name
+	
+	return item_name
