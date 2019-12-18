@@ -20,6 +20,19 @@ var _target = null
 
 class CustomSorter:
 	
+	static func distance_sorter(frontier_a, frontier_b):
+		"""
+		Sorts an Array of frontier points based on their priority cost to
+		get to the goal. Lower costs are prioritized.
+		"""
+		var distance_a = frontier_a[1]
+		var distance_b = frontier_b[1]
+		if distance_a < distance_b:
+			return true
+		return false
+
+#-------------------------------------------------------------------------------
+
 	static func speed_sorter(actor_a, actor_b):
 		"""
 		Sorts an Array of Actors by their Speed stat. Actors in the Array are
@@ -212,37 +225,73 @@ func _find_closest_cell_near_target(host, action):
 	var origin_cell = host.world_to_map(_current_battler.position)
 	var target_cell = host.world_to_map(_target.position)
 	var used_map_cells = host.provide_used_cells('map')
-	var closest_cell = {}
-	var neighbors = [
-			Vector2(target_cell.x, target_cell.y - 1), # up
-			Vector2(target_cell.x, target_cell.y + 1), # down
-			Vector2(target_cell.x - 1, target_cell.y), # left
-			Vector2(target_cell.x + 1, target_cell.y)] # right
+	var closest_cell = origin_cell
+	var target_distance = origin_cell.distance_to(target_cell)
 	
 	match action:
 		'attack':
 			action_range = _current_weapon.provide_stats()['attack_range']
 	
-	if origin_cell.distance_to(target_cell) > action_range:
-		for neighbor in neighbors:
-			# Manhattan distance calculation for grid
-			var cost = abs(neighbor.x - origin_cell.x) + \
-				abs(neighbor.y - origin_cell.y)
-			if not neighbor in used_map_cells:
-				continue
-			elif host._check_obstacle(neighbor):
-				continue
-			else:
-				if closest_cell.empty():
-					closest_cell['neighbor'] = neighbor
-					closest_cell['cost'] = cost
-				elif cost < closest_cell['cost']:
-					closest_cell['neighbor'] = neighbor
-					closest_cell['cost'] = cost
+	# Search for cell that puts Battler within range of the target
+	if target_distance > action_range:
+		var frontier = []
+		var visited = []
+		var history = []
+		frontier.append([origin_cell, target_distance])
+		visited.append(origin_cell)
+		
+		# Scan all allowed movement cells
+		while not frontier.empty():
+			frontier.sort_custom(CustomSorter, 'distance_sorter')
+			var current = frontier.pop_front()
+			var current_cell = current[0]
+			var current_distance = current[1]
+			
+			if current_distance <= action_range:
+				closest_cell = current_cell
+				break
+			
+			history.append(current)
+			
+			var neighbors = [
+				Vector2(current_cell.x, current_cell.y - 1), # up
+				Vector2(current_cell.x, current_cell.y + 1), # down
+				Vector2(current_cell.x - 1, current_cell.y), # left
+				Vector2(current_cell.x + 1, current_cell.y)] # right
+			
+			for neighbor in neighbors:
+				if not neighbor in host._allowed_move_cells:
+					continue
+				if neighbor in visited:
+					continue
+				var distance = neighbor.distance_to(target_cell)
+				visited.append(neighbor)
+				frontier.append([neighbor, distance])
+		
+		# If no cell is in range, get Battler as close to target as possible
+		if closest_cell == origin_cell:
+			var cell_info = {}
+			var neighbors = [
+				Vector2(target_cell.x, target_cell.y - 1), # up
+				Vector2(target_cell.x, target_cell.y + 1), # down
+				Vector2(target_cell.x - 1, target_cell.y), # left
+				Vector2(target_cell.x + 1, target_cell.y)] # right
+			
+			for neighbor in neighbors:
+				var distance = origin_cell.distance_to(neighbor)
+				if cell_info.empty():
+					cell_info['cell'] = neighbor
+					cell_info['distance'] = distance
+				else:
+					if distance < cell_info['distance']:
+						cell_info['cell'] = neighbor
+						cell_info['distance'] = distance
+			
+			closest_cell = cell_info['cell']
 	else:
-		closest_cell['neighbor'] = origin_cell
+		closest_cell = origin_cell
 	
-	return closest_cell['neighbor']
+	return closest_cell
 
 #-------------------------------------------------------------------------------
 
