@@ -1,14 +1,13 @@
 [gd_resource type="Resource" load_steps=2 format=2]
 
-[ext_resource path="res://globals/item_database/weapons/weapon_template.gd" type="Script" id=1]
+[ext_resource path="res://items/weapons/weapon_template.gd" type="Script" id=1]
 
 [resource]
 script = ExtResource( 1 )
-weapon_name = "Combat Knife"
 weapon_type = "melee"
 damage_type = "physical"
 attack_damage = 1
 attack_range = 1
-max_ammo = 1
+max_ammo = 0
 ammo_per_attack = 0
 

@@ -4,5 +4,6 @@
 
 [node name="ItemDatabase" type="Node"]
 script = ExtResource( 1 )
-_weapon_directory = "res://globals/item_database/weapons"
+_melee_weapon_directory = "res://globals/item_database/references/weapons/melee"
+_ranged_weapon_directory = "res://globals/item_database/references/weapons/ranged"
 

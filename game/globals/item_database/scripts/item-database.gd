@@ -1,7 +1,8 @@
 extends Node
 
 # Item references
-export (String, DIR) var _weapon_directory = ""
+export (String, DIR) var _melee_weapon_directory = ""
+export (String, DIR) var _ranged_weapon_directory = ""
 var _weapons = {}
 
 ################################################################################
@@ -9,7 +10,8 @@ var _weapons = {}
 ################################################################################
 
 func _ready() -> void:
-	_load_item_references(_weapon_directory, 'weapon')
+	_load_item_references(_melee_weapon_directory, 'weapon')
+	_load_item_references(_ranged_weapon_directory, 'weapon')
 
 ################################################################################
 # PRIVATE METHODS

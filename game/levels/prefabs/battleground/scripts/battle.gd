@@ -276,9 +276,6 @@ func _next_ai_battle_action(host):
 #-------------------------------------------------------------------------------
 
 func _perform_next_ai_move(host):
-	
-	print(_move_list)
-	
 	if _move_list.empty():
 		_current_battler.deactivate()
 		_next_ai_battle_action(host)
