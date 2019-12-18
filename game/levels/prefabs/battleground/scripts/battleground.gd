@@ -9,14 +9,16 @@ signal ally_positions_requested
 signal battle_action_cancelled
 signal battle_action_completed
 signal begin_battle
+signal current_weapon_update_requested(current_weapon)
 signal hide_active_actor_gui_requested
 signal hide_target_actor_gui_requested
 signal hide_weapon_status_requested
 signal load_active_actor_info(actor)
 signal load_target_actor_info(actor)
-signal load_weapon_info(weapon)
+signal load_weapon_info(weapon1, weapon2)
 signal player_battle_menu_requested(actor)
 signal player_world_menu_requested(actor)
+signal refresh_weapon_info
 signal selection_update_requested(type)
 signal show_active_actor_gui_requested
 signal show_target_actor_gui_requested
@@ -421,6 +423,14 @@ func update_actors_on_grid(actor, operation):
 				actor.disconnect('reaction_completed', self, 
 					'_on_Actor_reaction_completed')
 				_actors_on_grid.erase(actor)
+
+#-------------------------------------------------------------------------------
+
+func update_current_weapon():
+	if _current_state == _state_map['battle']:
+		_current_state.update_current_weapon()
+
+#-------------------------------------------------------------------------------
 
 ################################################################################
 # SIGNAL HANDLING

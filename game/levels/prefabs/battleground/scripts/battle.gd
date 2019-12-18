@@ -3,6 +3,8 @@ extends "res://assets/scripts/state.gd"
 # General battle parameters
 var _turn_order = []
 var _current_battler = null
+var _weapon1 = null
+var _weapon2 = null
 var _current_weapon = null
 var _current_action = ""
 var _valid_targets = []
@@ -359,7 +361,7 @@ func _player_attack_target(host):
 		host.set_process(false)
 		host.emit_signal('battle_action_completed')
 		_current_weapon.consume_ammo()
-		host.emit_signal('load_weapon_info', _current_weapon)
+		host.emit_signal('refresh_weapon_info')
 		_valid_targets[_target_index].hide_battle_cursor()
 		_valid_targets[_target_index].take_damage(_current_weapon)
 		host.emit_signal('load_target_actor_info', 
@@ -410,6 +412,8 @@ func setup_for_next_turn(host):
 	if _current_battler:
 		_current_battler.deactivate()
 		_current_battler = null
+		_weapon1 = null
+		_weapon2 = null
 		_current_weapon = null
 		host._remove_blinking_cells()
 		host.emit_signal('hide_active_actor_gui_requested')
@@ -421,9 +425,23 @@ func setup_for_next_turn(host):
 		return
 	
 	_current_battler = _turn_order.pop_front()
-	_current_weapon = _current_battler.provide_weapon()
+	var weapons = _current_battler.provide_weapons()
+	_weapon1 = weapons['weapon1']
+	_weapon2 = weapons['weapon2']
+	_current_weapon = _current_battler.provide_current_weapon()
+	host.emit_signal('current_weapon_update_requested', _current_weapon)
 	_determine_move_cells(host)
 	host._battle_camera.track_actor(_current_battler)
+
+#-------------------------------------------------------------------------------
+
+func update_current_weapon():
+	if _current_weapon == _weapon1:
+		_current_weapon = _weapon2
+	else:
+		_current_weapon = _weapon1
+	
+	_current_battler.swap_weapons()
 
 ################################################################################
 # SIGNAL HANDLING
@@ -454,6 +472,6 @@ func _on_BattleCamera_tracking_added(host, actor):
 		_current_battler.script_running = true
 		_determine_behavioral_ai_actions(host)
 	else:
-		host.emit_signal('load_weapon_info', _current_weapon)
+		host.emit_signal('load_weapon_info', _weapon1, _weapon2)
 		host.emit_signal('show_weapon_status_requested')
 		_current_battler.activate_for_battle()

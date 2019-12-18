@@ -21,6 +21,7 @@ onready var _cursor = $BattleCursor
 onready var _skin = $Skin
 onready var _reaction = $ReactionPoint/ReactionNumber
 onready var _state_label = $Debug/StateLabel
+onready var _weapon_label = $Debug/WeaponLabel
 
 # State machine
 var _current_state = null
@@ -61,6 +62,7 @@ func _process(delta):
 
 func _ready():
 	hide_battle_cursor()
+	_weapon_label.update_label(_inventory.provide_current_weapon())
 	
 	if onready_invisible:
 		modulate_alpha_channel('out', 'instant')
@@ -203,13 +205,18 @@ func perform_scripted_move(next_direction, movement_type):
 
 #-------------------------------------------------------------------------------
 
+func provide_current_weapon():
+	return _inventory.provide_current_weapon()
+
+#-------------------------------------------------------------------------------
+
 func provide_job_info():
 	return _job.provide_job_info()
 
 #-------------------------------------------------------------------------------
 
-func provide_weapon():
-	return _inventory.provide_weapon()
+func provide_weapons():
+	return _inventory.provide_weapons()
 
 #-------------------------------------------------------------------------------
 
@@ -240,6 +247,11 @@ func scripted_state_change(new_state):
 
 func show_battle_cursor():
 	_cursor.visible = true
+
+#-------------------------------------------------------------------------------
+
+func swap_weapons():
+	_inventory.swap_weapons()
 
 #-------------------------------------------------------------------------------
 
@@ -275,6 +287,11 @@ func get_script_running():
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
+
+func _on_Inventory_current_weapon_updated(current_weapon):
+	_weapon_label.update_label(current_weapon)
+
+#-------------------------------------------------------------------------------
 
 func _on_ReactionNumber_animation_completed():
 	emit_signal('reaction_completed')

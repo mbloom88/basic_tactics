@@ -1,10 +1,18 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://ui/battle_gui/scripts/battle-gui.gd" type="Script" id=1]
 [ext_resource path="res://ui/battle_gui/prefabs/actor_panel/ActorPanel.tscn" type="PackedScene" id=2]
 [ext_resource path="res://ui/battle_gui/prefabs/squad_count/SquadCount.tscn" type="PackedScene" id=3]
 [ext_resource path="res://ui/battle_gui/prefabs/squad_status/SquadStatus.tscn" type="PackedScene" id=4]
 [ext_resource path="res://ui/battle_gui/prefabs/weapon_status/WeaponStatus.tscn" type="PackedScene" id=5]
+[ext_resource path="res://ui/battle_gui/scripts/weapon-swap.gd" type="Script" id=6]
+
+[sub_resource type="DynamicFontData" id=1]
+font_path = "res://assets/fonts/Roboto/Roboto-Bold.ttf"
+
+[sub_resource type="DynamicFont" id=2]
+use_filter = true
+font_data = SubResource( 1 )
 
 [node name="BattleGUI" type="Control"]
 anchor_right = 1.0
@@ -13,38 +21,53 @@ mouse_filter = 2
 script = ExtResource( 1 )
 
 [node name="ActiveActorPanel" parent="." instance=ExtResource( 2 )]
-anchor_top = 1.0
-anchor_bottom = 1.0
-margin_top = -400.0
-margin_bottom = 0.0
-box_alignment = "left"
 
 [node name="TargetActorPanel" parent="." instance=ExtResource( 2 )]
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
 margin_left = -700.0
-margin_top = -400.0
 margin_right = 0.0
-margin_bottom = 0.0
-box_alignment = "left"
 
 [node name="SquadCount" parent="." instance=ExtResource( 3 )]
 
 [node name="SquadStatus" parent="." instance=ExtResource( 4 )]
-margin_left = -720.0
-margin_top = 624.0
-margin_right = -420.0
-margin_bottom = 674.0
+margin_left = -639.0
+margin_top = 290.0
+margin_right = -339.0
+margin_bottom = 340.0
 
-[node name="WeaponStatus" parent="." instance=ExtResource( 5 )]
+[node name="WeaponStatus1" parent="." instance=ExtResource( 5 )]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -100.0
-margin_top = 335.813
-margin_right = 100.0
-margin_bottom = 435.813
+margin_left = -330.0
+margin_top = 420.0
+margin_right = -30.0
+margin_bottom = 520.0
+hide_on_ready = true
 
+[node name="WeaponStatus2" parent="." instance=ExtResource( 5 )]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 100.0
+margin_top = 421.246
+margin_right = 400.0
+margin_bottom = 521.246
+hide_on_ready = true
+
+[node name="WeaponSwap" type="Button" parent="."]
+margin_left = 960.0
+margin_top = 971.246
+margin_right = 1035.0
+margin_bottom = 1046.25
+focus_mode = 0
+custom_fonts/font = SubResource( 2 )
+enabled_focus_mode = 0
+text = "Swap"
+script = ExtResource( 6 )
+hide_on_ready = true
+
+[connection signal="pressed" from="WeaponSwap" to="." method="_on_WeaponSwap_pressed"]

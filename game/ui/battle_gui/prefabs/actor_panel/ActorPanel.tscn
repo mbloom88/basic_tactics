@@ -63,13 +63,11 @@ editor/display_folded = true
 margin_left = 260.0
 margin_right = 660.0
 margin_bottom = 380.0
-alignment = 2
 
 [node name="StatPanel" type="NinePatchRect" parent="HBoxContainer/VBoxContainer"]
 self_modulate = Color( 1, 1, 1, 0.470588 )
-margin_top = 120.0
 margin_right = 400.0
-margin_bottom = 380.0
+margin_bottom = 260.0
 rect_min_size = Vector2( 400, 260 )
 size_flags_vertical = 0
 texture = SubResource( 4 )

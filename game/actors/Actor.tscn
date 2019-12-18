@@ -15,19 +15,12 @@
 [ext_resource path="res://actors/animations/SETUP.anim" type="Animation" id=13]
 [ext_resource path="res://actors/animations/damaged.anim" type="Animation" id=14]
 [ext_resource path="res://actors/prefabs/reaction_number/ReactionNumber.tscn" type="PackedScene" id=15]
-[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=16]
+[ext_resource path="res://actors/themes/debug.theme" type="Theme" id=16]
+[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=17]
+[ext_resource path="res://actors/scripts/weapon-label.gd" type="Script" id=18]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
-
-[sub_resource type="DynamicFontData" id=2]
-font_path = "res://assets/fonts/Roboto/Roboto-Bold.ttf"
-
-[sub_resource type="DynamicFont" id=3]
-outline_size = 1
-outline_color = Color( 0, 0, 0, 1 )
-use_filter = true
-font_data = SubResource( 2 )
 
 [node name="Actor" type="KinematicBody2D" groups=[
 "actors",
@@ -93,6 +86,7 @@ shape = SubResource( 1 )
 [node name="Debug" type="Control" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
+theme = ExtResource( 16 )
 
 [node name="StateLabel" type="Label" parent="Debug" groups=[
 "debug",
@@ -103,11 +97,23 @@ margin_right = 20.4933
 margin_bottom = -33.4787
 grow_horizontal = 2
 grow_vertical = 2
-custom_fonts/font = SubResource( 3 )
 text = "State Label"
 align = 1
-script = ExtResource( 16 )
+script = ExtResource( 17 )
 
+[node name="WeaponLabel" type="Label" parent="Debug" groups=[
+"debug",
+]]
+margin_left = -51.2343
+margin_top = 35.6503
+margin_right = 51.7657
+margin_bottom = 54.6503
+grow_horizontal = 2
+text = "Weapon Label"
+align = 1
+script = ExtResource( 18 )
+
+[connection signal="current_weapon_updated" from="Inventory" to="." method="_on_Inventory_current_weapon_updated"]
 [connection signal="tween_completed" from="TweenAlpha" to="." method="_on_TweenAlpha_tween_completed"]
 [connection signal="tween_completed" from="TweenMove" to="." method="_on_TweenMove_tween_completed"]
 [connection signal="animation_finished" from="Skin/AnimationPlayer" to="Skin" method="_on_AnimationPlayer_animation_finished"]

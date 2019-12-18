@@ -27,7 +27,7 @@ func _ready():
 ################################################################################
 
 func _on_Battleground_allies_ready_for_placement():
-	_battle_gui.show_ally_select_gui()
+	_guis.show_ally_select_gui()
 	_battleground.place_actors()
 
 #-------------------------------------------------------------------------------
@@ -48,43 +48,48 @@ func _on_Battleground_battle_action_cancelled():
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_battle_action_completed():
-	_guis.exit_all_menus()
+	_guis.remove_all_menus()
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_begin_battle():
 	_battleground.add_battle_camera(_camera)
-	_battle_gui.hide_ally_select_gui()
+	_guis.hide_ally_select_gui()
+
+#-------------------------------------------------------------------------------
+
+func _on_Battleground_current_weapon_update_requested(current_weapon):
+	_guis.update_current_weapon(current_weapon)
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_hide_active_actor_gui_requested():
-	_battle_gui.hide_active_actor_gui()
+	_guis.hide_active_actor_gui()
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_hide_target_actor_gui_requested():
-	_battle_gui.hide_target_actor_gui()
+	_guis.hide_target_actor_gui()
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_hide_weapon_status_requested():
-	_battle_gui.hide_weapon_status()
+	_guis.hide_weapon_status()
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_load_active_actor_info(actor):
-	_battle_gui.load_active_actor_info(actor)
+	_guis.load_active_actor_info(actor)
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_load_target_actor_info(actor):
-	_battle_gui.load_target_actor_info(actor)
+	_guis.load_target_actor_info(actor)
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_load_weapon_info(weapon):
-	_battle_gui.load_weapon_info(weapon)
+func _on_Battleground_load_weapon_info(weapon1, weapon2):
+	_guis.load_weapon_info(weapon1, weapon2)
 
 #-------------------------------------------------------------------------------
 
@@ -98,28 +103,33 @@ func _on_Battleground_player_world_menu_requested(actor):
 
 #-------------------------------------------------------------------------------
 
+func _on_Battleground_refresh_weapon_info():
+	_guis.refresh_weapon_info()
+
+#-------------------------------------------------------------------------------
+
 func _on_Battleground_selection_update_requested(type):
-	_battle_gui.update_squad_status(type)
+	_guis.update_squad_status(type)
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_show_active_actor_gui_requested():
-	_battle_gui.show_active_actor_gui()
+	_guis.show_active_actor_gui()
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_show_target_actor_gui_requested():
-	_battle_gui.show_target_actor_gui()
+	_guis.show_target_actor_gui()
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_show_weapon_status_requested():
-	_battle_gui.show_weapon_status()
+	_guis.show_weapon_status()
 
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_squad_update_requested():
-	_battle_gui.update_squad_count()
+	_guis.update_squad_count()
 
 #-------------------------------------------------------------------------------
 
@@ -130,6 +140,11 @@ func _on_GUIs_player_attacking():
 
 func _on_GUIs_player_waiting():
 	_battleground.next_battler()
+
+#-------------------------------------------------------------------------------
+
+func _on_GUIs_weapon_changed():
+	_battleground.update_current_weapon()
 
 ################################################################################
 # DEBUG
