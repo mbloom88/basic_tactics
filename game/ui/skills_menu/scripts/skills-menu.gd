@@ -1,14 +1,11 @@
-extends Control
+extends NinePatchRect
 
 # Signals 
-signal menu_requested(menu)
-signal player_attacking
-signal player_browsing_skills
-signal player_waiting
 signal state_changed(menu, state)
 
 # Child nodes
-onready var _attack_button = $Background/MenuButtons/Attack
+onready var _scroll = $VBoxContainer/ScrollContainer
+onready var _skill_list = $VBoxContainer/ScrollContainer/SkillList
 
 # State machine
 var _current_state = null
@@ -22,6 +19,9 @@ onready var _state_map = {
 
 # Button handling
 var _current_focus = null
+
+# Scrolling
+export (int) var _button_spacing = 10 # Based on SkillList vbox separation
 
 ################################################################################
 # VIRTUAL METHODS
@@ -60,7 +60,7 @@ func _change_state(state_name):
 	if state_name != 'previous':
 		_current_state._enter(self)
 	
-	emit_signal("state_changed", self, state_name)
+	emit_signal('state_changed', self, state_name)
 
 ################################################################################
 # PUBLIC METHODS
@@ -78,21 +78,7 @@ func interact():
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Attack_pressed():
-	emit_signal('player_attacking')
-	_change_state('idle')
-
-#-------------------------------------------------------------------------------
-
-func _on_Skills_pressed():
-	emit_signal('player_browsing_skills')
-	_change_state('idle')
-
-#-------------------------------------------------------------------------------
-
-func _on_Wait_pressed():
-	emit_signal('player_waiting')
-	_change_state('exit')
-
-
-
+func _on_SkillOption_skill_focus_entered(skill_option):
+	var index = skill_option.get_position_in_parent()
+	_scroll.scroll_vertical = \
+		index * (skill_option.rect_size.y + _button_spacing)

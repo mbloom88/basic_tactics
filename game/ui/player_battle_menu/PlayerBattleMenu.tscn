@@ -115,4 +115,5 @@ size_flags_horizontal = 4
 text = "Wait"
 
 [connection signal="pressed" from="Background/MenuButtons/Attack" to="." method="_on_Attack_pressed"]
+[connection signal="pressed" from="Background/MenuButtons/HBoxContainer/Skills" to="." method="_on_Skills_pressed"]
 [connection signal="pressed" from="Background/MenuButtons/Wait" to="." method="_on_Wait_pressed"]

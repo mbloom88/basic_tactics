@@ -11,7 +11,6 @@
 [ext_resource path="res://assets/spritesheets/greybox_tiles/greybox_tiles_spritesheet.png" type="Texture" id=9]
 [ext_resource path="res://ui/dialogue_handler/prefabs/continue_indicator/ContinueIndicator.tscn" type="PackedScene" id=10]
 
-
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 9 )
 region = Rect2( 128, 0, 64, 64 )

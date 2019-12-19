@@ -12,6 +12,7 @@ onready var _battle_gui = $BattleGUI
 # Menu info
 export (PackedScene) var _player_world_menu
 export (PackedScene) var _player_battle_menu
+export (PackedScene)  var _skills_menu
 
 # Actor info
 var _actor_in_menu = null
@@ -32,7 +33,11 @@ func _add_menu(menu):
 			new_menu.connect('menu_requested', self, '_on_Menu_menu_requested')
 			new_menu.connect('player_attacking', self,
 				 '_on_Menu_player_attacking')
+			new_menu.connect('player_browsing_skills', self, 
+				'_on_Menu_player_browsing_skills')
 			new_menu.connect('player_waiting', self, '_on_Menu_player_waiting')
+		'skills_menu':
+			new_menu = _skills_menu.instance()
 
 	new_menu.connect('state_changed', self, '_on_Menu_state_changed')
 	_menus.add_child(new_menu)
@@ -162,6 +167,11 @@ func _on_Menu_player_attacking():
 
 #-------------------------------------------------------------------------------
 
+func _on_Menu_player_browsing_skills():
+	_add_menu('skills_menu')
+
+#-------------------------------------------------------------------------------
+
 func _on_Menu_player_waiting():
 	_actor_in_menu = null
 	emit_signal('player_waiting')
@@ -180,12 +190,12 @@ func _on_Menu_state_changed(menu, state):
 					'_on_Menu_menu_requested')
 				menu.disconnect('player_attacking', self,
 					 '_on_Menu_player_attacking')
+				menu.disconnect('player_browsing_skills', self, 
+				'_on_Menu_player_browsing_skills')
 				menu.disconnect('player_waiting', self, 
 					'_on_Menu_player_waiting')
+				if _actor_in_menu:
+					_actor_in_menu.resume_from_player_menu()
 		_menus.remove_child(menu)
 		menu.queue_free()
-		
-		if _actor_in_menu:
-			_actor_in_menu.resume_from_player_menu()
-		
 		resume_last_menu()

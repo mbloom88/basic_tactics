@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://levels/scripts/level.gd" type="Script" id=1]
 [ext_resource path="res://levels/prefabs/battleground/Battleground.tscn" type="PackedScene" id=2]
@@ -6,14 +6,19 @@
 [ext_resource path="res://levels/scripts/guis.gd" type="Script" id=4]
 [ext_resource path="res://ui/player_world_menu/PlayerWorldMenu.tscn" type="PackedScene" id=5]
 [ext_resource path="res://ui/player_battle_menu/PlayerBattleMenu.tscn" type="PackedScene" id=6]
-[ext_resource path="res://ui/dialogue_handler/DialogueHandler.tscn" type="PackedScene" id=7]
-[ext_resource path="res://ui/battle_gui/BattleGUI.tscn" type="PackedScene" id=8]
-[ext_resource path="res://levels/scripts/cell-vectors.gd" type="Script" id=9]
+[ext_resource path="res://ui/skills_menu/SkillsMenu.tscn" type="PackedScene" id=7]
+[ext_resource path="res://ui/dialogue_handler/DialogueHandler.tscn" type="PackedScene" id=8]
+[ext_resource path="res://ui/battle_gui/BattleGUI.tscn" type="PackedScene" id=9]
+[ext_resource path="res://levels/scripts/cell-vectors.gd" type="Script" id=10]
 
 [node name="Level" type="Node2D"]
 script = ExtResource( 1 )
 
 [node name="Battleground" parent="." instance=ExtResource( 2 )]
+editor/display_folded = true
+
+[node name="State" parent="Battleground" index="0"]
+editor/display_folded = true
 
 [node name="Camera" parent="." instance=ExtResource( 3 )]
 
@@ -23,15 +28,16 @@ script = ExtResource( 1 )
 script = ExtResource( 4 )
 _player_world_menu = ExtResource( 5 )
 _player_battle_menu = ExtResource( 6 )
+_skills_menu = ExtResource( 7 )
 
 [node name="Menus" type="Control" parent="GUIs"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
 
-[node name="DialogueHandler" parent="GUIs" instance=ExtResource( 7 )]
+[node name="DialogueHandler" parent="GUIs" instance=ExtResource( 8 )]
 
-[node name="BattleGUI" parent="GUIs" instance=ExtResource( 8 )]
+[node name="BattleGUI" parent="GUIs" instance=ExtResource( 9 )]
 
 [node name="Debug" type="Control" parent="."]
 margin_right = 40.0
@@ -42,7 +48,7 @@ margin_bottom = 40.0
 ]]
 margin_right = 40.0
 margin_bottom = 40.0
-script = ExtResource( 9 )
+script = ExtResource( 10 )
 
 [node name="CommandPrograms" type="Node" parent="."]
 
