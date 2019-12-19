@@ -1,5 +1,9 @@
 extends Node
 
+# Signals
+signal item_skills_requested
+signal weapon_reload_requested
+
 # Child nodes
 onready var _stats = $Stats
 onready var _skills = $Skills
@@ -43,6 +47,16 @@ func level_up():
 
 #-------------------------------------------------------------------------------
 
+func load_job_skills():
+	_skills.load_job_skills(job_loadout.skill_references)
+
+#-------------------------------------------------------------------------------
+
+func load_weapon_skills(skill_refs):
+	_skills.load_weapon_skills(skill_refs)
+
+#-------------------------------------------------------------------------------
+
 func provide_job_info():
 	var info = {
 		'job_name': job_loadout.name,
@@ -60,8 +74,18 @@ func provide_job_info():
 
 #-------------------------------------------------------------------------------
 
+func provide_skills():
+	return _skills.provide_skills()
+
+#-------------------------------------------------------------------------------
+
 func take_damage(weapon):
 	_stats.take_damage(weapon)
+
+#-------------------------------------------------------------------------------
+
+func use_skill(skill):
+	_skills.use_skill(skill)
 
 ################################################################################
 # SETTERS
@@ -69,3 +93,10 @@ func take_damage(weapon):
 
 func set_level(value):
 	level = value
+
+################################################################################
+# SIGNAL HANDLING
+################################################################################
+
+func _on_Skills_weapon_reload_requested():
+	emit_signal('weapon_reload_requested')

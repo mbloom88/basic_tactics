@@ -1,7 +1,7 @@
 extends Node
 
 # Skill references
-export (String, DIR) var _skills_directory = ""
+export (String, DIR) var _weapon_skills_directory = ""
 var _skills = {}
 
 ################################################################################
@@ -9,7 +9,7 @@ var _skills = {}
 ################################################################################
 
 func _ready():
-	_load_skill_references(_skills_directory)
+	_load_skill_references(_weapon_skills_directory)
 
 ################################################################################
 # PRIVATE METHODS
@@ -43,10 +43,24 @@ func _load_skill_references(directory):
 # PUBLIC METHODS
 ################################################################################
 
+func lookup_description(skill_ref):
+	assert skill_ref in _skills
+	var skill_description = _skills[skill_ref].description
+	
+	return skill_description
+
+#-------------------------------------------------------------------------------
+
+func lookup_name(skill_ref):
+	assert skill_ref in _skills
+	var skill_name = _skills[skill_ref].skill_name
+	
+	return skill_name
+
+#-------------------------------------------------------------------------------
+
 func provide_skill(skill_ref):
 	assert skill_ref in _skills
-	assert _skills[skill_ref].skill_scene
-	
 	var skill = _skills[skill_ref].skill_scene
 	
 	return skill

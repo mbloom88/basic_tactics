@@ -5,5 +5,5 @@ extends Resource
 
 class_name SkillTemplate
 
-export (String, 'none', 'ammo', 'nano') var resource_type = 'none'
-export (int) var resource_per_use
+export (int) var cost = -1
+export (int) var damage

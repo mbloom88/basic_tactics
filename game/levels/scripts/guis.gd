@@ -1,8 +1,10 @@
 extends CanvasLayer
 
 # Signals
+signal battler_skills_requested
 signal player_attacking
 signal player_waiting
+signal skill_selected(skill)
 signal weapon_changed
 
 # Child nodes
@@ -38,6 +40,8 @@ func _add_menu(menu):
 			new_menu.connect('player_waiting', self, '_on_Menu_player_waiting')
 		'skills_menu':
 			new_menu = _skills_menu.instance()
+			new_menu.connect('skill_selected', self, 
+				'_on_SkillMenu_skill_selected')
 
 	new_menu.connect('state_changed', self, '_on_Menu_state_changed')
 	_menus.add_child(new_menu)
@@ -45,6 +49,15 @@ func _add_menu(menu):
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
+
+func add_skills_to_list(skills):
+	var last_index = _menus.get_child_count() - 1
+	var last_menu = _menus.get_child(last_index)
+	
+	if last_menu.has_method('add_skills_to_list'):
+		last_menu.add_skills_to_list(skills)
+
+#-------------------------------------------------------------------------------
 
 func hide_active_actor_gui():
 	_battle_gui.hide_active_actor_gui()
@@ -178,7 +191,16 @@ func _on_Menu_player_waiting():
 
 #-------------------------------------------------------------------------------
 
+func _on_SkillMenu_skill_selected(skill):
+	emit_signal('skill_selected', skill)
+
+#-------------------------------------------------------------------------------
+
 func _on_Menu_state_changed(menu, state):
+	if state == 'interact':
+		match menu.name:
+			'SkillsMenu':
+				emit_signal('battler_skills_requested')
 	if state == 'exit':
 		match menu.name:
 			'PlayerWorldMenu':
@@ -196,6 +218,10 @@ func _on_Menu_state_changed(menu, state):
 					'_on_Menu_player_waiting')
 				if _actor_in_menu:
 					_actor_in_menu.resume_from_player_menu()
+			'SkillsMenu':
+				menu.disconnect('skill_selected', self, 
+				'_on_SkillMenu_skill_selected')
+		menu.disconnect('state_changed', self, '_on_Menu_state_changed')
 		_menus.remove_child(menu)
 		menu.queue_free()
 		resume_last_menu()

@@ -113,7 +113,11 @@ text = "Weapon Label"
 align = 1
 script = ExtResource( 18 )
 
+[connection signal="item_skills_requested" from="Job" to="." method="_on_Job_item_skills_requested"]
+[connection signal="weapon_reload_requested" from="Job" to="." method="_on_Job_weapon_reload_requested"]
+[connection signal="weapon_reload_requested" from="Job/Skills" to="Job" method="_on_Skills_weapon_reload_requested"]
 [connection signal="current_weapon_updated" from="Inventory" to="." method="_on_Inventory_current_weapon_updated"]
+[connection signal="new_skills_loaded" from="Inventory" to="." method="_on_Inventory_new_skills_loaded"]
 [connection signal="tween_completed" from="TweenAlpha" to="." method="_on_TweenAlpha_tween_completed"]
 [connection signal="tween_completed" from="TweenMove" to="." method="_on_TweenMove_tween_completed"]
 [connection signal="animation_finished" from="Skin/AnimationPlayer" to="Skin" method="_on_AnimationPlayer_animation_finished"]

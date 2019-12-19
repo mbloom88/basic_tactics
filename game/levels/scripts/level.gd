@@ -58,6 +58,11 @@ func _on_Battleground_begin_battle():
 
 #-------------------------------------------------------------------------------
 
+func _on_Battleground_current_battler_skills_acquired(skills):
+	_guis.add_skills_to_list(skills)
+
+#-------------------------------------------------------------------------------
+
 func _on_Battleground_current_weapon_update_requested(current_weapon):
 	_guis.update_current_weapon(current_weapon)
 
@@ -133,6 +138,11 @@ func _on_Battleground_squad_update_requested():
 
 #-------------------------------------------------------------------------------
 
+func _on_GUIs_battler_skills_requested():
+	_battleground.provide_current_battler_skills()
+
+#-------------------------------------------------------------------------------
+
 func _on_GUIs_player_attacking():
 	_battleground.find_player_attack_targets()
 
@@ -140,6 +150,11 @@ func _on_GUIs_player_attacking():
 
 func _on_GUIs_player_waiting():
 	_battleground.next_battler()
+
+#-------------------------------------------------------------------------------
+
+func _on_GUIs_skill_selected(skill):
+	_battleground.validate_skill_for_use(skill)
 
 #-------------------------------------------------------------------------------
 

@@ -63,6 +63,8 @@ func _process(delta):
 func _ready():
 	hide_battle_cursor()
 	_weapon_label.update_label(_inventory.provide_current_weapon())
+	_job.load_job_skills()
+	_inventory.load_item_skills()
 	
 	if onready_invisible:
 		modulate_alpha_channel('out', 'instant')
@@ -215,8 +217,18 @@ func provide_job_info():
 
 #-------------------------------------------------------------------------------
 
+func provide_skills():
+	return _job.provide_skills()
+
+#-------------------------------------------------------------------------------
+
 func provide_weapons():
 	return _inventory.provide_weapons()
+
+#-------------------------------------------------------------------------------
+
+func reload_current_weapon():
+	_inventory.reload_current_weapon()
 
 #-------------------------------------------------------------------------------
 
@@ -290,6 +302,21 @@ func get_script_running():
 
 func _on_Inventory_current_weapon_updated(current_weapon):
 	_weapon_label.update_label(current_weapon)
+
+#-------------------------------------------------------------------------------
+
+func _on_Inventory_new_skills_loaded(skill_refs):
+	_job.load_weapon_skills(skill_refs)
+
+#-------------------------------------------------------------------------------
+
+func _on_Job_item_skills_requested():
+	_inventory.load_item_skills()
+
+#-------------------------------------------------------------------------------
+
+func _on_Job_weapon_reload_requested():
+	_inventory.reload_current_weapon()
 
 #-------------------------------------------------------------------------------
 

@@ -12,7 +12,7 @@ _global_script_classes=[ {
 "base": "Resource",
 "class": "ActorReference",
 "language": "GDScript",
-"path": "res://globals/actor_database/references/actor_reference_template.gd"
+"path": "res://globals/actor_database/references/actor-reference-template.gd"
 }, {
 "base": "Resource",
 "class": "ItemReference",
@@ -37,7 +37,7 @@ _global_script_classes=[ {
 "base": "Resource",
 "class": "WeaponTemplate",
 "language": "GDScript",
-"path": "res://items/weapons/weapon_template.gd"
+"path": "res://items/weapons/weapon-template.gd"
 } ]
 _global_script_class_icons={
 "ActorReference": "",
@@ -64,6 +64,7 @@ ActorDatabase="*res://globals/actor_database/ActorDatabase.tscn"
 EventDatabase="*res://globals/event_database/EventDatabase.tscn"
 PartyDatabase="*res://globals/party_database/PartyDatabase.tscn"
 ItemDatabase="*res://globals/item_database/ItemDatabase.tscn"
+SkillsDatabase="*res://globals/skills_database/SkillsDatabase.tscn"
 
 [display]
 

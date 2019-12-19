@@ -4,11 +4,12 @@
 
 [resource]
 script = ExtResource( 1 )
-name = "Test Job 1"
+name = "Test Job 3"
 max_health = 3
 max_armor = 0
 max_shields = 0
-aim = 5
-speed = 2
+aim = 2
+speed = 6
 move = 2
+skill_references = [  ]
 

@@ -78,3 +78,21 @@ func lookup_name(item_ref):
 	var item_name = _items[item_ref].item_name
 	
 	return item_name
+
+#-------------------------------------------------------------------------------
+
+func lookup_skills(item_ref):
+	"""
+	Looks up an item's associated skills from its associated .tres file.
+	
+	Args:
+		- item_ref (String): The Items's .tres file name.
+	
+	Returns:
+		- skills (Array): A list of skills associated with the item. Returns
+			empty if none exist.
+	"""
+	assert item_ref in _items
+	var skills = _items[item_ref].skill_references
+	
+	return skills

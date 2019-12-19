@@ -25,3 +25,8 @@ func consume_ammo():
 
 func provide_stats():
 	return _stats.provide_stats()
+
+#-------------------------------------------------------------------------------
+
+func reload():
+	_stats.reload()

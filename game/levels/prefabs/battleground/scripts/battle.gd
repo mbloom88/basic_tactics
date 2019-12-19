@@ -403,6 +403,12 @@ func find_player_attack_targets(host, battlers):
 
 #-------------------------------------------------------------------------------
 
+func provide_current_battler_skills(host):
+	var skills = _current_battler.provide_skills()
+	host.emit_signal('current_battler_skills_acquired', skills)
+
+#-------------------------------------------------------------------------------
+
 func setup_for_next_turn(host):
 	"""
 	Preparation for the next Battler's turn. Registers the next battle in the
@@ -442,6 +448,17 @@ func update_current_weapon():
 		_current_weapon = _weapon1
 	
 	_current_battler.swap_weapons()
+
+#-------------------------------------------------------------------------------
+
+func validate_skill_for_use(host, skill):
+	if skill.reference == 'reload-weapon':
+		_current_battler.reload_current_weapon()
+		host.emit_signal('refresh_weapon_info')
+		_current_battler.deactivate()
+		yield(get_tree().create_timer(0.5), 'timeout')
+		host.emit_signal('battle_action_completed')
+		setup_for_next_turn(host)
 
 ################################################################################
 # SIGNAL HANDLING

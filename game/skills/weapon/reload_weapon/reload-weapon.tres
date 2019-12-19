@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource( 1 )
-resource_type = "none"
-resource_per_use = -1
+cost = -1
+damage = 0
 

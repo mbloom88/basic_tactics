@@ -9,6 +9,7 @@ signal ally_positions_requested
 signal battle_action_cancelled
 signal battle_action_completed
 signal begin_battle
+signal current_battler_skills_acquired(skills)
 signal current_weapon_update_requested(current_weapon)
 signal hide_active_actor_gui_requested
 signal hide_target_actor_gui_requested
@@ -311,6 +312,12 @@ func provide_cell_size():
 
 #-------------------------------------------------------------------------------
 
+func provide_current_battler_skills():
+	if _current_state == _state_map['battle']:
+		_current_state.provide_current_battler_skills(self)
+
+#-------------------------------------------------------------------------------
+
 func provide_used_cells(type):
 	"""
 	Provides the list of all active tiles in the Battleground TileMap either as
@@ -424,13 +431,17 @@ func update_actors_on_grid(actor, operation):
 					'_on_Actor_reaction_completed')
 				_actors_on_grid.erase(actor)
 
-#-------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
 
 func update_current_weapon():
 	if _current_state == _state_map['battle']:
 		_current_state.update_current_weapon()
 
-#-------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
+
+func validate_skill_for_use(skill):
+	if _current_state == _state_map['battle']:
+		_current_state.validate_skill_for_use(self, skill)
 
 ################################################################################
 # SIGNAL HANDLING

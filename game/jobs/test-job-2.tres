@@ -2,7 +2,6 @@
 
 [ext_resource path="res://jobs/job-template.gd" type="Script" id=1]
 
-
 [resource]
 script = ExtResource( 1 )
 name = "Test Job 2"
@@ -12,4 +11,5 @@ max_shields = 0
 aim = 5
 speed = 4
 move = 4
+skill_references = [  ]
 

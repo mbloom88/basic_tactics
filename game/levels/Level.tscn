@@ -15,10 +15,6 @@
 script = ExtResource( 1 )
 
 [node name="Battleground" parent="." instance=ExtResource( 2 )]
-editor/display_folded = true
-
-[node name="State" parent="Battleground" index="0"]
-editor/display_folded = true
 
 [node name="Camera" parent="." instance=ExtResource( 3 )]
 
@@ -57,6 +53,7 @@ script = ExtResource( 10 )
 [connection signal="battle_action_cancelled" from="Battleground" to="." method="_on_Battleground_battle_action_cancelled"]
 [connection signal="battle_action_completed" from="Battleground" to="." method="_on_Battleground_battle_action_completed"]
 [connection signal="begin_battle" from="Battleground" to="." method="_on_Battleground_begin_battle"]
+[connection signal="current_battler_skills_acquired" from="Battleground" to="." method="_on_Battleground_current_battler_skills_acquired"]
 [connection signal="current_weapon_update_requested" from="Battleground" to="." method="_on_Battleground_current_weapon_update_requested"]
 [connection signal="hide_active_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_hide_active_actor_gui_requested"]
 [connection signal="hide_target_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_hide_target_actor_gui_requested"]
@@ -72,8 +69,10 @@ script = ExtResource( 10 )
 [connection signal="show_target_actor_gui_requested" from="Battleground" to="." method="_on_Battleground_show_target_actor_gui_requested"]
 [connection signal="show_weapon_status_requested" from="Battleground" to="." method="_on_Battleground_show_weapon_status_requested"]
 [connection signal="squad_update_requested" from="Battleground" to="." method="_on_Battleground_squad_update_requested"]
+[connection signal="battler_skills_requested" from="GUIs" to="." method="_on_GUIs_battler_skills_requested"]
 [connection signal="player_attacking" from="GUIs" to="." method="_on_GUIs_player_attacking"]
 [connection signal="player_waiting" from="GUIs" to="." method="_on_GUIs_player_waiting"]
+[connection signal="skill_selected" from="GUIs" to="." method="_on_GUIs_skill_selected"]
 [connection signal="weapon_changed" from="GUIs" to="." method="_on_GUIs_weapon_changed"]
 [connection signal="weapon_changed" from="GUIs/BattleGUI" to="GUIs" method="_on_BattleGUI_weapon_changed"]
 

@@ -3,8 +3,8 @@ extends Node
 # Skill info
 export (String) var reference = ""
 export (Resource) var skill_loadout
-var resouce_type = ""
-var resource_per_use = -1
+var cost
+var damage
 
 ################################################################################
 # PUBLIC METHODS
@@ -18,15 +18,14 @@ func _ready():
 ################################################################################
 
 func initialize(skill_loadout):
-	resouce_type = skill_loadout.resource_type
-	resource_per_use = skill_loadout.resource_per_use
+	cost = skill_loadout.cost
+	damage = skill_loadout.damage
 
 #-------------------------------------------------------------------------------
 
-func provide_skill():
-	return self
-
-#-------------------------------------------------------------------------------
-
-func use_skill():
-	pass
+func provide_skill_stats():
+	var skill_stats = {
+		'cost': cost,
+		'damage': damage,
+	}
+	return skill_stats

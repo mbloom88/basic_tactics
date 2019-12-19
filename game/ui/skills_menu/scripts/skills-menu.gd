@@ -1,11 +1,13 @@
 extends NinePatchRect
 
 # Signals 
+signal skill_selected(skill)
 signal state_changed(menu, state)
 
 # Child nodes
 onready var _scroll = $VBoxContainer/ScrollContainer
 onready var _skill_list = $VBoxContainer/ScrollContainer/SkillList
+onready var _description = $VBoxContainer/SkillDescriptionPanel/Desription
 
 # State machine
 var _current_state = null
@@ -16,6 +18,9 @@ onready var _state_map = {
 	'interact': $State/Interact,
 	'exit': $State/Exit,
 }
+
+# Skills
+export (PackedScene) var skill_option_scene
 
 # Button handling
 var _current_focus = null
@@ -66,6 +71,12 @@ func _change_state(state_name):
 # PUBLIC METHODS
 ################################################################################
 
+func add_skills_to_list(skills):
+	if _current_state == _state_map['interact']:
+		_current_state.add_skills_to_list(self, skills)
+
+#-------------------------------------------------------------------------------
+
 func exit():
 	_change_state('exit')
 
@@ -80,5 +91,13 @@ func interact():
 
 func _on_SkillOption_skill_focus_entered(skill_option):
 	var index = skill_option.get_position_in_parent()
+	var skill_ref = skill_option.provide_skill_reference()
 	_scroll.scroll_vertical = \
 		index * (skill_option.rect_size.y + _button_spacing)
+	_description.bbcode_text = \
+		'%s' % SkillsDatabase.lookup_description(skill_ref)
+
+#-------------------------------------------------------------------------------
+
+func _on_SkillOption_skill_selected(skill):
+	emit_signal('skill_selected', skill)
