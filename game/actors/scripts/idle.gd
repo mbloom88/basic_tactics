@@ -23,7 +23,7 @@ func check_user_inputs():
 	Looks for user inputs corresponding to specific actions.
 	
 	Returns:
-		- action (String): The next action to be performance. Returns empty
+		- action (String): The next action to be performed. Returns empty
 			if no user input was detected.
 	"""
 	var action = ""
