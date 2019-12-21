@@ -20,7 +20,7 @@ theme = ExtResource( 1 )
 texture = SubResource( 1 )
 script = ExtResource( 3 )
 
-[node name="Label" type="Label" parent="."]
+[node name="StatusLabel" type="Label" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2

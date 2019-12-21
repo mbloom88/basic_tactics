@@ -1,7 +1,7 @@
 extends NinePatchRect
 
 # Child nodes
-onready var _label = $Label
+onready var _label = $StatusLabel
 
 ################################################################################
 # VIRTUAL METHODS
@@ -30,5 +30,5 @@ func update_squad_status(status):
 			_label.text = 'IN SQUAD'
 			_label.set("custom_colors/font_color", Color.chartreuse)
 		'not_selected':
-			_label.text = 'NOT SELECTED'
+			_label.text = 'NOT IN SQUAD'
 			_label.set("custom_colors/font_color", Color.red)
