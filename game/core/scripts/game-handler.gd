@@ -5,7 +5,7 @@ onready var _level = $Level
 onready var _menus = $Menus
 
 ################################################################################
-# VIRTUAL METHODS
+# BUILT-IN VIRTUAL METHODS
 ################################################################################
 
 func _ready():
