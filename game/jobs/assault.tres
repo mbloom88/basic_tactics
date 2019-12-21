@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://jobs/job-template.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Assault"
+max_health = 5
+max_armor = 0
+max_shields = 0
+aim = 0
+speed = 2
+move = 3
+skill_references = [  ]
+
