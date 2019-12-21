@@ -6,7 +6,6 @@ extends Node2D
 # Child nodes
 onready var _camera = $Camera
 onready var _battleground = $Battleground
-onready var _ally_positions = $AllyBattlePositions
 onready var _guis = $GUIs
 onready var _battle_gui = $GUIs/BattleGUI
 onready var _cell_vectors = $Debug/CellVectors
@@ -29,16 +28,6 @@ func _ready():
 func _on_Battleground_allies_ready_for_placement():
 	_guis.show_ally_select_gui()
 	_battleground.place_actors()
-
-#-------------------------------------------------------------------------------
-
-func _on_Battleground_ally_positions_requested():
-	var start_cells = {}
-	
-	for cell in _ally_positions.get_children():
-		start_cells[cell.name] = cell.position
-	
-	_battleground.register_battle_positions(start_cells)
 
 #-------------------------------------------------------------------------------
 

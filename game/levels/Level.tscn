@@ -15,10 +15,9 @@
 script = ExtResource( 1 )
 
 [node name="Battleground" parent="." instance=ExtResource( 2 )]
+editor/display_folded = true
 
 [node name="Camera" parent="." instance=ExtResource( 3 )]
-
-[node name="AllyBattlePositions" type="Node2D" parent="."]
 
 [node name="GUIs" type="CanvasLayer" parent="."]
 script = ExtResource( 4 )
@@ -49,7 +48,6 @@ script = ExtResource( 10 )
 [node name="CommandPrograms" type="Node" parent="."]
 
 [connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]
-[connection signal="ally_positions_requested" from="Battleground" to="." method="_on_Battleground_ally_positions_requested"]
 [connection signal="battle_action_cancelled" from="Battleground" to="." method="_on_Battleground_battle_action_cancelled"]
 [connection signal="battle_action_completed" from="Battleground" to="." method="_on_Battleground_battle_action_completed"]
 [connection signal="begin_battle" from="Battleground" to="." method="_on_Battleground_begin_battle"]
