@@ -2,7 +2,6 @@ extends CanvasLayer
 
 # Signals
 signal battler_skills_requested
-signal player_attacking
 signal player_waiting
 signal skill_selected(skill)
 signal weapon_changed
@@ -32,12 +31,12 @@ func _add_menu(menu):
 			new_menu.connect('menu_requested', self, '_on_Menu_menu_requested')
 		'player_battle':
 			new_menu = _player_battle_menu.instance()
+			new_menu.set_actor(_actor_in_menu)
 			new_menu.connect('menu_requested', self, '_on_Menu_menu_requested')
-			new_menu.connect('player_attacking', self,
-				 '_on_Menu_player_attacking')
 			new_menu.connect('player_browsing_skills', self, 
-				'_on_Menu_player_browsing_skills')
-			new_menu.connect('player_waiting', self, '_on_Menu_player_waiting')
+				'_on_PlayerBattleMenu_player_browsing_skills')
+			new_menu.connect('player_waiting', self, 
+				'_on_PlayerBattleMenu_player_waiting')
 		'skills_menu':
 			new_menu = _skills_menu.instance()
 			new_menu.connect('skill_selected', self, 
@@ -137,7 +136,7 @@ func show_player_world_menu(actor):
 
 #-------------------------------------------------------------------------------
 
-func show_target_actor_gui():
+func show_target_actor_gui(target):
 	_battle_gui.show_target_actor_gui()
 
 #-------------------------------------------------------------------------------
@@ -175,17 +174,12 @@ func _on_Menu_menu_requested(menu):
 
 #-------------------------------------------------------------------------------
 
-func _on_Menu_player_attacking():
-	emit_signal('player_attacking')
-
-#-------------------------------------------------------------------------------
-
-func _on_Menu_player_browsing_skills():
+func _on_PlayerBattleMenu_player_browsing_skills():
 	_add_menu('skills_menu')
 
 #-------------------------------------------------------------------------------
 
-func _on_Menu_player_waiting():
+func _on_PlayerBattleMenu_player_waiting():
 	_actor_in_menu = null
 	emit_signal('player_waiting')
 
@@ -210,12 +204,10 @@ func _on_Menu_state_changed(menu, state):
 				_battle_gui.activate_weapon_swap()
 				menu.disconnect('menu_requested', self, 
 					'_on_Menu_menu_requested')
-				menu.disconnect('player_attacking', self,
-					 '_on_Menu_player_attacking')
 				menu.disconnect('player_browsing_skills', self, 
-				'_on_Menu_player_browsing_skills')
+				'_on_PlayerBattleMenu_player_browsing_skills')
 				menu.disconnect('player_waiting', self, 
-					'_on_Menu_player_waiting')
+					'_on_PlayerBattleMenu_player_waiting')
 				if _actor_in_menu:
 					_actor_in_menu.resume_from_player_menu()
 			'SkillsMenu':

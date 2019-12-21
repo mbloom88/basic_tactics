@@ -63,16 +63,6 @@ func hide_weapon_status():
 
 #-------------------------------------------------------------------------------
 
-func load_active_actor_info(actor):
-	_active_panel.load_actor_info(actor)
-
-#-------------------------------------------------------------------------------
-
-func load_target_actor_info(actor):
-	_target_panel.load_actor_info(actor)
-
-#-------------------------------------------------------------------------------
-
 func load_weapon_info(weapon1, weapon2):
 	_weapon_status1.load_weapon_info(weapon1)
 	_weapon_status2.load_weapon_info(weapon2)
@@ -94,7 +84,8 @@ func refresh_weapon_info():
 
 #-------------------------------------------------------------------------------
 
-func show_active_actor_gui():
+func show_active_actor_gui(actor):
+	_active_panel.load_actor_info(actor)
 	_active_panel.show_gui()
 
 #-------------------------------------------------------------------------------
@@ -106,7 +97,8 @@ func show_ally_select_gui():
 
 #-------------------------------------------------------------------------------
 
-func show_target_actor_gui():
+func show_target_actor_gui(target):
+	_target_panel.load_actor_info(target)
 	_target_panel.show_gui()
 
 #-------------------------------------------------------------------------------

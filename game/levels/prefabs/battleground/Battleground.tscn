@@ -38,5 +38,5 @@ script = ExtResource( 7 )
 
 [node name="NonBattlers" type="YSort" parent="."]
 
-[node name="Objects" type="YSort" parent="."]
+[node name="Destructables" type="YSort" parent="."]
 

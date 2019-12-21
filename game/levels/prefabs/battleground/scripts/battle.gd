@@ -66,7 +66,6 @@ func _update(host, delta):
 ################################################################################
 
 func _ai_attack_target(host):
-	_determine_attack_cells(host)
 	yield(get_tree().create_timer(0.25), 'timeout') # Slows the ai down
 	host.emit_signal('load_target_actor_info', _target)
 	host.emit_signal('show_target_actor_gui_requested')
@@ -114,25 +113,6 @@ func _check_targets_for_player(host):
 
 #-------------------------------------------------------------------------------
 
-func _determine_attack_cells(host):
-	"""
-	Determines the attack range for the current Battler and then displays the
-	allowable range.
-	"""
-	var origin_map_cell = host.world_to_map(_current_battler.position)
-	var attack_range = _current_weapon.provide_stats()['attack_range']
-	var used_cells = host.provide_used_cells('map')
-	_allowed_action_cells = []
-	
-	for cell in used_cells:
-		if cell.distance_to(origin_map_cell) <= attack_range:
-			_allowed_action_cells.append(cell)
-	
-	host._remove_blinking_cells()
-	host._add_blinking_cells(_allowed_action_cells)
-
-#-------------------------------------------------------------------------------
-
 func _determine_behavioral_ai_actions(host):
 	"""
 	Determines the type of battle actions that the current Enemy or NPC
@@ -144,32 +124,6 @@ func _determine_behavioral_ai_actions(host):
 				_action_list = ['move_to_attack', 'attack']
 	
 	_next_ai_battle_action(host)
-
-#-------------------------------------------------------------------------------
-
-func _determine_move_cells(host):
-	"""
-	Determines what cells the current Battler will be allowed to move into
-	during its turn and then displays the allowable cells.
-	"""
-	var move_stat = _current_battler.provide_job_info()['move']
-	var mover_type = ActorDatabase.lookup_type(_current_battler.reference)
-	var origin_map_cell = host.world_to_map(_current_battler.position)
-	var used_cells = host.provide_used_cells('map')
-	host._allowed_move_cells = []
-	
-	for cell in used_cells:
-		if cell.distance_to(origin_map_cell) <= move_stat:
-			host._allowed_move_cells.append(cell)
-	
-	for cell in host._allowed_move_cells:
-		var obstacle = host._check_obstacle(cell)
-		if obstacle:
-			if ActorDatabase.lookup_type(obstacle.reference) != mover_type:
-				host._allowed_move_cells.erase(cell)
-	
-	host._remove_blinking_cells()
-	host._add_blinking_cells(host._allowed_move_cells)
 
 #-------------------------------------------------------------------------------
 
@@ -338,70 +292,9 @@ func _perform_next_ai_move(host):
 	else:
 		_next_ai_battle_action(host)
 
-#-------------------------------------------------------------------------------
-
-func _player_attack_target(host):
-	"""
-	Allows the player Battler to attack a target if the Battler's Weapon has
-	enough ammo.
-	"""
-	var ammo = _current_weapon.provide_stats()['ammo']
-	var max_ammo = _current_weapon.provide_stats()['max_ammo']
-	var ammo_per_attack = _current_weapon.provide_stats()['ammo_per_attack']
-	if _max_target_index > -1 and max_ammo == -1:
-		_current_battler.deactivate()
-		host.set_process(false)
-		host.emit_signal('battle_action_completed')
-		_valid_targets[_target_index].hide_battle_cursor()
-		_valid_targets[_target_index].take_damage(_current_weapon)
-		host.emit_signal('load_target_actor_info', 
-			_valid_targets[_target_index])
-	elif _max_target_index > -1 and ammo >= ammo_per_attack:
-		_current_battler.deactivate()
-		host.set_process(false)
-		host.emit_signal('battle_action_completed')
-		_current_weapon.consume_ammo()
-		host.emit_signal('refresh_weapon_info')
-		_valid_targets[_target_index].hide_battle_cursor()
-		_valid_targets[_target_index].take_damage(_current_weapon)
-		host.emit_signal('load_target_actor_info', 
-			_valid_targets[_target_index])
-
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
-
-func find_player_attack_targets(host, battlers):
-	"""
-	Determines attack targets for for the player's Battler.
-	
-	Args:
-		- battlers (Array): Array of Battler objects.
-	"""
-	var attack_range = _current_weapon.provide_stats()['attack_range']
-	var origin_map_cell = host.world_to_map(_current_battler.position)
-	var attacker_type = ActorDatabase.lookup_type(_current_battler.reference)
-	_valid_targets = []
-	_current_action = 'attack'
-	
-	for battler in battlers:
-		var battler_type = ActorDatabase.lookup_type(battler.reference)
-		var target_map_cell = host.world_to_map(battler.position)
-		var distance_to_target = origin_map_cell.distance_to(target_map_cell)
-		if battler_type != attacker_type and distance_to_target <= attack_range:
-			_valid_targets.append(battler)
-	
-	_determine_attack_cells(host)
-	
-	if _valid_targets.empty():
-		_max_target_index = -1
-	else:
-		_max_target_index = _valid_targets.size() - 1
-	
-	_target_index = 0
-	host.set_process(true)
-
-#-------------------------------------------------------------------------------
 
 func provide_current_battler_skills(host):
 	var skills = _current_battler.provide_skills()

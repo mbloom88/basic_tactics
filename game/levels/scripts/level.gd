@@ -127,13 +127,13 @@ func _on_Battleground_squad_update_requested():
 
 #-------------------------------------------------------------------------------
 
-func _on_GUIs_battler_skills_requested():
-	_battleground.provide_current_battler_skills()
+func _on_Battleground_target_selected(target):
+	_guis.show_target_actor_gui(target)
 
 #-------------------------------------------------------------------------------
 
-func _on_GUIs_player_attacking():
-	_battleground.find_player_attack_targets()
+func _on_GUIs_battler_skills_requested():
+	_battleground.provide_current_battler_skills()
 
 #-------------------------------------------------------------------------------
 

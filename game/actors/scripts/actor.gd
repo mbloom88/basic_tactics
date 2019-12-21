@@ -5,12 +5,17 @@ extends KinematicBody2D
 
 # Signals 
 signal alpha_modulate_completed
+signal attack_cells_requested(actor, attack_range)
+signal attack_started(actor)
+signal battle_action_cancelled
 signal camera_move_requested(location, move_speed)
+signal move_cells_requested(actor, move_range)
 signal move_completed(actor)
 signal move_requested(actor, direction)
 signal player_menu_requested(actor)
 signal reaction_completed
 signal state_changed(state)
+signal target_selected(target)
 
 # Child nodes
 onready var _job = $Job
@@ -32,6 +37,7 @@ onready var _state_map = {
 	'idle': $State/Idle,
 	'move': $State/Move,
 	'menu': $State/Menu,
+	'attack': $State/Attack,
 }
 
 # Actor info
@@ -84,6 +90,8 @@ func _change_state(state_name):
 
 	if state_name == 'previous':
 		_state_stack.pop_front()
+	elif state_name == 'attack':
+		_state_stack.push_front(_state_map[state_name])
 	else:
 		var new_state = _state_map[state_name]
 		_state_stack[0] = new_state
@@ -132,6 +140,12 @@ func deactivate():
 
 func hide_battle_cursor():
 	_cursor.visible = false
+
+#-------------------------------------------------------------------------------
+
+func initiate_attack():
+	if _current_state == _state_map['menu']:
+		_change_state('attack')
 
 #-------------------------------------------------------------------------------
 
@@ -255,6 +269,19 @@ func scripted_state_change(new_state):
 		script_running = true
 		
 	_change_state(new_state)
+
+#-------------------------------------------------------------------------------
+
+func search_for_attack_targets(target_info):
+	"""
+	Args:
+		target_info (Dictionary): A dictionary that holds the requesting actor
+			as a key within its current map cell as a value. Targets are listed 
+			as keys and their associated map cells are their values. The map
+			cells can be used for determining distances.
+	"""
+	if _current_state == _state_map['menu']:
+		_current_state.search_for_attack_targets(self, target_info)
 
 #-------------------------------------------------------------------------------
 

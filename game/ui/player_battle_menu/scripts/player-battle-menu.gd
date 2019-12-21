@@ -2,7 +2,6 @@ extends Control
 
 # Signals 
 signal menu_requested(menu)
-signal player_attacking
 signal player_browsing_skills
 signal player_waiting
 signal state_changed(menu, state)
@@ -22,6 +21,9 @@ onready var _state_map = {
 
 # Button handling
 var _current_focus = null
+
+# Actor info
+var _current_actor = null
 
 ################################################################################
 # VIRTUAL METHODS
@@ -74,12 +76,17 @@ func exit():
 func interact():
 	_change_state('interact')
 
+#-------------------------------------------------------------------------------
+
+func set_actor(actor):
+	_current_actor = actor
+
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
 
 func _on_Attack_pressed():
-	emit_signal('player_attacking')
+	_current_actor.initiate_attack()
 	_change_state('idle')
 
 #-------------------------------------------------------------------------------
