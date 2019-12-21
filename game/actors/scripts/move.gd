@@ -17,13 +17,10 @@ func _enter(host):
 #-------------------------------------------------------------------------------
 
 func _update(host, delta):
-	var action = check_actions()
-	
-	if action:
-		match action[0]:
-			'move':
-				host.set_process(false)
-				host.emit_signal('move_requested', host, action[1])
+	var direction = check_move_directions()
+	if direction:
+		host.set_process(false)
+		host.emit_signal('move_requested', host, direction)
 	else:
 		return 'idle'
 
@@ -31,26 +28,26 @@ func _update(host, delta):
 # PUBLIC METHODS
 ################################################################################
 
-func check_actions():
+func check_move_directions():
 	"""
-	Looks for user inputs corresponding to specific actions.
+	Looks for user inputs corresponding to specific move directions.
 	
 	Returns:
-		- action (Array): Two element array. Element 0 is the action to be
-			performed. Element 1 is the value associated with that action. 
+		- direction (Vector2): The next direction to move in. Returns Vector2()
+			if no user input was detected.
 	"""
-	var action = []
+	var direction = Vector2()
 	
 	if Input.is_action_pressed("move_up"):
-		action = ['move', Vector2(0, -1)]
+		direction = Vector2(0, -1)
 	elif Input.is_action_pressed("move_down"):
-		action = ['move', Vector2(0, 1)]
+		direction = Vector2(0, 1)
 	elif Input.is_action_pressed("move_left"):
-		action = ['move', Vector2(-1, 0)]
+		direction = Vector2(-1, 0)
 	elif Input.is_action_pressed("move_right"):
-		action = ['move', Vector2(1, 0)]
+		direction = Vector2(1, 0)
 	
-	return action
+	return direction
 
 #-------------------------------------------------------------------------------
 
@@ -60,7 +57,7 @@ func determine_next_cell(host, next_direction, movement_type):
 
 #-------------------------------------------------------------------------------
 
-func move_to_cell(host, cell):
+func move_to_position(host, world_position):
 	"""
 	Moves the actor towards a cell corresponding with a move key.
 	
@@ -68,7 +65,7 @@ func move_to_cell(host, cell):
 		- host (Object): The actor object for this state.
 		- cell (Vector2): The next world cell to move into.
 	"""
-	if host.position != cell:
+	if host.position != world_position:
 		var move_speed = 0.0
 		
 		match move_type:
@@ -81,13 +78,13 @@ func move_to_cell(host, cell):
 			host,
 			"position",
 			host.position,
-			cell,
+			world_position,
 			move_speed,
 			Tween.TRANS_LINEAR,
 			Tween.EASE_IN)
 		
 		host._tween_move.start()
-		host.emit_signal('camera_move_requested', cell, move_speed)
+		host.emit_signal('camera_move_requested', world_position, move_speed)
 	else:
 		if not host.script_running:
 			host.set_process(true)

@@ -181,16 +181,17 @@ func modulate_alpha_channel(fade_type, mode, speed=0.5):
 
 #-------------------------------------------------------------------------------
 
-func perform_move(cell):
+func perform_move(world_position):
 	"""
-	Move command that tells the Actor the next cell to move into. Generally 
-	called from the 'Level/Ground' node after an Actor has made a move request
-	based on user directional input.
+	Move command that tells the Actor the next world position to move into. 
+	Generally called from the 'Level/Ground' node after an Actor has made a move
+	request.
 	
 	Args:
-		- cell (Vector2): World cell for the actor to move into.
+		- world_position (Vector2): World position for the Actor to move into.
 	"""
-	_current_state.move_to_cell(self, cell)
+	if _current_state == _state_map['move']:
+		_current_state.move_to_position(self, world_position)
 
 #-------------------------------------------------------------------------------
 

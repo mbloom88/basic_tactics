@@ -455,6 +455,7 @@ func validate_skill_for_use(skill):
 
 func _on_Actor_move_completed(actor):
 	var actor_type = ActorDatabase.lookup_type(actor.reference)
+	# For AI movements during battle
 	if _current_state == _state_map['battle'] and actor_type != 'ally':
 		_current_state._on_Actor_move_completed(self, actor)
 
