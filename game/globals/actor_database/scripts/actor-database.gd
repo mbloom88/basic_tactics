@@ -102,7 +102,7 @@ func lookup_unlocked(actor_ref):
 
 #-------------------------------------------------------------------------------
 
-func provide_actor_object(actor_ref):
+func provide_actor(actor_ref):
 	return _actors[actor_ref].actor_scene.instance()
 
 #-------------------------------------------------------------------------------
