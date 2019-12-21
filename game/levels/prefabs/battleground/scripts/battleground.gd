@@ -5,7 +5,6 @@ extends TileMap
 
 # Signals
 signal allies_ready_for_placement
-signal ally_positions_requested
 signal battle_action_cancelled
 signal battle_action_completed
 signal begin_battle
@@ -29,6 +28,7 @@ signal state_changed(state)
 
 # Child nodes
 onready var _pathing = $Pathing
+onready var _battle_positions = $AllyBattlePositions
 onready var _blinking_cells = $BlinkingCells
 onready var _battlers = $Battlers
 onready var _non_battlers = $NonBattlers
@@ -46,6 +46,8 @@ onready var _state_map = {
 }
 
 # Tile info
+export (float) var cell_offset_x = 0.50
+export (float) var cell_offset_y = 0.25
 export (PackedScene) var blinking_tile
 var _used_map_cells = []
 var _used_world_cells = []
@@ -122,7 +124,7 @@ func _add_astar_instance(actor, goal_cell):
 func _add_blinking_cells(cells):
 	"""
 	Args: 
-		- cells (Vector2): Map coordinates to place blinking cells at.
+		- cells (Array): Vector2 map coordinates to place blinking tiles at.
 	"""
 	for cell in cells:
 		var world_location = map_to_world(cell)
@@ -206,6 +208,23 @@ func _gather_cell_info():
 
 #-------------------------------------------------------------------------------
 
+func _offset_world_position(map_cell):
+	"""
+	Converts a map cell to a world position with a positional offset.
+	
+	Args:
+		- map_cell (Vector2): The map cell location within the TileMap.
+	Returns:
+		- world_position (Vector2): The new world position with an offset.
+	"""
+	var world_position = map_to_world(map_cell)
+	world_position.x +=cell_size.x * cell_offset_x
+	world_position.y +=cell_size.y * cell_offset_y
+	
+	return world_position
+
+#-------------------------------------------------------------------------------
+
 func _remove_blinking_cells():
 	"""
 	Removes all blinking tiles that are assigned to Battleground map cells.
@@ -256,28 +275,24 @@ func determine_move_path(actor, direction):
 			proper execution.
 	
 	Returns:
-		- new_world_cell (Vector2): An world (pixel) coordinate that the actor
-			is authorized to move into. Will return the actor's current position
-			if the new cell is outside of the allowable grid or if an obstacle
-			exists in that space.
+		- world_position (Vector2): A world position that the actor is
+			authorized to move into. Will return the actor's current position
+			if the new position is outside of the allowable grid or if an 
+			obstacle exists in that space.
 	"""
-	var new_world_cell = actor.position
-	var current_map_cell = world_to_map(actor.position)
+	var new_world_position = actor.position
+	var current_map_cell = world_to_map(new_world_position)
 	var new_map_cell = current_map_cell + direction
 	var obstacle = _check_obstacle(new_map_cell)
 	
 	if _current_state == _state_map['battle']:
 		if new_map_cell in _allowed_move_cells:
-			new_world_cell = map_to_world(new_map_cell)
-			new_world_cell.x += cell_size.x * 0.50
-			new_world_cell.y += cell_size.y * 0.25
+			new_world_position = _offset_world_position(new_map_cell)
 	else:
 		if new_map_cell in _used_map_cells and not obstacle:
-			new_world_cell = map_to_world(new_map_cell)
-			new_world_cell.x += cell_size.x * 0.50
-			new_world_cell.y += cell_size.y * 0.25
+			new_world_position = _offset_world_position(new_map_cell)
 	
-	return new_world_cell
+	return new_world_position
 
 #-------------------------------------------------------------------------------
 
@@ -294,7 +309,7 @@ func place_actors():
 	"""
 	Activates the Ally selection and placement phase of a battle.
 	"""
-	if _current_state.has_method('place_actors'):
+	if _current_state == _state_map['select']:
 		_current_state.place_actors(self)
 
 #-------------------------------------------------------------------------------
@@ -321,38 +336,20 @@ func provide_current_battler_skills():
 func provide_used_cells(type):
 	"""
 	Provides the list of all active tiles in the Battleground TileMap either as
-	world coordinates or map coordinates.
+	world positions or map cells.
 	
 	Args:
 		- type (String): The type of used cells to be requested.
 			* map: Map cell vectors assigned to each tile. Primary use is
 				within the TileMap.
-			* world: World pixel coordinates translated from the used map cells
-				within the TileMap.
+			* world: World positions translated from the used map cells within
+				the TileMap.
 	"""
 	match type:
 		'map':
 			return _used_map_cells
 		'world':
 			return _used_world_cells
-
-#-------------------------------------------------------------------------------
-
-func register_battle_positions(world_cells):
-	"""
-	Args:
-		- world_cells (Dictionary): Keys are the name of the world coordinates
-			while values are the Vector2 world coordinate values. Note that one
-			of the positions must be named 'Spawn'.
-	"""
-	_start_cells = world_cells
-	var map_cells = []
-	
-	for world_cell in world_cells.values():
-		map_cells.append(world_to_map(world_cell))
-		
-	_add_blinking_cells(map_cells)
-	_change_state('select')
 
 #-------------------------------------------------------------------------------
 
@@ -391,7 +388,16 @@ func start_battle():
 	"""
 	Starts a battle on the Battleground.
 	"""
-	emit_signal('ally_positions_requested')
+	for position2d in _battle_positions.get_children():
+		var map_cell = world_to_map(position2d.position)
+		_start_cells[position2d.name] = map_cell
+	
+	var map_cells = []
+	for map_cell in _start_cells.values():
+		map_cells.append(map_cell)
+		
+	_add_blinking_cells(map_cells)
+	_change_state('select')
 
 #-------------------------------------------------------------------------------
 
@@ -492,7 +498,5 @@ func _on_AStarInstance_pathing_completed(astar_node, path, actor):
 #-------------------------------------------------------------------------------
 
 func _on_BattleCamera_tracking_added(actor):
-	if not _current_state.has_method('_on_BattleCamera_tracking_added'):
-		return
-
-	_current_state._on_BattleCamera_tracking_added(self, actor)
+	if _current_state == _state_map['battle']:
+		_current_state._on_BattleCamera_tracking_added(self, actor)
