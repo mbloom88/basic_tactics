@@ -411,7 +411,7 @@ func provide_current_battler_skills(host):
 
 func setup_for_next_turn(host):
 	"""
-	Preparation for the next Battler's turn. Registers the next battle in the
+	Preparation for the next Battler's turn. Registers the next Battler in the
 	turn order and its inventory before directing the battle Camera to the 
 	Battler.
 	"""
