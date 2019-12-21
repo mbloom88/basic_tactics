@@ -9,12 +9,15 @@ signal attack_cells_requested(actor, attack_range)
 signal attack_started(actor)
 signal battle_action_cancelled
 signal camera_move_requested(location, move_speed)
-signal move_cells_requested(actor, move_range)
+signal hide_target_gui_requested
+signal move_cells_requested
 signal move_completed(actor)
 signal move_requested(actor, direction)
 signal player_menu_requested(actor)
 signal reaction_completed
 signal state_changed(state)
+signal stats_modified
+signal target_affected(target)
 signal target_selected(target)
 
 # Child nodes
@@ -280,7 +283,7 @@ func search_for_attack_targets(target_info):
 			as keys and their associated map cells are their values. The map
 			cells can be used for determining distances.
 	"""
-	if _current_state == _state_map['menu']:
+	if _current_state == _state_map['attack']:
 		_current_state.search_for_attack_targets(self, target_info)
 
 #-------------------------------------------------------------------------------
@@ -335,6 +338,11 @@ func _on_Inventory_current_weapon_updated(current_weapon):
 
 func _on_Inventory_new_skills_loaded(skill_refs):
 	_job.load_weapon_skills(skill_refs)
+
+#-------------------------------------------------------------------------------
+
+func _on_Job_stats_modified():
+	emit_signal('stats_modified')
 
 #-------------------------------------------------------------------------------
 

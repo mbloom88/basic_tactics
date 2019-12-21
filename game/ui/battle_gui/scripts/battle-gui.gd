@@ -1,18 +1,19 @@
 extends Control
 
-# Signals 
-signal weapon_changed
-
 # Child nodes
 onready var _active_panel = $ActiveActorPanel
+onready var _active_anim =$ActiveActorPanel/ActiveAnimation
 onready var _target_panel = $TargetActorPanel
+onready var _target_anim = $TargetActorPanel/TargetAnimation
 onready var _squad_count = $SquadCount
 onready var _squad_status = $SquadStatus
-onready var _weapon_status1 = $WeaponStatus1
-onready var _weapon_status2 = $WeaponStatus2
-onready var _weapon_swap = $WeaponSwap
+onready var _weapon_anim = $WeaponPanel/WeaponAnimation
+onready var _weapon_status1 = $WeaponPanel/HBoxContainer/WeaponStatus1
+onready var _weapon_status2 = $WeaponPanel/HBoxContainer/WeaponStatus2
+onready var _weapon_swap = $WeaponPanel/HBoxContainer/WeaponSwap
 
-# Weapons
+# Actor and Weapons
+var _active_actor = null
 var _current_weapon = null
 var _weapon_focus = null
 
@@ -40,91 +41,74 @@ func deactivate_weapon_swap():
 #-------------------------------------------------------------------------------
 
 func hide_active_actor_gui():
-	_active_panel.hide_gui()
+	_active_anim.play('active_exit')
 	
 #-------------------------------------------------------------------------------
 
 func hide_ally_select_gui():
-	_active_panel.hide_gui()
+	hide_active_actor_gui()
 	_squad_count.hide_gui()
 	_squad_status.hide_gui()
 
 #-------------------------------------------------------------------------------
 
 func hide_target_actor_gui():
-	_target_panel.hide_gui()
+	_target_anim.play('target_exit')
 
 #-------------------------------------------------------------------------------
 
-func hide_weapon_status():
-	_weapon_status1.hide_gui()
-	_weapon_status2.hide_gui()
-	_weapon_swap.hide_gui()
+func hide_weapon_gui():
+	_weapon_anim.play('weapon_exit')
 
 #-------------------------------------------------------------------------------
 
-func load_weapon_info(weapon1, weapon2):
-	_weapon_status1.load_weapon_info(weapon1)
-	_weapon_status2.load_weapon_info(weapon2)
+func load_active_actor_gui(actor):
+	_active_panel.load_actor(actor)
+	_active_anim.play('active_enter')
+
+#-------------------------------------------------------------------------------
+
+func load_target_actor_gui(target):
+	_target_panel.load_actor(target)
+	_target_anim.play('target_enter')
+
+#-------------------------------------------------------------------------------
+
+func load_weapon_gui(actor):
+	"""
+	Loads new weapons onto the GUI before displaying the GUI.
 	
-	if _current_weapon == _weapon_status1.provide_assigned_weapon():
+	Args:
+		- actor (Object): The actor that the weapons will be derived from.
+	"""
+	_active_actor = actor
+	var weapons = actor.provide_weapons()
+	_weapon_status1.load_weapon(weapons['weapon1'])
+	_weapon_status2.load_weapon(weapons['weapon2'])
+	_current_weapon = weapons['current']
+	
+	if _current_weapon == _weapon_status1.current_weapon:
 		_weapon_status1.activate()
 		_weapon_status2.deactivate()
 		_weapon_focus = _weapon_status1
-	elif _current_weapon == _weapon_status2.provide_assigned_weapon():
+	elif _current_weapon == _weapon_status2.current_weapon:
 		_weapon_status1.deactivate()
 		_weapon_status2.activate()
 		_weapon_focus = _weapon_status2
-
-#-------------------------------------------------------------------------------
-
-func refresh_weapon_info():
-	_weapon_status1.refresh_weapon_info()
-	_weapon_status2.refresh_weapon_info()
-
-#-------------------------------------------------------------------------------
-
-func show_active_actor_gui(actor):
-	_active_panel.load_actor_info(actor)
-	_active_panel.show_gui()
+	
+	show_weapon_gui()
 
 #-------------------------------------------------------------------------------
 
 func show_ally_select_gui():
-	_active_panel.show_gui()
+	_active_anim.play('active_enter')
 	_squad_count.show_gui()
 	_squad_status.show_gui()
 
 #-------------------------------------------------------------------------------
 
-func show_target_actor_gui(target):
-	_target_panel.load_actor_info(target)
-	_target_panel.show_gui()
-
-#-------------------------------------------------------------------------------
-
-func show_weapon_status():
-	_weapon_status1.show_gui()
-	_weapon_status2.show_gui()
-	_weapon_swap.show_gui()
-
-#-------------------------------------------------------------------------------
-
-func update_current_weapon(current_weapon):
-	"""
-	Args:
-		- weapon (Object)
-	"""
-	_current_weapon = current_weapon
-	
-	if _weapon_focus == _weapon_status1:
-		_weapon_status1.activate()
-		_weapon_status2.deactivate()
-		_weapon_focus = _weapon_status1
-	elif _weapon_focus == _weapon_status2:
-		_weapon_status1.deactivate()
-		_weapon_status2.activate()
-		_weapon_focus = _weapon_status2
+func show_weapon_gui():
+	_weapon_anim.play('weapon_enter')
 
 #-------------------------------------------------------------------------------
 
@@ -142,12 +126,11 @@ func _on_WeaponSwap_pressed():
 	_weapon_focus.deactivate()
 	
 	if _weapon_focus == _weapon_status1:
-		_current_weapon = _weapon_status2.provide_assigned_weapon()
+		_current_weapon = _weapon_status2.current_weapon
 		_weapon_focus = _weapon_status2
 	elif _weapon_focus == _weapon_status2:
-		_current_weapon = _weapon_status1.provide_assigned_weapon()
+		_current_weapon = _weapon_status1.current_weapon
 		_weapon_focus = _weapon_status1
 
 	_weapon_focus.activate()
-	
-	emit_signal('weapon_changed')
+	_active_actor.swap_weapons()

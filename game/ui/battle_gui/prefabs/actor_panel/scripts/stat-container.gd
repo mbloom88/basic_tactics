@@ -11,6 +11,15 @@ export (String, 'health', 'armor', 'shields')  var type = 'health'
 # PUBLIC METHODS
 ################################################################################
 
+func subtract_amount(amount):
+	"""
+	Args:
+		- amount (int): Value to subtract from the texture progress.
+	"""
+	_texture.value -= amount
+
+#-------------------------------------------------------------------------------
+
 func update_info(stats):
 	match type:
 		'health':

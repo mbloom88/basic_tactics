@@ -42,6 +42,7 @@ func provide_weapons():
 	var weapons = {}
 	weapons['weapon1'] = _weapon1
 	weapons['weapon2'] = _weapon2
+	weapons['current'] = _current_weapon
 	
 	return weapons
 

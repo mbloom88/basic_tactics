@@ -25,6 +25,11 @@ func _ready():
 # SIGNAL HANDLING
 ################################################################################
 
+func _on_Battleground_active_actor_selected(actor):
+	_guis.load_active_actor_gui(actor)
+
+#-------------------------------------------------------------------------------
+
 func _on_Battleground_allies_ready_for_placement():
 	_guis.show_ally_select_gui()
 	_battleground.place_actors()
@@ -52,23 +57,18 @@ func _on_Battleground_current_battler_skills_acquired(skills):
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_current_weapon_update_requested(current_weapon):
-	_guis.update_current_weapon(current_weapon)
-
-#-------------------------------------------------------------------------------
-
-func _on_Battleground_hide_active_actor_gui_requested():
+func _on_Battleground_hide_active_gui_requested():
 	_guis.hide_active_actor_gui()
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_hide_target_actor_gui_requested():
+func _on_Battleground_hide_target_gui_requested():
 	_guis.hide_target_actor_gui()
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_hide_weapon_status_requested():
-	_guis.hide_weapon_status()
+func _on_Battleground_hide_weapon_gui_requested():
+	_guis.hide_weapon_gui()
 
 #-------------------------------------------------------------------------------
 
@@ -82,11 +82,6 @@ func _on_Battleground_load_target_actor_info(actor):
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_load_weapon_info(weapon1, weapon2):
-	_guis.load_weapon_info(weapon1, weapon2)
-
-#-------------------------------------------------------------------------------
-
 func _on_Battleground_player_battle_menu_requested(actor):
 	_guis.show_player_battle_menu(actor)
 
@@ -94,11 +89,6 @@ func _on_Battleground_player_battle_menu_requested(actor):
 
 func _on_Battleground_player_world_menu_requested(actor):
 	_guis.show_player_world_menu(actor)
-
-#-------------------------------------------------------------------------------
-
-func _on_Battleground_refresh_weapon_info():
-	_guis.refresh_weapon_info()
 
 #-------------------------------------------------------------------------------
 
@@ -117,8 +107,8 @@ func _on_Battleground_show_target_actor_gui_requested():
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_show_weapon_status_requested():
-	_guis.show_weapon_status()
+func _on_Battleground_show_weapon_gui_requested(actor):
+	_guis.load_weapon_gui(actor)
 
 #-------------------------------------------------------------------------------
 
@@ -128,7 +118,7 @@ func _on_Battleground_squad_update_requested():
 #-------------------------------------------------------------------------------
 
 func _on_Battleground_target_selected(target):
-	_guis.show_target_actor_gui(target)
+	_guis.load_target_actor_gui(target)
 
 #-------------------------------------------------------------------------------
 
@@ -144,11 +134,6 @@ func _on_GUIs_player_waiting():
 
 func _on_GUIs_skill_selected(skill):
 	_battleground.validate_skill_for_use(skill)
-
-#-------------------------------------------------------------------------------
-
-func _on_GUIs_weapon_changed():
-	_battleground.update_current_weapon()
 
 ################################################################################
 # DEBUG

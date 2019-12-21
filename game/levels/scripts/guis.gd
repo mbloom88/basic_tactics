@@ -4,7 +4,6 @@ extends CanvasLayer
 signal battler_skills_requested
 signal player_waiting
 signal skill_selected(skill)
-signal weapon_changed
 
 # Child nodes
 onready var _menus = $Menus
@@ -73,28 +72,23 @@ func hide_target_actor_gui():
 
 #-------------------------------------------------------------------------------
 
-func hide_weapon_status():
-	_battle_gui.hide_weapon_status()
+func hide_weapon_gui():
+	_battle_gui.hide_weapon_gui()
 
 #-------------------------------------------------------------------------------
 
-func load_active_actor_info(actor):
-	_battle_gui.load_active_actor_info(actor)
+func load_active_actor_gui(actor):
+	_battle_gui.load_active_actor_gui(actor)
 
 #-------------------------------------------------------------------------------
 
-func load_target_actor_info(actor):
-	_battle_gui.load_target_actor_info(actor)
+func load_target_actor_gui(target):
+	_battle_gui.load_target_actor_gui(target)
 
 #-------------------------------------------------------------------------------
 
-func load_weapon_info(weapon1, weapon2):
-	_battle_gui.load_weapon_info(weapon1, weapon2)
-
-#-------------------------------------------------------------------------------
-
-func refresh_weapon_info():
-	_battle_gui.refresh_weapon_info()
+func load_weapon_gui(actor):
+	_battle_gui.load_weapon_gui(actor)
 
 #-------------------------------------------------------------------------------
 
@@ -136,22 +130,6 @@ func show_player_world_menu(actor):
 
 #-------------------------------------------------------------------------------
 
-func show_target_actor_gui(target):
-	_battle_gui.show_target_actor_gui()
-
-#-------------------------------------------------------------------------------
-
-func show_weapon_status():
-	_battle_gui.show_weapon_status()
-	_battle_gui.activate_weapon_swap()
-
-#-------------------------------------------------------------------------------
-
-func update_current_weapon(current_weapon):
-	_battle_gui.update_current_weapon(current_weapon)
-
-#-------------------------------------------------------------------------------
-
 func update_squad_count():
 	_battle_gui.update_squad_count()
 
@@ -163,11 +141,6 @@ func update_squad_status(type):
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
-
-func _on_BattleGUI_weapon_changed():
-	emit_signal('weapon_changed')
-
-#-------------------------------------------------------------------------------
 
 func _on_Menu_menu_requested(menu):
 	_add_menu(menu)

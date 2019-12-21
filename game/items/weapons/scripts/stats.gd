@@ -1,5 +1,8 @@
 extends Node
 
+# Signals 
+signal ammo_consumed(ammount)
+
 # Weapon info
 var attack_damage
 var attack_range
@@ -13,6 +16,7 @@ var ammo_per_attack
 
 func consume_ammo():
 	ammo -= ammo_per_attack
+	emit_signal('ammo_consumed', ammo_per_attack)
 
 #-------------------------------------------------------------------------------
 

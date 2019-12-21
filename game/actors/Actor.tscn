@@ -118,6 +118,7 @@ align = 1
 script = ExtResource( 19 )
 
 [connection signal="item_skills_requested" from="Job" to="." method="_on_Job_item_skills_requested"]
+[connection signal="stats_modified" from="Job" to="." method="_on_Job_stats_modified"]
 [connection signal="weapon_reload_requested" from="Job" to="." method="_on_Job_weapon_reload_requested"]
 [connection signal="weapon_reload_requested" from="Job/Skills" to="Job" method="_on_Skills_weapon_reload_requested"]
 [connection signal="current_weapon_updated" from="Inventory" to="." method="_on_Inventory_current_weapon_updated"]

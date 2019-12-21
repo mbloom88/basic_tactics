@@ -39,14 +39,14 @@ func _check_actions(host):
 			_index = _max_index
 		else:
 			_index -= 1
-		host.emit_signal('load_active_actor_info', _active_allies[_index])
+		host.emit_signal('active_actor_selected', _active_allies[_index])
 		_check_if_selected(host)
 	elif Input.is_action_just_pressed("ui_right"):
 		if _index == _max_index:
 			_index = 0
 		else:
 			_index += 1
-		host.emit_signal('load_active_actor_info', _active_allies[_index])
+		host.emit_signal('active_actor_selected', _active_allies[_index])
 		_check_if_selected(host)
 	elif Input.is_action_just_pressed('ui_cancel'):
 		var ally_to_remove = _active_allies[_index]
@@ -118,6 +118,6 @@ func _initialize(host):
 ################################################################################
 
 func place_actors(host):
-	host.emit_signal('load_active_actor_info', _active_allies[_index])
+	host.emit_signal('active_actor_selected', _active_allies[_index])
 	_check_if_selected(host)
 	host.set_process(true)

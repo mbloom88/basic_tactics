@@ -13,11 +13,21 @@ func _enter(host):
 	host.set_process(false)
 	host.emit_signal('attack_started', host)
 
+#-------------------------------------------------------------------------------
+
+func _update(host, delta):
+	var action = _check_targets(host)
+	
+	if action:
+		return action
+
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
 
 func _check_targets(host):
+	var action = ""
+	
 	if Input.is_action_just_pressed("move_left") and _max_index >= 0:
 		_targets[_index].hide_battle_cursor()
 		if _index > 0:
@@ -35,41 +45,49 @@ func _check_targets(host):
 		_targets[_index].show_battle_cursor()
 		host.emit_signal('target_selected', _targets[_index])
 	elif Input.is_action_just_pressed('ui_accept'):
-		_player_attack_target(host)
+		var has_attacked = _player_attack_target(host)
+		if has_attacked:
+			host.set_process(false)
+			action = 'previous'
 	elif Input.is_action_just_pressed('ui_cancel'):
 		host.set_process(false)
 		if _max_index >= 0:
 			_targets[_index].hide_battle_cursor()
-		var move_range = host.provide_job_info()['move']
-		host.emit_signal('move_cells_requested', host, move_range)
+		host.emit_signal('move_cells_requested')
+		host.emit_signal('hide_target_gui_requested')
 		host.emit_signal('battle_action_cancelled')
+		action = 'previous'
+
+	return action
 
 #-------------------------------------------------------------------------------
 
 func _player_attack_target(host):
 	"""
 	Allows the Actor to attack a target if the Actor's Weapon has enough ammo.
+	
+	Returns:
+		-has_attacked (bool): True if they player successfully attacked.
 	"""
-	var current_weapon = host.provide_current_weapon().provide_stats()
-	var ammo = current_weapon['ammo']
-	var max_ammo = current_weapon['max_ammo']
-	var ammo_per_attack = current_weapon['ammo_per_attack']
+	var has_attacked = false
+	var current_weapon = host.provide_current_weapon()
+	var stats = current_weapon.provide_stats()
+	var ammo = stats['ammo']
+	var max_ammo = stats['max_ammo']
+	var ammo_per_attack = stats['ammo_per_attack']
 	# Melee weapons
 	if _max_index > -1 and max_ammo == -1:
-		host.set_process(false)
-		host.emit_signal('battle_action_completed')
+		has_attacked = true
 		_targets[_index].hide_battle_cursor()
 		_targets[_index].take_damage(current_weapon)
-		host.emit_signal('load_target_actor_info', _targets[_index])
 	# Ranged weapons
 	elif _max_index > -1 and ammo >= ammo_per_attack:
-		host.set_process(false)
-		host.emit_signal('battle_action_completed')
+		has_attacked = true
 		current_weapon.consume_ammo()
-		host.emit_signal('refresh_weapon_info')
 		_targets[_index].hide_battle_cursor()
 		_targets[_index].take_damage(current_weapon)
-		host.emit_signal('load_target_actor_info', _targets[_index])
+	
+	return has_attacked
 
 ################################################################################
 # PUBLIC METHODS

@@ -4,25 +4,23 @@ Base 'Battleground' scene.
 extends TileMap
 
 # Signals
+signal active_actor_selected(actor)
 signal allies_ready_for_placement
 signal battle_action_cancelled
 signal battle_action_completed
 signal begin_battle
 signal current_battler_skills_acquired(skills)
-signal current_weapon_update_requested(current_weapon)
-signal hide_active_actor_gui_requested
-signal hide_target_actor_gui_requested
-signal hide_weapon_status_requested
+signal hide_active_gui_requested
+signal hide_target_gui_requested
+signal hide_weapon_gui_requested
 signal load_active_actor_info(actor)
 signal load_target_actor_info(actor)
-signal load_weapon_info(weapon1, weapon2)
 signal player_battle_menu_requested(actor)
 signal player_world_menu_requested(actor)
-signal refresh_weapon_info
 signal selection_update_requested(type)
 signal show_active_actor_gui_requested
 signal show_target_actor_gui_requested
-signal show_weapon_status_requested
+signal show_weapon_gui_requested(actor)
 signal squad_update_requested
 signal state_changed(state)
 signal target_selected(target)
@@ -60,6 +58,7 @@ var _start_cells = {}
 var _actor_to_place = null
 
 # Battle parameters
+var _current_battler = null
 var _allowed_move_cells = []
 var _battle_camera = null
 
@@ -227,10 +226,10 @@ func _gather_battle_targets(initiator):
 		'targets': {},
 	}
 	
-	for battler in _battlers:
+	for battler in _battlers.get_children():
 		if battler != initiator:
 			target_info['targets'][battler] = world_to_map(battler.position)
-	for destructable in _destructables:
+	for destructable in _destructables.get_children():
 		target_info['target'][destructable] = world_to_map(destructable.position)
 		
 	target_info['initiator'][initiator] = world_to_map(initiator.position)
@@ -253,6 +252,12 @@ func _offset_world_position(map_cell):
 	world_position.y +=cell_size.y * cell_offset_y
 	
 	return world_position
+
+#-------------------------------------------------------------------------------
+
+func _reload_move_cells():
+	_remove_blinking_cells()
+	_add_blinking_cells(_allowed_move_cells)
 
 #-------------------------------------------------------------------------------
 
@@ -286,15 +291,15 @@ func _show_action_cells(battler, action_range):
 
 #-------------------------------------------------------------------------------
 
-func _show_move_cells(battler, move_range):
+func _show_move_cells(battler):
 	"""
 	Determines what cells the current Battler will be allowed to move into
 	during its turn and then displays the allowable cells.
 	
 	Args:
 		- battler (Object): The current Battler that is making the move request.
-		- move_range (int): The current Battler's move range.
 	"""
+	var move_range = battler.provide_job_info()['move']
 	var mover_type = ActorDatabase.lookup_type(battler.reference)
 	var origin_cell = world_to_map(battler.position)
 	_allowed_move_cells = []
@@ -309,8 +314,7 @@ func _show_move_cells(battler, move_range):
 			if ActorDatabase.lookup_type(obstacle.reference) != mover_type:
 				_allowed_move_cells.erase(cell)
 	
-	_remove_blinking_cells()
-	_add_blinking_cells(_allowed_move_cells)
+	_reload_move_cells()
 
 ################################################################################
 # PUBLIC METHODS
@@ -490,6 +494,8 @@ func update_actors_on_grid(actor, operation):
 					'_on_Actor_attack_started')
 				actor.connect('battle_action_cancelled', self,
 					'_on_Actor_battle_action_cancelled')
+				actor.connect('hide_target_gui_requested', self, 
+					'_on_Actor_hide_target_gui_requested')
 				actor.connect('move_cells_requested', self, 
 					'_on_Actor_move_cells_requested')
 				actor.connect('move_completed', self, 
@@ -500,18 +506,14 @@ func update_actors_on_grid(actor, operation):
 					'_on_Actor_player_menu_requested')
 				actor.connect('reaction_completed', self, 
 					'_on_Actor_reaction_completed')
+				actor.connect('target_affected', self, 
+					'_on_Actor_target_affected')
 				actor.connect('target_selected', self, 
 					'_on_Actor_target_selected')
 				_actors_on_grid.append(actor)
 		'remove':
 			if actor in _actors_on_grid:
 				_actors_on_grid.erase(actor)
-
-#--------------------------------------------------------------------------------
-
-func update_current_weapon():
-	if _current_state == _state_map['battle']:
-		_current_state.update_current_weapon()
 
 #--------------------------------------------------------------------------------
 
@@ -539,8 +541,13 @@ func _on_Actor_battle_action_cancelled():
 
 #-------------------------------------------------------------------------------
 
-func _on_Actor_move_cells_requested(actor, move_range):
-	_show_move_cells(actor, move_range)
+func _on_Actor_hide_target_gui_requested():
+	emit_signal('hide_target_gui_requested')
+
+#-------------------------------------------------------------------------------
+
+func _on_Actor_move_cells_requested():
+	_reload_move_cells()
 
 #-------------------------------------------------------------------------------
 
@@ -572,8 +579,13 @@ func _on_Actor_reaction_completed():
 
 #-------------------------------------------------------------------------------
 
+func _on_Actor_target_affected(target):
+	emit_signal('target_affected', target)
+
+#-------------------------------------------------------------------------------
+
 func _on_Actor_target_selected(target):
-	emit_signal('target_selected')
+	emit_signal('target_selected', target)
 
 #-------------------------------------------------------------------------------
 

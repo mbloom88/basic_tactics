@@ -2,6 +2,7 @@ extends Node
 
 # Signals
 signal item_skills_requested
+signal stats_modified
 signal weapon_reload_requested
 
 # Child nodes
@@ -81,6 +82,7 @@ func provide_skills():
 
 func take_damage(weapon):
 	_stats.take_damage(weapon)
+	emit_signal('stats_modified')
 
 #-------------------------------------------------------------------------------
 

@@ -19,28 +19,34 @@ onready var _shields = \
 export (String, 'left', 'right') var box_alignment = 'left' \
 	setget set_box_alignment
 
+# Actor info
+var current_actor = null setget , get_current_actor
+
 ################################################################################
-# VIRTUAL METHODS
+# PRIVATE METHODS
 ################################################################################
 
-func _ready():
-	if not Engine.is_editor_hint():
-		hide_gui()
+func _refresh_actor_stats(info):
+	_hp.update_info(info)
+	_armor.update_info(info)
+	_shields.update_info(info)
 
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
 
-func hide_gui():
-	hide()
-
-#-------------------------------------------------------------------------------
-
-func load_actor_info(actor):
+func load_actor(actor):
 	"""
 	Args:
 		- actor (Object)
 	"""
+	if current_actor:
+		var last_actor = current_actor
+		last_actor.disconnect('stats_modified', self, 
+			'_on_Actor_stats_modified')
+	
+	current_actor = actor
+	current_actor.connect('stats_modified', self, '_on_Actor_stats_modified')
 	var actor_name  = ActorDatabase.lookup_name(actor.reference)
 	var info = actor.provide_job_info()
 	
@@ -52,17 +58,10 @@ func load_actor_info(actor):
 		_actor_name.text = '%s %s' % [actor_name['first'], actor_name['last']]
 	
 	_actor_level_job.text = 'Level %s - %s' % [info['level'], info['job_name']]
-	_hp.update_info(info)
-	_armor.update_info(info)
-	_shields.update_info(info)
+	_refresh_actor_stats(info)
 	
 	# Set portrait
 	_portrait.texture = ActorDatabase.lookup_portrait(actor.reference)
-
-#-------------------------------------------------------------------------------
-
-func show_gui():
-	show()
 
 ################################################################################
 # SETTERS
@@ -84,3 +83,18 @@ func set_box_alignment(value):
 				_hbox.move_child(_portrait, last_index)
 				_actor_name.align = Label.ALIGN_RIGHT
 				_actor_level_job.align = Label.ALIGN_RIGHT
+
+################################################################################
+# GETTERS
+################################################################################
+
+func get_current_actor():
+	return current_actor
+
+################################################################################
+# SIGNAL HANDLING
+################################################################################
+
+func _on_Actor_stats_modified():
+	var info = current_actor.provide_job_info()
+	_refresh_actor_stats(info)
