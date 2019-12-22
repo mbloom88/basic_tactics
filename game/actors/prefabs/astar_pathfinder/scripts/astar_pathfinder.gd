@@ -1,8 +1,7 @@
 extends Node
 
 # Signals
-signal initialized(astar_node)
-signal pathing_completed(astar_node, path, actor)
+signal pathing_completed(path)
 
 # AStar
 onready var _astar = AStar.new()
@@ -36,6 +35,32 @@ class CustomSorter:
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
+
+func _calculate_astar_path():
+	"""
+	Calculates a pathway between the starting and goal points. 
+	
+	Returns:
+		- directions (Array): A list of Vector2 directions between the starting
+			and goal points. Returns as Empty if no pathway is found.
+	"""
+	_set_astar_points()
+	_connect_astar_points()
+	var pathway_vector3 = Array(_astar.get_point_path(_start_id, _goal_id))
+	var directions = []
+	var previous_point = pathway_vector3.pop_front()
+	
+	# Converts map cells to directions
+	for point in pathway_vector3:
+		var x = int(sign(point.x - previous_point.x))
+		var y = int(sign(point.y - previous_point.y))
+		directions.append(Vector2(x, y))
+		previous_point = point
+	
+	emit_signal('pathing_completed', directions)
+	_astar.clear()
+
+#-------------------------------------------------------------------------------
 
 func _calculate_point_index(point):
 	"""
@@ -102,31 +127,6 @@ func _set_astar_points():
 # PUBLIC METHODS
 ################################################################################
 
-func calculate_astar_path():
-	"""
-	Calculates a pathway between the starting and goal points. 
-	
-	Returns:
-		- directions (Array): A list of Vector2 directions between the starting
-			and goal points. Returns as Empty if no pathway is found.
-	"""
-	_set_astar_points()
-	_connect_astar_points()
-	var pathway_vector3 = Array(_astar.get_point_path(_start_id, _goal_id))
-	var directions = []
-	var previous_point = pathway_vector3.pop_front()
-	
-	# Converts map cells to directions
-	for point in pathway_vector3:
-		var x = int(sign(point.x - previous_point.x))
-		var y = int(sign(point.y - previous_point.y))
-		directions.append(Vector2(x, y))
-		previous_point = point
-	
-	emit_signal('pathing_completed', self, directions, _actor)
-
-#-------------------------------------------------------------------------------
-
 func initialize(pathing_info):
 	"""
 	Initializes the AStar node with the following Dictionary information.
@@ -163,4 +163,4 @@ func initialize(pathing_info):
 	for point in walkable_points_vector2:
 		_walkable_points.append(Vector3(point.x, point.y, 0))
 	
-	emit_signal('initialized', self)
+	_calculate_astar_path()

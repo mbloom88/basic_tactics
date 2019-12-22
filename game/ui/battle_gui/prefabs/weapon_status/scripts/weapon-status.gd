@@ -28,8 +28,15 @@ func load_weapon(weapon):
 	Args:
 		- weapon (Object):
 	"""
+	if is_instance_valid(current_weapon):
+		var last_weapon = current_weapon
+		last_weapon.disconnect('ammo_consumed', self, 
+			'_on_Weapon_ammo_consumed')
+		current_weapon.disconnect('reloaded', self, '_on_Weapon_reloaded')
+	
 	current_weapon = weapon
 	current_weapon.connect('ammo_consumed', self, '_on_Weapon_ammo_consumed')
+	current_weapon.connect('reloaded', self, '_on_Weapon_reloaded')
 	var stats = weapon.provide_stats()
 	_icon.texture = ItemDatabase.lookup_icon(current_weapon.reference)
 	_name.text = '%s' % ItemDatabase.lookup_name(current_weapon.reference)
@@ -56,4 +63,10 @@ func get_current_weapon():
 
 func _on_Weapon_ammo_consumed(amount):
 	_ammo_prog.value -= amount
+	_ammo_value.text = '%s / %s' % [_ammo_prog.value, _ammo_prog.max_value]
+
+#-------------------------------------------------------------------------------
+
+func _on_Weapon_reloaded():
+	_ammo_prog.value = _ammo_prog.max_value
 	_ammo_value.text = '%s / %s' % [_ammo_prog.value, _ammo_prog.max_value]

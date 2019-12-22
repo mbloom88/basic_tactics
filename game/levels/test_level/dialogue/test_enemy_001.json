@@ -1,7 +1,7 @@
 {
   "start": {
     "type": "text",
-    "speaker": "test-enemy-001",
+    "speaker": "test_enemy_001",
     "expression": "neutral",
     "screen_side": "bottom",
     "portrait_align": "left",
@@ -15,7 +15,7 @@
   },
   "path001_001": {
     "type": "text",
-    "speaker": "test-ally-001",
+    "speaker": "test_ally_001",
     "expression": "neutral",
     "screen_side": "top",
     "portrait_align": "right",
@@ -29,7 +29,7 @@
   },
   "path001_002": {
     "type": "text",
-    "speaker": "test-enemy-001",
+    "speaker": "test_enemy_001",
     "expression": "neutral",
     "screen_side": "bottom",
     "portrait_align": "left",
@@ -43,7 +43,7 @@
   },
   "path001_response001": {
     "type": "response",
-    "speaker": "test-ally-001",
+    "speaker": "test_ally_001",
     "expression": "neutral",
     "screen_side": "top",
     "portrait_align": "right",
@@ -59,7 +59,7 @@
   },
   "path001_003A": {
     "type": "text",
-    "speaker": "test-enemy-001",
+    "speaker": "test_enemy_001",
     "expression": "neutral",
     "screen_side": "bottom",
     "portrait_align": "left",
@@ -73,7 +73,7 @@
   },
   "path001_003B": {
     "type": "text",
-    "speaker": "test-enemy-001",
+    "speaker": "test_enemy_001",
     "expression": "neutral",
     "screen_side": "bottom",
     "portrait_align": "left",

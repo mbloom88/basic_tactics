@@ -2,7 +2,7 @@
 
 [ext_resource path="res://levels/prefabs/battleground/scripts/battleground.gd" type="Script" id=1]
 [ext_resource path="res://levels/prefabs/blinking_tile/BlinkingTile.tscn" type="PackedScene" id=2]
-[ext_resource path="res://levels/prefabs/astar_instance/AStarInstance.tscn" type="PackedScene" id=3]
+[ext_resource path="res://actors/prefabs/astar_pathfinder/AStarPathfinder.tscn" type="PackedScene" id=3]
 [ext_resource path="res://levels/prefabs/battleground/scripts/idle.gd" type="Script" id=4]
 [ext_resource path="res://levels/prefabs/battleground/scripts/select.gd" type="Script" id=5]
 [ext_resource path="res://levels/prefabs/battleground/scripts/place.gd" type="Script" id=6]

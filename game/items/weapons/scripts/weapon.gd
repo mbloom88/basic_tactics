@@ -2,6 +2,7 @@ extends Sprite
 
 # Signals 
 signal ammo_consumed(amount)
+signal reloaded
 
 # Child nodes
 onready var _stats = $Stats
@@ -33,6 +34,7 @@ func provide_stats():
 
 func reload():
 	_stats.reload()
+	emit_signal('reloaded')
 
 ################################################################################
 # SIGNAL HANDLING

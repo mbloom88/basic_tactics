@@ -1,7 +1,6 @@
 extends NinePatchRect
 
 # Signals 
-signal skill_selected(skill)
 signal state_changed(menu, state)
 
 # Child nodes
@@ -27,6 +26,9 @@ var _current_focus = null
 
 # Scrolling
 export (int) var _button_spacing = 10 # Based on SkillList vbox separation
+
+# Actor info
+var _actor_in_menu = null
 
 ################################################################################
 # VIRTUAL METHODS
@@ -71,7 +73,9 @@ func _change_state(state_name):
 # PUBLIC METHODS
 ################################################################################
 
-func add_skills_to_list(skills):
+func add_skills_to_list(actor):
+	_actor_in_menu = actor
+	var skills = _actor_in_menu.provide_skills()
 	if _current_state == _state_map['interact']:
 		_current_state.add_skills_to_list(self, skills)
 
@@ -100,4 +104,5 @@ func _on_SkillOption_skill_focus_entered(skill_option):
 #-------------------------------------------------------------------------------
 
 func _on_SkillOption_skill_selected(skill):
-	emit_signal('skill_selected', skill)
+	if skill.reference == 'reload_weapon':
+		_actor_in_menu.reload_current_weapon()

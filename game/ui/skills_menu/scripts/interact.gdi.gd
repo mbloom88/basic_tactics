@@ -29,8 +29,7 @@ func _update(host, delta):
 func _check_actions():
 	var action = ""
 	
-	if Input.is_action_just_pressed('player_menu') or \
-		Input.is_action_just_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("ui_cancel"):
 		action = 'exit'
 	
 	return action

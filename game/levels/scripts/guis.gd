@@ -1,9 +1,7 @@
 extends CanvasLayer
 
 # Signals
-signal battler_skills_requested
 signal player_waiting
-signal skill_selected(skill)
 
 # Child nodes
 onready var _menus = $Menus
@@ -38,8 +36,6 @@ func _add_menu(menu):
 				'_on_PlayerBattleMenu_player_waiting')
 		'skills_menu':
 			new_menu = _skills_menu.instance()
-			new_menu.connect('skill_selected', self, 
-				'_on_SkillMenu_skill_selected')
 
 	new_menu.connect('state_changed', self, '_on_Menu_state_changed')
 	_menus.add_child(new_menu)
@@ -167,7 +163,7 @@ func _on_Menu_state_changed(menu, state):
 	if state == 'interact':
 		match menu.name:
 			'SkillsMenu':
-				emit_signal('battler_skills_requested')
+				menu.add_skills_to_list(_actor_in_menu)
 	if state == 'exit':
 		match menu.name:
 			'PlayerWorldMenu':
@@ -183,9 +179,6 @@ func _on_Menu_state_changed(menu, state):
 					'_on_PlayerBattleMenu_player_waiting')
 				if _actor_in_menu:
 					_actor_in_menu.resume_from_player_menu()
-			'SkillsMenu':
-				menu.disconnect('skill_selected', self, 
-				'_on_SkillMenu_skill_selected')
 		menu.disconnect('state_changed', self, '_on_Menu_state_changed')
 		_menus.remove_child(menu)
 		menu.queue_free()

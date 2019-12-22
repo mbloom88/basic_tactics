@@ -49,7 +49,7 @@ script = ExtResource( 10 )
 [connection signal="active_actor_selected" from="Battleground" to="." method="_on_Battleground_active_actor_selected"]
 [connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]
 [connection signal="battle_action_cancelled" from="Battleground" to="." method="_on_Battleground_battle_action_cancelled"]
-[connection signal="battle_action_completed" from="Battleground" to="." method="_on_Battleground_battle_action_completed"]
+[connection signal="battle_turn_completed" from="Battleground" to="." method="_on_Battleground_battle_turn_completed"]
 [connection signal="begin_battle" from="Battleground" to="." method="_on_Battleground_begin_battle"]
 [connection signal="current_battler_skills_acquired" from="Battleground" to="." method="_on_Battleground_current_battler_skills_acquired"]
 [connection signal="hide_active_gui_requested" from="Battleground" to="." method="_on_Battleground_hide_active_gui_requested"]
@@ -65,8 +65,6 @@ script = ExtResource( 10 )
 [connection signal="show_weapon_gui_requested" from="Battleground" to="." method="_on_Battleground_show_weapon_gui_requested"]
 [connection signal="squad_update_requested" from="Battleground" to="." method="_on_Battleground_squad_update_requested"]
 [connection signal="target_selected" from="Battleground" to="." method="_on_Battleground_target_selected"]
-[connection signal="battler_skills_requested" from="GUIs" to="." method="_on_GUIs_battler_skills_requested"]
 [connection signal="player_waiting" from="GUIs" to="." method="_on_GUIs_player_waiting"]
-[connection signal="skill_selected" from="GUIs" to="." method="_on_GUIs_skill_selected"]
 
 [editable path="Battleground"]

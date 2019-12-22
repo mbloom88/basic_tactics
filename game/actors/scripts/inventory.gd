@@ -29,13 +29,9 @@ func load_item_skills():
 	
 	for skill_ref in weapon_skill_refs:
 		skill_refs.append(skill_ref)
+		
 	emit_signal('new_skills_loaded', skill_refs)
 	
-#-------------------------------------------------------------------------------
-
-func provide_current_weapon():
-	return _current_weapon
-
 #-------------------------------------------------------------------------------
 
 func provide_weapons():

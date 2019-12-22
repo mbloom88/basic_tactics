@@ -41,7 +41,7 @@ func _on_Battleground_battle_action_cancelled():
 
 #-------------------------------------------------------------------------------
 
-func _on_Battleground_battle_action_completed():
+func _on_Battleground_battle_turn_completed():
 	_guis.remove_all_menus()
 
 #-------------------------------------------------------------------------------
@@ -122,18 +122,8 @@ func _on_Battleground_target_selected(target):
 
 #-------------------------------------------------------------------------------
 
-func _on_GUIs_battler_skills_requested():
-	_battleground.provide_current_battler_skills()
-
-#-------------------------------------------------------------------------------
-
 func _on_GUIs_player_waiting():
 	_battleground.next_battler()
-
-#-------------------------------------------------------------------------------
-
-func _on_GUIs_skill_selected(skill):
-	_battleground.validate_skill_for_use(skill)
 
 ################################################################################
 # DEBUG

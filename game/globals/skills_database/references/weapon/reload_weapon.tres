@@ -1,7 +1,7 @@
 [gd_resource type="Resource" load_steps=4 format=2]
 
 [ext_resource path="res://assets/gfx/test_portait.png" type="Texture" id=1]
-[ext_resource path="res://globals/skills_database/references/skill-reference-template.gd" type="Script" id=2]
+[ext_resource path="res://globals/skills_database/references/skill_reference_template.gd" type="Script" id=2]
 [ext_resource path="res://skills/weapon/reload_weapon/ReloadWeapon.tscn" type="PackedScene" id=3]
 
 [resource]

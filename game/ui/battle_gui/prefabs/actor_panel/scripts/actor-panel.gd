@@ -40,7 +40,7 @@ func load_actor(actor):
 	Args:
 		- actor (Object)
 	"""
-	if current_actor:
+	if is_instance_valid(current_actor):
 		var last_actor = current_actor
 		last_actor.disconnect('stats_modified', self, 
 			'_on_Actor_stats_modified')

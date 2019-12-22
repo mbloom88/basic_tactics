@@ -4,23 +4,25 @@ Base 'Actor' scene.
 extends KinematicBody2D
 
 # Signals 
+signal ai_battle_actions_set(actor)
 signal alpha_modulate_completed
 signal attack_cells_requested(actor, attack_range)
 signal attack_started(actor)
 signal battle_action_cancelled
+signal battle_info_requested(actor)
 signal camera_move_requested(location, move_speed)
 signal hide_target_gui_requested
 signal move_cells_requested
 signal move_completed(actor)
 signal move_requested(actor, direction)
 signal player_menu_requested(actor)
-signal reaction_completed
+signal reaction_completed(actor)
 signal state_changed(state)
 signal stats_modified
-signal target_affected(target)
 signal target_selected(target)
 
 # Child nodes
+onready var _astar = $AStarPathfinder
 onready var _job = $Job
 onready var _inventory = $Inventory
 onready var _tween_alpha = $TweenAlpha
@@ -41,13 +43,19 @@ onready var _state_map = {
 	'move': $State/Move,
 	'menu': $State/Menu,
 	'attack': $State/Attack,
+	'battle_ai': $State/BattleAI,
 }
 
 # Actor info
 export (String) var reference = "" setget , get_reference
-export (String, 'aggressive_melee') var battle_ai_behavior = 'aggressive_melee'
 export (bool) var onready_invisible = true
-var script_running = false setget set_script_running, get_script_running
+var has_script_running = false setget set_has_script_running, get_has_script_running
+
+# Battle Info
+export (String, 'aggressive_melee') var battle_ai_behavior = 'aggressive_melee'
+var has_ai_running = false setget , get_has_ai_running
+var _ai_movements = []
+var _ai_target = null
 
 ################################################################################
 # VIRTUAL METHODS
@@ -71,7 +79,7 @@ func _process(delta):
 
 func _ready():
 	hide_battle_cursor()
-	_weapon_label.update_label(_inventory.provide_current_weapon())
+	_weapon_label.update_label(_inventory.provide_weapons()['current'])
 	_job.load_job_skills()
 	_inventory.load_item_skills()
 	
@@ -93,16 +101,20 @@ func _change_state(state_name):
 
 	if state_name == 'previous':
 		_state_stack.pop_front()
-	elif state_name == 'attack':
+	elif state_name in ['attack', 'move']:
 		_state_stack.push_front(_state_map[state_name])
 	else:
 		var new_state = _state_map[state_name]
 		_state_stack[0] = new_state
-
+	
+	# Set new state
 	_current_state = _state_stack[0]
 	
 	if state_name != 'previous':
 		_current_state._enter(self)
+	else:
+		if _current_state == _state_map['battle_ai']:
+			_current_state.next_ai_battle_action(self)
 	
 	_state_label.update_label(_current_state.name)
 	emit_signal("state_changed", state_name)
@@ -113,13 +125,14 @@ func _change_state(state_name):
 
 func activate_for_battle():
 	"""
-	Sets the Actor to the 'idle' state. Doing so enables Actor input processing
-	by the Player. Note that Enemy and NPC actions are handled by a Level's
-	Battleground node.
+	Sets the Actor to the 'idle' state if activating an Ally. Doing so enables
+	Actor input processing by the Player on the Ally. Enemy and NPC
+	activations...
 	"""
 	if ActorDatabase.lookup_type(reference) == 'ally':
 		_change_state('idle')
 	elif ActorDatabase.lookup_type(reference) in ['enemy', 'npc']:
+		has_ai_running = true
 		_change_state('battle_ai')
 
 #-------------------------------------------------------------------------------
@@ -225,11 +238,6 @@ func perform_scripted_move(next_direction, movement_type):
 
 #-------------------------------------------------------------------------------
 
-func provide_current_weapon():
-	return _inventory.provide_current_weapon()
-
-#-------------------------------------------------------------------------------
-
 func provide_job_info():
 	return _job.provide_job_info()
 
@@ -267,9 +275,9 @@ func scripted_state_change(new_state):
 		- new_state (String): The name of the state to change into.
 	"""
 	if new_state == 'inactive':
-		script_running = false
+		has_script_running = false
 	else:
-		script_running = true
+		has_script_running = true
 		
 	_change_state(new_state)
 
@@ -305,6 +313,12 @@ func take_damage(weapon):
 
 #-------------------------------------------------------------------------------
 
+func update_ai_battle_info(target_info):
+	if _current_state == _state_map['battle_ai']:
+		_current_state.update_ai_battle_info(self, target_info)
+
+#-------------------------------------------------------------------------------
+
 func update_level(value):
 	_job.level = value
 
@@ -312,24 +326,35 @@ func update_level(value):
 # SETTERS
 ################################################################################
 
-func set_script_running(value):
-	script_running = value
+func set_has_script_running(value):
+	has_script_running = value
 
 ################################################################################
 # GETTERS
 ################################################################################
 
-func get_reference():
-	return reference
+func get_has_ai_running():
+	return has_ai_running
 
 #-------------------------------------------------------------------------------
 
-func get_script_running():
-	return script_running
+func get_has_script_running():
+	return has_script_running
+
+#-------------------------------------------------------------------------------
+
+func get_reference():
+	return reference
 
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
+
+func _on_AStarPathfinder_pathing_completed(path):
+	if _current_state == _state_map['battle_ai']:
+		_current_state._on_AStarPathfinder_pathing_completed(self, path)
+
+#-------------------------------------------------------------------------------
 
 func _on_Inventory_current_weapon_updated(current_weapon):
 	_weapon_label.update_label(current_weapon)
@@ -357,19 +382,17 @@ func _on_Job_weapon_reload_requested():
 #-------------------------------------------------------------------------------
 
 func _on_ReactionNumber_animation_completed():
-	emit_signal('reaction_completed')
+	emit_signal('reaction_completed', self)
 
 #-------------------------------------------------------------------------------
 
 func _on_TweenMove_tween_completed(object, key):
-	if not _current_state.has_method("_on_TweenMove_tween_completed"):
-		return
-
-	var state_name = _current_state._on_TweenMove_tween_completed(self, \
+	if _current_state == _state_map['move']:
+		var state_name = _current_state._on_TweenMove_tween_completed(self, \
 		object, key)
-	
-	if state_name:
-		_change_state(state_name)
+		
+		if state_name:
+			_change_state(state_name)
 
 #-------------------------------------------------------------------------------
 

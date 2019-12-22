@@ -1,10 +1,11 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://actors/themes/reaction-numbers.theme" type="Theme" id=1]
+[ext_resource path="res://actors/themes/reaction_numbers.theme" type="Theme" id=1]
 [ext_resource path="res://actors/prefabs/reaction_number/scripts/reaction-number.gd" type="Script" id=2]
 [ext_resource path="res://actors/prefabs/reaction_number/animations/SETUP.anim" type="Animation" id=3]
 [ext_resource path="res://actors/prefabs/reaction_number/animations/hide.anim" type="Animation" id=4]
 [ext_resource path="res://actors/prefabs/reaction_number/animations/show.anim" type="Animation" id=5]
+
 
 [node name="ReactionNumber" type="Label"]
 margin_left = -25.0

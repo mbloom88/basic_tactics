@@ -9,5 +9,5 @@ script = ExtResource( 3 )
 item_name = "Old Pistol"
 item_scene = ExtResource( 2 )
 icon = ExtResource( 1 )
-skill_references = [ "reload-weapon" ]
+skill_references = [ "reload_weapon" ]
 

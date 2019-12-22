@@ -5,15 +5,15 @@
 [ext_resource path="res://ui/battle_gui/prefabs/weapon_status/scripts/weapon-status.gd" type="Script" id=3]
 [ext_resource path="res://assets/gfx/test_portait.png" type="Texture" id=4]
 
-[sub_resource type="AtlasTexture" id=3]
+[sub_resource type="AtlasTexture" id=4]
 atlas = ExtResource( 2 )
 region = Rect2( 0, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=1]
+[sub_resource type="AtlasTexture" id=5]
 atlas = ExtResource( 2 )
 region = Rect2( 128, 0, 64, 64 )
 
-[sub_resource type="AtlasTexture" id=2]
+[sub_resource type="AtlasTexture" id=3]
 atlas = ExtResource( 2 )
 region = Rect2( 64, 0, 64, 64 )
 
@@ -22,7 +22,7 @@ margin_right = 200.0
 margin_bottom = 90.0
 rect_min_size = Vector2( 300, 90 )
 theme = ExtResource( 1 )
-texture = SubResource( 3 )
+texture = SubResource( 4 )
 region_rect = Rect2( 0, 0, 64, 64 )
 script = ExtResource( 3 )
 
@@ -65,8 +65,8 @@ margin_right = 206.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 10 )
 value = 50.0
-texture_under = SubResource( 1 )
-texture_progress = SubResource( 2 )
+texture_under = SubResource( 5 )
+texture_progress = SubResource( 3 )
 nine_patch_stretch = true
 
 [node name="AmmoValues" type="Label" parent="HBoxContainer/VBoxContainer"]

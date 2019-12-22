@@ -12,7 +12,7 @@ _global_script_classes=[ {
 "base": "Resource",
 "class": "ActorReference",
 "language": "GDScript",
-"path": "res://globals/actor_database/references/actor-reference-template.gd"
+"path": "res://globals/actor_database/references/actor_reference_template.gd"
 }, {
 "base": "Resource",
 "class": "ItemReference",
@@ -22,22 +22,22 @@ _global_script_classes=[ {
 "base": "Resource",
 "class": "JobTemplate",
 "language": "GDScript",
-"path": "res://jobs/job-template.gd"
+"path": "res://jobs/job_template.gd"
 }, {
 "base": "Resource",
 "class": "SkillReference",
 "language": "GDScript",
-"path": "res://globals/skills_database/references/skill-reference-template.gd"
+"path": "res://globals/skills_database/references/skill_reference_template.gd"
 }, {
 "base": "Resource",
 "class": "SkillTemplate",
 "language": "GDScript",
-"path": "res://skills/skill-template.gd"
+"path": "res://skills/skill_template.gd"
 }, {
 "base": "Resource",
 "class": "WeaponTemplate",
 "language": "GDScript",
-"path": "res://items/weapons/weapon-template.gd"
+"path": "res://items/weapons/weapon_template.gd"
 } ]
 _global_script_class_icons={
 "ActorReference": "",

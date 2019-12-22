@@ -1,9 +1,9 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://skills/Skill.tscn" type="PackedScene" id=1]
-[ext_resource path="res://skills/weapon/reload_weapon/reload-weapon.tres" type="Resource" id=2]
+[ext_resource path="res://skills/weapon/reload_weapon/reload_weapon.tres" type="Resource" id=2]
 
-[node name="ReloadWeapon" index="0" instance=ExtResource( 1 )]
-reference = "reload-weapon"
+[node name="ReloadWeapon" instance=ExtResource( 1 )]
+reference = "reload_weapon"
 skill_loadout = ExtResource( 2 )
 

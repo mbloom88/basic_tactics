@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://actors/scripts/actor.gd" type="Script" id=1]
 [ext_resource path="res://actors/scripts/inactive.gd" type="Script" id=2]
@@ -6,19 +6,21 @@
 [ext_resource path="res://actors/scripts/move.gd" type="Script" id=4]
 [ext_resource path="res://actors/scripts/menu.gd" type="Script" id=5]
 [ext_resource path="res://actors/scripts/attack.gd" type="Script" id=6]
-[ext_resource path="res://actors/scripts/job.gd" type="Script" id=7]
-[ext_resource path="res://actors/scripts/stats.gd" type="Script" id=8]
-[ext_resource path="res://actors/scripts/skills.gd" type="Script" id=9]
-[ext_resource path="res://actors/scripts/inventory.gd" type="Script" id=10]
-[ext_resource path="res://assets/sprites/cursor.png" type="Texture" id=11]
-[ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=12]
-[ext_resource path="res://actors/scripts/skin.gd" type="Script" id=13]
-[ext_resource path="res://actors/animations/SETUP.anim" type="Animation" id=14]
-[ext_resource path="res://actors/animations/damaged.anim" type="Animation" id=15]
-[ext_resource path="res://actors/prefabs/reaction_number/ReactionNumber.tscn" type="PackedScene" id=16]
-[ext_resource path="res://actors/themes/debug.theme" type="Theme" id=17]
-[ext_resource path="res://actors/scripts/state-label.gd" type="Script" id=18]
-[ext_resource path="res://actors/scripts/weapon-label.gd" type="Script" id=19]
+[ext_resource path="res://actors/scripts/battle_ai.gd" type="Script" id=7]
+[ext_resource path="res://actors/prefabs/astar_pathfinder/AStarPathfinder.tscn" type="PackedScene" id=8]
+[ext_resource path="res://actors/scripts/job.gd" type="Script" id=9]
+[ext_resource path="res://actors/scripts/stats.gd" type="Script" id=10]
+[ext_resource path="res://actors/scripts/skills.gd" type="Script" id=11]
+[ext_resource path="res://actors/scripts/inventory.gd" type="Script" id=12]
+[ext_resource path="res://assets/sprites/cursor.png" type="Texture" id=13]
+[ext_resource path="res://assets/sprites/test_actor.png" type="Texture" id=14]
+[ext_resource path="res://actors/scripts/skin.gd" type="Script" id=15]
+[ext_resource path="res://actors/animations/SETUP.anim" type="Animation" id=16]
+[ext_resource path="res://actors/animations/damaged.anim" type="Animation" id=17]
+[ext_resource path="res://actors/prefabs/reaction_number/ReactionNumber.tscn" type="PackedScene" id=18]
+[ext_resource path="res://actors/themes/debug.theme" type="Theme" id=19]
+[ext_resource path="res://actors/scripts/state_label.gd" type="Script" id=20]
+[ext_resource path="res://actors/scripts/weapon_label.gd" type="Script" id=21]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
@@ -45,17 +47,24 @@ script = ExtResource( 5 )
 [node name="Attack" type="Node" parent="State"]
 script = ExtResource( 6 )
 
-[node name="Job" type="Node" parent="."]
+[node name="BattleAI" type="Node" parent="State"]
 script = ExtResource( 7 )
 
-[node name="Stats" type="Node" parent="Job"]
-script = ExtResource( 8 )
+[node name="AStarPathfinder" parent="." instance=ExtResource( 8 )]
 
-[node name="Skills" type="Node" parent="Job"]
+[node name="Job" type="Node" parent="."]
+editor/display_folded = true
 script = ExtResource( 9 )
 
-[node name="Inventory" type="Node" parent="."]
+[node name="Stats" type="Node" parent="Job"]
 script = ExtResource( 10 )
+
+[node name="Skills" type="Node" parent="Job"]
+script = ExtResource( 11 )
+
+[node name="Inventory" type="Node" parent="."]
+editor/display_folded = true
+script = ExtResource( 12 )
 
 [node name="Weapon1" type="Node" parent="Inventory"]
 
@@ -68,20 +77,20 @@ script = ExtResource( 10 )
 [node name="BattleCursor" type="Sprite" parent="."]
 position = Vector2( 0, 16 )
 scale = Vector2( 1.25, 1.25 )
-texture = ExtResource( 11 )
+texture = ExtResource( 13 )
 
 [node name="Skin" type="Sprite" parent="."]
-texture = ExtResource( 12 )
-script = ExtResource( 13 )
+texture = ExtResource( 14 )
+script = ExtResource( 15 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Skin"]
-anims/SETUP = ExtResource( 14 )
-anims/damaged = ExtResource( 15 )
+anims/SETUP = ExtResource( 16 )
+anims/damaged = ExtResource( 17 )
 
 [node name="ReactionPoint" type="Node2D" parent="."]
 position = Vector2( 0, -48 )
 
-[node name="ReactionNumber" parent="ReactionPoint" instance=ExtResource( 16 )]
+[node name="ReactionNumber" parent="ReactionPoint" instance=ExtResource( 18 )]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
@@ -90,7 +99,7 @@ shape = SubResource( 1 )
 [node name="Debug" type="Control" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
-theme = ExtResource( 17 )
+theme = ExtResource( 19 )
 
 [node name="StateLabel" type="Label" parent="Debug" groups=[
 "debug",
@@ -103,7 +112,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "State Label"
 align = 1
-script = ExtResource( 18 )
+script = ExtResource( 20 )
 
 [node name="WeaponLabel" type="Label" parent="Debug" groups=[
 "debug",
@@ -115,8 +124,9 @@ margin_bottom = 54.6503
 grow_horizontal = 2
 text = "Weapon Label"
 align = 1
-script = ExtResource( 19 )
+script = ExtResource( 21 )
 
+[connection signal="pathing_completed" from="AStarPathfinder" to="." method="_on_AStarPathfinder_pathing_completed"]
 [connection signal="item_skills_requested" from="Job" to="." method="_on_Job_item_skills_requested"]
 [connection signal="stats_modified" from="Job" to="." method="_on_Job_stats_modified"]
 [connection signal="weapon_reload_requested" from="Job" to="." method="_on_Job_weapon_reload_requested"]

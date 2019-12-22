@@ -11,7 +11,10 @@ var _index = 0
 
 func _enter(host):
 	host.set_process(false)
-	host.emit_signal('attack_started', host)
+	if host.has_ai_running:
+		_ai_attack_target(host)
+	else:
+		host.emit_signal('attack_started', host)
 
 #-------------------------------------------------------------------------------
 
@@ -24,6 +27,20 @@ func _update(host, delta):
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
+
+func _ai_attack_target(host):
+	var current_weapon = host.provide_weapons()['current']
+	
+	host.emit_signal('target_selected', host._ai_target)
+	host._ai_target.show_battle_cursor()
+	
+	yield(get_tree().create_timer(1), 'timeout') # Slows the AI down
+	host._ai_target.hide_battle_cursor()
+	host._ai_target.take_damage(current_weapon)
+	
+	host._change_state('previous')
+
+#-------------------------------------------------------------------------------
 
 func _check_targets(host):
 	var action = ""
@@ -70,7 +87,7 @@ func _player_attack_target(host):
 		-has_attacked (bool): True if they player successfully attacked.
 	"""
 	var has_attacked = false
-	var current_weapon = host.provide_current_weapon()
+	var current_weapon = host.provide_weapons()['current']
 	var stats = current_weapon.provide_stats()
 	var ammo = stats['ammo']
 	var max_ammo = stats['max_ammo']
@@ -93,26 +110,24 @@ func _player_attack_target(host):
 # PUBLIC METHODS
 ################################################################################
 
-func search_for_attack_targets(host, target_info):
+func search_for_attack_targets(host, battle_info):
 	"""
 	Determines attack targets for the actor.
 	
 	Args:
 		- host (Object): The actor.
-		- target_info (Dictionary): A dictionary that holds the requesting actor
-			as a key within its current map cell as a value. Targets are listed 
-			as keys and their associated map cells are their values. The map
-			cells can be used for determining distances.
+		- battle_info (Dictionary): A dictionary of battle information provided
+			by the Battleground.
 	"""
-	var attack_range = \
-		host.provide_current_weapon().provide_stats()['attack_range']
+	var current_weapon = host.provide_weapons()['current']
+	var attack_range = current_weapon.provide_stats()['attack_range']
 	var host_type = ActorDatabase.lookup_type(host.reference)
-	var host_cell = target_info['initiator'][host]
+	var host_cell = battle_info['initiator'][host]
 	_targets = []
 	
-	for target in target_info['targets'].keys():
+	for target in battle_info['targets'].keys():
 		var target_type = ActorDatabase.lookup_type(target.reference)
-		var target_cell = target_info['targets'][target]
+		var target_cell = battle_info['targets'][target]
 		var distance_to_target = host_cell.distance_to(target_cell)
 		if target_type != host_type and distance_to_target <= attack_range:
 			_targets.append(target)

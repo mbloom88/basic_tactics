@@ -96,6 +96,7 @@ func load_weapon_gui(actor):
 		_weapon_status2.activate()
 		_weapon_focus = _weapon_status2
 	
+	activate_weapon_swap()
 	show_weapon_gui()
 
 #-------------------------------------------------------------------------------

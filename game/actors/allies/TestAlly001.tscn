@@ -1,21 +1,25 @@
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://actors/Actor.tscn" type="PackedScene" id=1]
-[ext_resource path="res://jobs/test-job-3.tres" type="Resource" id=2]
+[ext_resource path="res://jobs/test_job_3.tres" type="Resource" id=2]
 [ext_resource path="res://items/weapons/ranged/OldPistol.tscn" type="PackedScene" id=3]
 [ext_resource path="res://items/weapons/melee/CombatKnife.tscn" type="PackedScene" id=4]
 [ext_resource path="res://assets/sprites/test_ally.png" type="Texture" id=5]
 
 [node name="TestAlly001" index="0" instance=ExtResource( 1 )]
-reference = "test-ally-001"
+reference = "test_ally_001"
 
-[node name="Job" parent="." index="1"]
+[node name="Job" parent="." index="2"]
+editor/display_folded = false
 job_loadout = ExtResource( 2 )
+
+[node name="Inventory" parent="." index="3"]
+editor/display_folded = false
 
 [node name="OldPistol" parent="Inventory/Weapon1" index="0" instance=ExtResource( 3 )]
 
 [node name="CombatKnife" parent="Inventory/Weapon2" index="0" instance=ExtResource( 4 )]
 
-[node name="Skin" parent="." index="6"]
+[node name="Skin" parent="." index="7"]
 texture = ExtResource( 5 )
 

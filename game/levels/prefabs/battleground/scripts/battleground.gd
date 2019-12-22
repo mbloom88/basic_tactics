@@ -7,7 +7,7 @@ extends TileMap
 signal active_actor_selected(actor)
 signal allies_ready_for_placement
 signal battle_action_cancelled
-signal battle_action_completed
+signal battle_turn_completed
 signal begin_battle
 signal current_battler_skills_acquired(skills)
 signal hide_active_gui_requested
@@ -59,6 +59,7 @@ var _actor_to_place = null
 
 # Battle parameters
 var _current_battler = null
+var _current_target = null
 var _allowed_move_cells = []
 var _battle_camera = null
 
@@ -208,7 +209,7 @@ func _gather_cell_info():
 
 #-------------------------------------------------------------------------------
 
-func _gather_battle_targets(initiator):
+func _gather_battle_info(initiator):
 	"""
 	Creates a dictionary of battle targets for the actor that has initiated a 
 	target-based action.
@@ -218,23 +219,30 @@ func _gather_battle_targets(initiator):
 	Returns:
 		- target_info (Dictionary): A dictionary that holds the requesting actor
 			as a key within its current map cell as a value. Targets are listed 
-			as keys and their associated map cells are their values. The map
-			cells can be used for determining distances.
+			as keys and their associated map cells are their values. A targets' 
+			map cell can be used for determining distances. The overall map from
+			the Battleground is also provided.
 	"""
-	var target_info = {
+	var battle_info = {
 		'initiator': {},
 		'targets': {},
+		'map_cells': [],
+		'move_cells': [],
 	}
+	
+	battle_info['initiator'][initiator] = world_to_map(initiator.position)
 	
 	for battler in _battlers.get_children():
 		if battler != initiator:
-			target_info['targets'][battler] = world_to_map(battler.position)
+			battle_info['targets'][battler] = world_to_map(battler.position)
 	for destructable in _destructables.get_children():
-		target_info['target'][destructable] = world_to_map(destructable.position)
-		
-	target_info['initiator'][initiator] = world_to_map(initiator.position)
+		battle_info['target'][destructable] = \
+			world_to_map(destructable.position)
 	
-	return target_info
+	battle_info['map_cells'] = provide_used_cells('map')
+	battle_info['move_cells'] = _allowed_move_cells
+	
+	return battle_info
 
 #-------------------------------------------------------------------------------
 
@@ -408,12 +416,6 @@ func provide_cell_size():
 
 #-------------------------------------------------------------------------------
 
-func provide_current_battler_skills():
-	if _current_state == _state_map['battle']:
-		_current_state.provide_current_battler_skills(self)
-
-#-------------------------------------------------------------------------------
-
 func provide_used_cells(type):
 	"""
 	Provides the list of all active tiles in the Battleground TileMap either as
@@ -488,26 +490,26 @@ func update_actors_on_grid(actor, operation):
 	match operation:
 		'add':
 			if not actor in _actors_on_grid:
+				actor.connect('ai_battle_actions_set', self, 
+					'_on_Actor_ai_battle_actions_set')
 				actor.connect('attack_cells_requested', self, 
 					'_on_Actor_attack_cells_requested')
 				actor.connect('attack_started', self, 
 					'_on_Actor_attack_started')
 				actor.connect('battle_action_cancelled', self,
 					'_on_Actor_battle_action_cancelled')
+				actor.connect('battle_info_requested', self, 
+					'_on_Actor_battle_info_requested')
 				actor.connect('hide_target_gui_requested', self, 
 					'_on_Actor_hide_target_gui_requested')
 				actor.connect('move_cells_requested', self, 
 					'_on_Actor_move_cells_requested')
-				actor.connect('move_completed', self, 
-					'_on_Actor_move_completed')
 				actor.connect('move_requested', self, 
 					'_on_Actor_move_requested')
 				actor.connect('player_menu_requested', self, 
 					'_on_Actor_player_menu_requested')
 				actor.connect('reaction_completed', self, 
 					'_on_Actor_reaction_completed')
-				actor.connect('target_affected', self, 
-					'_on_Actor_target_affected')
 				actor.connect('target_selected', self, 
 					'_on_Actor_target_selected')
 				_actors_on_grid.append(actor)
@@ -525,19 +527,32 @@ func validate_skill_for_use(skill):
 # SIGNAL HANDLING
 ################################################################################
 
+func _on_Actor_ai_battle_actions_set(actor):
+	var battle_info = _gather_battle_info(actor)
+	actor.update_ai_battle_info(battle_info)
+
+#-------------------------------------------------------------------------------
+
 func _on_Actor_attack_cells_requested(actor, attack_range):
 	_show_action_cells(actor, attack_range)
 
 #-------------------------------------------------------------------------------
 
 func _on_Actor_attack_started(actor):
-	var target_info = _gather_battle_targets(actor)
-	actor.search_for_attack_targets(target_info)
+	var battle_info = _gather_battle_info(actor)
+	actor.search_for_attack_targets(battle_info)
 
 #-------------------------------------------------------------------------------
 
 func _on_Actor_battle_action_cancelled():
+	_current_target = null
 	emit_signal('battle_action_cancelled')
+
+#-------------------------------------------------------------------------------
+
+func _on_Actor_battle_info_requested(actor):
+	var battle_info = _gather_battle_info(actor)
+	actor.update_ai_battle_info(battle_info)
 
 #-------------------------------------------------------------------------------
 
@@ -548,14 +563,6 @@ func _on_Actor_hide_target_gui_requested():
 
 func _on_Actor_move_cells_requested():
 	_reload_move_cells()
-
-#-------------------------------------------------------------------------------
-
-func _on_Actor_move_completed(actor):
-	var actor_type = ActorDatabase.lookup_type(actor.reference)
-	# For AI movements during battle
-	if _current_state == _state_map['battle'] and actor_type != 'ally':
-		_current_state._on_Actor_move_completed(self, actor)
 
 #-------------------------------------------------------------------------------
 
@@ -573,18 +580,14 @@ func _on_Actor_player_menu_requested(actor):
 
 #-------------------------------------------------------------------------------
 
-func _on_Actor_reaction_completed():
-	if _current_state == _state_map['battle']:
+func _on_Actor_reaction_completed(actor):
+	if _current_state == _state_map['battle'] and _current_target == actor:
 		_current_state.setup_for_next_turn(self)
 
 #-------------------------------------------------------------------------------
 
-func _on_Actor_target_affected(target):
-	emit_signal('target_affected', target)
-
-#-------------------------------------------------------------------------------
-
 func _on_Actor_target_selected(target):
+	_current_target = target
 	emit_signal('target_selected', target)
 
 #-------------------------------------------------------------------------------
