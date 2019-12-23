@@ -10,7 +10,7 @@
     "enter_speed": "fade_in",
     "exit_scene": false,
     "exit_speed": "fade_out",
-    "content": "Test Ally 001. You bastard...you dare show your face around here?!",
+    "content": "Test Ally 001. You want to fight?!",
     "next": "path001_001"
   },
   "path001_001": {
@@ -24,7 +24,7 @@
     "enter_speed": "fade_in",
     "exit_scene": false,
     "exit_speed": "fade_out",
-    "content": "Shut up and let's do this...",
+    "content": "You bet I wanna fight.",
     "next": "path001_002"
   },
   "path001_002": {
@@ -82,7 +82,7 @@
     "enter_speed": "fade_in",
     "exit_scene": false,
     "exit_speed": "fade_out",
-    "content": "Fine then...pussy...",
+    "content": "Too bad asshole...this is happening.",
     "next": "end"
   }
 }

@@ -20,7 +20,7 @@ export (String, 'left', 'right') var box_alignment = 'left' \
 	setget set_box_alignment
 
 # Actor info
-var current_actor = null setget , get_current_actor
+var current_actor = null setget set_current_actor, get_current_actor
 
 ################################################################################
 # PRIVATE METHODS
@@ -35,15 +35,20 @@ func _refresh_actor_stats(info):
 # PUBLIC METHODS
 ################################################################################
 
+func clear_actor():
+		current_actor.disconnect('stats_modified', self, 
+			'_on_Actor_stats_modified')
+		current_actor = null
+
+#-------------------------------------------------------------------------------
+
 func load_actor(actor):
 	"""
 	Args:
 		- actor (Object)
 	"""
-	if is_instance_valid(current_actor):
-		var last_actor = current_actor
-		last_actor.disconnect('stats_modified', self, 
-			'_on_Actor_stats_modified')
+	if current_actor == actor:
+		return
 	
 	current_actor = actor
 	current_actor.connect('stats_modified', self, '_on_Actor_stats_modified')
@@ -83,6 +88,13 @@ func set_box_alignment(value):
 				_hbox.move_child(_portrait, last_index)
 				_actor_name.align = Label.ALIGN_RIGHT
 				_actor_level_job.align = Label.ALIGN_RIGHT
+
+################################################################################
+# SETTERS
+################################################################################
+
+func  set_current_actor(value):
+	current_actor = value # Object actor
 
 ################################################################################
 # GETTERS

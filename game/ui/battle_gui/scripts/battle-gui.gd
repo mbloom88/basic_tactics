@@ -41,7 +41,7 @@ func deactivate_weapon_swap():
 #-------------------------------------------------------------------------------
 
 func hide_active_actor_gui():
-	_active_anim.play('active_exit')
+	_active_anim.queue('active_exit')
 	
 #-------------------------------------------------------------------------------
 
@@ -53,24 +53,25 @@ func hide_ally_select_gui():
 #-------------------------------------------------------------------------------
 
 func hide_target_actor_gui():
-	_target_anim.play('target_exit')
+	if _target_panel.current_actor:
+		_target_anim.queue('target_exit')
 
 #-------------------------------------------------------------------------------
 
 func hide_weapon_gui():
-	_weapon_anim.play('weapon_exit')
+	_weapon_anim.queue('weapon_exit')
 
 #-------------------------------------------------------------------------------
 
 func load_active_actor_gui(actor):
 	_active_panel.load_actor(actor)
-	_active_anim.play('active_enter')
+	_active_anim.queue('active_enter')
 
 #-------------------------------------------------------------------------------
 
 func load_target_actor_gui(target):
 	_target_panel.load_actor(target)
-	_target_anim.play('target_enter')
+	_target_anim.queue('target_enter')
 
 #-------------------------------------------------------------------------------
 
@@ -102,14 +103,13 @@ func load_weapon_gui(actor):
 #-------------------------------------------------------------------------------
 
 func show_ally_select_gui():
-	_active_anim.play('active_enter')
 	_squad_count.show_gui()
 	_squad_status.show_gui()
 
 #-------------------------------------------------------------------------------
 
 func show_weapon_gui():
-	_weapon_anim.play('weapon_enter')
+	_weapon_anim.queue('weapon_enter')
 
 #-------------------------------------------------------------------------------
 
@@ -121,7 +121,9 @@ func update_squad_count():
 func update_squad_status(type):
 	_squad_status.update_squad_status(type)
 
-#-------------------------------------------------------------------------------
+################################################################################
+# SIGNAL HANDLING
+################################################################################
 
 func _on_WeaponSwap_pressed():
 	_weapon_focus.deactivate()
@@ -135,3 +137,9 @@ func _on_WeaponSwap_pressed():
 
 	_weapon_focus.activate()
 	_active_actor.swap_weapons()
+
+#-------------------------------------------------------------------------------
+
+func _on_TargetAnimation_animation_finished(anim_name):
+	if anim_name == 'target_exit':
+		_target_panel.clear_actor()

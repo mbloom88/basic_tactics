@@ -134,10 +134,12 @@ func search_for_attack_targets(host, battle_info):
 	
 	host.emit_signal('attack_cells_requested', host, attack_range)
 	
+	_index = 0
 	if _targets.empty():
 		_max_index = -1
 	else:
 		_max_index = _targets.size() - 1
-	
-	_index = 0
+		_targets[_index].show_battle_cursor()
+		host.emit_signal('target_selected', _targets[_index])
+		
 	host.set_process(true)

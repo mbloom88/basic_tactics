@@ -58,9 +58,6 @@ func setup_for_next_turn(host):
 		host._current_battler = null
 		host._current_target = null
 		host._remove_blinking_cells()
-		host.emit_signal('hide_active_gui_requested')
-		host.emit_signal('hide_target_gui_requested')
-		host.emit_signal('hide_weapon_gui_requested')
 	
 	if _turn_order.empty():
 		_determine_turn_order(host)
@@ -70,16 +67,6 @@ func setup_for_next_turn(host):
 	var move_range = host._current_battler.provide_job_info()['move']
 	host._show_move_cells(host._current_battler)
 	host._battle_camera.track_actor(host._current_battler)
-
-#-------------------------------------------------------------------------------
-
-func validate_skill_for_use(host, skill):
-	if skill.reference == 'reload-weapon':
-		host._current_battler.reload_current_weapon()
-		host.emit_signal('refresh_weapon_info')
-		host._current_battler.deactivate()
-		yield(get_tree().create_timer(0.5), 'timeout')
-		setup_for_next_turn(host)
 
 ################################################################################
 # SIGNAL HANDLING

@@ -43,6 +43,9 @@ func _on_Battleground_battle_action_cancelled():
 
 func _on_Battleground_battle_turn_completed():
 	_guis.remove_all_menus()
+	_guis.hide_target_actor_gui()
+	_guis.hide_active_actor_gui()
+	_guis.hide_weapon_gui()
 
 #-------------------------------------------------------------------------------
 

@@ -3,6 +3,7 @@ extends Node
 # Signals
 signal current_weapon_updated(current_weapon)
 signal new_skills_loaded(skill_refs)
+signal weapon_reloaded
 
 # Child nodes
 onready var _weapon1 = $Weapon1.get_child(0)
@@ -17,6 +18,10 @@ var _current_weapon = null
 
 func _ready():
 	_current_weapon = _weapon1
+	if _weapon1:
+		_weapon1.connect('reloaded', self, '_on_Weapon_reloaded')
+	if _weapon2:
+		_weapon2.connect('reloaded', self, '_on_Weapon_reloaded')
 
 ################################################################################
 # PUBLIC METHODS
@@ -56,3 +61,10 @@ func swap_weapons():
 		_current_weapon = _weapon1
 	emit_signal('current_weapon_updated', _current_weapon)
 	load_item_skills()
+
+################################################################################
+# SIGNAL HANDLING
+################################################################################
+
+func _on_Weapon_reloaded():
+	emit_signal('weapon_reloaded')

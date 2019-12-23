@@ -512,16 +512,12 @@ func update_actors_on_grid(actor, operation):
 					'_on_Actor_reaction_completed')
 				actor.connect('target_selected', self, 
 					'_on_Actor_target_selected')
+				actor.connect('weapon_reloaded', self, 
+					'_on_Actor_weapon_reloaded')
 				_actors_on_grid.append(actor)
 		'remove':
 			if actor in _actors_on_grid:
 				_actors_on_grid.erase(actor)
-
-#--------------------------------------------------------------------------------
-
-func validate_skill_for_use(skill):
-	if _current_state == _state_map['battle']:
-		_current_state.validate_skill_for_use(self, skill)
 
 ################################################################################
 # SIGNAL HANDLING
@@ -589,6 +585,12 @@ func _on_Actor_reaction_completed(actor):
 func _on_Actor_target_selected(target):
 	_current_target = target
 	emit_signal('target_selected', target)
+#-------------------------------------------------------------------------------
+
+
+func _on_Actor_weapon_reloaded():
+	if _current_state == _state_map['battle']:
+		_current_state.setup_for_next_turn(self)
 
 #-------------------------------------------------------------------------------
 

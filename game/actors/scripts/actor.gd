@@ -20,6 +20,7 @@ signal reaction_completed(actor)
 signal state_changed(state)
 signal stats_modified
 signal target_selected(target)
+signal weapon_reloaded
 
 # Child nodes
 onready var _astar = $AStarPathfinder
@@ -363,6 +364,11 @@ func _on_Inventory_current_weapon_updated(current_weapon):
 
 func _on_Inventory_new_skills_loaded(skill_refs):
 	_job.load_weapon_skills(skill_refs)
+
+#-------------------------------------------------------------------------------
+
+func _on_Inventory_weapon_reloaded():
+	emit_signal('weapon_reloaded')
 
 #-------------------------------------------------------------------------------
 

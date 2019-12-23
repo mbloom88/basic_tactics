@@ -1,7 +1,6 @@
 extends Node2D
 
 func _ready():
-	var thing = [1]
+	var thing = get_child(0)
 	
-	if thing:
-		print("There is something here!")
+	print(thing)

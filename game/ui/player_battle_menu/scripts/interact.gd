@@ -5,6 +5,7 @@ extends "res://assets/scripts/state.gd"
 ################################################################################
 
 func _enter(host):
+	yield(get_tree().create_timer(0.1), 'timeout') # slow down menu activation
 	for button in get_tree().get_nodes_in_group('player_battle_menu_buttons'):
 		button.disabled = false
 		button.focus_mode = Control.FOCUS_ALL

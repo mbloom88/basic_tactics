@@ -73,7 +73,7 @@ anims/active_exit = SubResource( 2 )
 [node name="TargetActorPanel" parent="." instance=ExtResource( 2 )]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_right = 700.005
+margin_right = 700.006
 
 [node name="TargetAnimation" type="AnimationPlayer" parent="TargetActorPanel"]
 anims/SETUP_target = ExtResource( 4 )
@@ -138,4 +138,5 @@ margin_left = 454.0
 margin_right = 754.0
 margin_bottom = 100.0
 
+[connection signal="animation_finished" from="TargetActorPanel/TargetAnimation" to="." method="_on_TargetAnimation_animation_finished"]
 [connection signal="pressed" from="WeaponPanel/HBoxContainer/WeaponSwap" to="." method="_on_WeaponSwap_pressed"]
