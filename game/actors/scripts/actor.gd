@@ -4,12 +4,12 @@ Base 'Actor' scene.
 extends KinematicBody2D
 
 # Signals 
-signal ai_battle_actions_set(actor)
+signal ai_actions_set(actor)
 signal alpha_modulate_completed
 signal attack_cells_requested(actor, attack_range)
 signal attack_started(actor)
 signal battle_action_cancelled
-signal battle_info_requested(actor)
+signal battleground_info_requested(actor)
 signal camera_move_requested(location, move_speed)
 signal hide_target_gui_requested
 signal move_cells_requested
@@ -44,7 +44,7 @@ onready var _state_map = {
 	'move': $State/Move,
 	'menu': $State/Menu,
 	'attack': $State/Attack,
-	'battle_ai': $State/BattleAI,
+	'ai': $State/AI,
 }
 
 # Actor info
@@ -114,8 +114,8 @@ func _change_state(state_name):
 	if state_name != 'previous':
 		_current_state._enter(self)
 	else:
-		if _current_state == _state_map['battle_ai']:
-			_current_state.next_ai_battle_action(self)
+		if _current_state == _state_map['ai']:
+			_current_state.next_ai_action(self)
 	
 	_state_label.update_label(_current_state.name)
 	emit_signal("state_changed", state_name)
@@ -128,21 +128,18 @@ func activate_for_battle():
 	"""
 	Sets the Actor to the 'idle' state if activating an Ally. Doing so enables
 	Actor input processing by the Player on the Ally. Enemy and NPC
-	activations...
+	activations will be handled by the Actor's AI.
 	"""
 	if ActorDatabase.lookup_type(reference) == 'ally':
 		_change_state('idle')
 	elif ActorDatabase.lookup_type(reference) in ['enemy', 'npc']:
 		has_ai_running = true
-		_change_state('battle_ai')
+		_change_state('ai')
 
 #-------------------------------------------------------------------------------
 
-func activate_for_world():
-	if ActorDatabase.lookup_type(reference) in ['enemy', 'npc']:
-		pass
-	else:
-		_change_state('idle')
+func activate_for_script():
+	pass
 
 #-------------------------------------------------------------------------------
 
@@ -314,9 +311,9 @@ func take_damage(weapon):
 
 #-------------------------------------------------------------------------------
 
-func update_ai_battle_info(target_info):
-	if _current_state == _state_map['battle_ai']:
-		_current_state.update_ai_battle_info(self, target_info)
+func update_ai_battleground_info(target_info):
+	if _current_state == _state_map['ai']:
+		_current_state.update_ai_battleground_info(self, target_info)
 
 #-------------------------------------------------------------------------------
 
@@ -352,7 +349,7 @@ func get_reference():
 ################################################################################
 
 func _on_AStarPathfinder_pathing_completed(path):
-	if _current_state == _state_map['battle_ai']:
+	if _current_state == _state_map['ai']:
 		_current_state._on_AStarPathfinder_pathing_completed(self, path)
 
 #-------------------------------------------------------------------------------

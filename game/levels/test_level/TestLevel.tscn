@@ -13,14 +13,16 @@
 [ext_resource path="res://levels/prefabs/command_program/move_camera/MoveCamera.tscn" type="PackedScene" id=11]
 [ext_resource path="res://levels/prefabs/command_program/trigger_battle/TriggerBattle.tscn" type="PackedScene" id=12]
 
-[node name="TestLevel" instance=ExtResource( 1 )]
+[node name="TestLevel" index="0" instance=ExtResource( 1 )]
 
 [node name="Battleground" parent="." index="0"]
-editor/display_folded = false
 tile_set = ExtResource( 2 )
 tile_data = PoolIntArray( 0, 0, 0, 1, 0, 1, 2, 0, 0, 3, 0, 1, 4, 0, 0, 65536, 0, 1, 65537, 0, 0, 65538, 0, 1, 65539, 0, 0, 65540, 0, 1, 131072, 0, 0, 131073, 0, 1, 131074, 0, 0, 131075, 0, 1, 131076, 0, 0, 196608, 0, 1, 196609, 0, 0, 196610, 0, 1, 196611, 0, 0, 196612, 0, 1, 262144, 0, 0, 262145, 0, 1, 262146, 0, 0, 262147, 0, 1, 262148, 0, 0 )
 
 [node name="State" parent="Battleground" index="0"]
+editor/display_folded = true
+
+[node name="AllyBattlePositions" parent="Battleground" index="2"]
 editor/display_folded = true
 
 [node name="Spawn" type="Position2D" parent="Battleground/AllyBattlePositions" index="0"]
@@ -38,15 +40,12 @@ position = Vector2( 96, 80 )
 [node name="Position005" type="Position2D" parent="Battleground/AllyBattlePositions" index="4"]
 position = Vector2( 224, 80 )
 
-[node name="Battlers" parent="Battleground" index="4"]
-editor/display_folded = true
-
 [node name="TestAlly001" parent="Battleground/Battlers" index="0" instance=ExtResource( 3 )]
-position = Vector2( 32, 272 )
+position = Vector2( 32, 144 )
 onready_invisible = false
 
 [node name="TestEnemy001" parent="Battleground/Battlers" index="1" instance=ExtResource( 4 )]
-position = Vector2( 288, 272 )
+position = Vector2( 288, 144 )
 onready_invisible = false
 
 [node name="Camera" parent="." index="1"]
@@ -55,100 +54,96 @@ position = Vector2( 0, 320 )
 [node name="Debug" parent="." index="3"]
 editor/display_folded = true
 
-[node name="Intro" parent="CommandPrograms" index="0" instance=ExtResource( 5 )]
-_queue_free_on_completion = true
+[node name="TestEnemy001 argument and battle" parent="Cutscenes" index="0" instance=ExtResource( 5 )]
 
-[node name="Camera track TestAlly001" parent="CommandPrograms/Intro" index="0" instance=ExtResource( 6 )]
-_camera_scene_path = NodePath("../../../../TestLevel/Camera")
+[node name="Camera track TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="0" instance=ExtResource( 6 )]
+_camera_scene_path = NodePath("../../../Camera")
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 
-[node name="Delay 1 sec 001" parent="CommandPrograms/Intro" index="1" instance=ExtResource( 7 )]
+[node name="Delay 1 second -001" parent="Cutscenes/TestEnemy001 argument and battle" index="1" instance=ExtResource( 7 )]
 
-[node name="Move TestAlly001 001" parent="CommandPrograms/Intro" index="2" instance=ExtResource( 8 )]
+[node name="Move TestAlly001 -001" parent="Cutscenes/TestEnemy001 argument and battle" index="2" instance=ExtResource( 8 )]
 editor/display_folded = true
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
+_movement_type = "walk"
 
-[node name="Position001" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 001" index="0"]
-position = Vector2( 32, 208 )
+[node name="Position 001" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -001" index="0"]
+position = Vector2( 96, 144 )
 
-[node name="Position002" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 001" index="1"]
-position = Vector2( 96, 208 )
+[node name="Position 002" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -001" index="1"]
+position = Vector2( 160, 144 )
 
-[node name="Position003" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 001" index="2"]
-position = Vector2( 160, 208 )
+[node name="Position 003" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -001" index="2"]
+position = Vector2( 224, 144 )
 
-[node name="Position004" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 001" index="3"]
-position = Vector2( 224, 208 )
-
-[node name="Position005" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 001" index="4"]
-position = Vector2( 288, 208 )
-
-[node name="Delay 50 msec 001" parent="CommandPrograms/Intro" index="3" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -001" parent="Cutscenes/TestEnemy001 argument and battle" index="3" instance=ExtResource( 7 )]
 _delay = 0.05
 
-[node name="Configure dialogue with TestEnemy001" parent="CommandPrograms/Intro" index="4" instance=ExtResource( 9 )]
+[node name="Configure dialogue with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="4" instance=ExtResource( 9 )]
 _dialogue_handler_scene_path = NodePath("../../../GUIs/DialogueHandler")
 _json_file = "res://levels/test_level/dialogue/test_enemy_001.json"
 
-[node name="Delay 50 msec 002" parent="CommandPrograms/Intro" index="5" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -002" parent="Cutscenes/TestEnemy001 argument and battle" index="5" instance=ExtResource( 7 )]
 _delay = 0.05
 
-[node name="Start dialogue with TestEnemy001" parent="CommandPrograms/Intro" index="6" instance=ExtResource( 10 )]
+[node name="Start dialogue with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="6" instance=ExtResource( 10 )]
 _dialogue_handler_scene_path = NodePath("../../../GUIs/DialogueHandler")
 
-[node name="Delay 1 sec 002" parent="CommandPrograms/Intro" index="7" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -003" parent="Cutscenes/TestEnemy001 argument and battle" index="7" instance=ExtResource( 7 )]
+_delay = 0.05
 
-[node name="Camera untrack actor" parent="CommandPrograms/Intro" index="8" instance=ExtResource( 6 )]
+[node name="Camera untrack TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="8" instance=ExtResource( 6 )]
 _camera_scene_path = NodePath("../../../Camera")
+_actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 _untrack_actor = true
 
-[node name="Delay 50 msec 003" parent="CommandPrograms/Intro" index="9" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -004" parent="Cutscenes/TestEnemy001 argument and battle" index="9" instance=ExtResource( 7 )]
 _delay = 0.05
 
-[node name="Move camera" parent="CommandPrograms/Intro" index="10" instance=ExtResource( 11 )]
+[node name="Move camera to ally starting positions" parent="Cutscenes/TestEnemy001 argument and battle" index="10" instance=ExtResource( 11 )]
 editor/display_folded = true
 _camera_scene_path = NodePath("../../../Camera")
 
-[node name="Position2D" type="Position2D" parent="CommandPrograms/Intro/Move camera" index="0"]
-position = Vector2( 160, 144 )
+[node name="Position2D" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move camera to ally starting positions" index="0"]
+position = Vector2( 160, 80 )
 
-[node name="Delay 50 msec 004" parent="CommandPrograms/Intro" index="11" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -005" parent="Cutscenes/TestEnemy001 argument and battle" index="11" instance=ExtResource( 7 )]
 _delay = 0.05
 
-[node name="Move TestEnemy001" parent="CommandPrograms/Intro" index="12" instance=ExtResource( 8 )]
-editor/display_folded = true
-_actor_scene_path = NodePath("../../../Battleground/Battlers/TestEnemy001")
-_quickrun_next_program = true
-
-[node name="Position001" type="Position2D" parent="CommandPrograms/Intro/Move TestEnemy001" index="0"]
-position = Vector2( 224, 272 )
-
-[node name="Position002" type="Position2D" parent="CommandPrograms/Intro/Move TestEnemy001" index="1"]
-position = Vector2( 160, 272 )
-
-[node name="Move TestAlly001 002" parent="CommandPrograms/Intro" index="13" instance=ExtResource( 8 )]
+[node name="Move TestAlly001 -002" parent="Cutscenes/TestEnemy001 argument and battle" index="12" instance=ExtResource( 8 )]
 editor/display_folded = true
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
+_quickrun_next_program = true
 
-[node name="Position001" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 002" index="0"]
-position = Vector2( 288, 144 )
+[node name="Position 001" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -002" index="0"]
+position = Vector2( 224, 80 )
 
-[node name="Position002" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 002" index="1"]
-position = Vector2( 288, 80 )
-
-[node name="Position003" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 002" index="2"]
-position = Vector2( 288, 16 )
-
-[node name="Position004" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 002" index="3"]
+[node name="Position 002" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -002" index="1"]
 position = Vector2( 224, 16 )
 
-[node name="Position005" type="Position2D" parent="CommandPrograms/Intro/Move TestAlly001 002" index="4"]
+[node name="Position 003" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -002" index="2"]
 position = Vector2( 160, 16 )
 
-[node name="Delay 50 msec 005" parent="CommandPrograms/Intro" index="14" instance=ExtResource( 7 )]
+[node name="Move TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="13" instance=ExtResource( 8 )]
+editor/display_folded = true
+_actor_scene_path = NodePath("../../../Battleground/Battlers/TestEnemy001")
+
+[node name="Position 001" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestEnemy001" index="0"]
+position = Vector2( 288, 208 )
+
+[node name="Position 002" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestEnemy001" index="1"]
+position = Vector2( 288, 272 )
+
+[node name="Position 003" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestEnemy001" index="2"]
+position = Vector2( 224, 272 )
+
+[node name="Position 004" type="Position2D" parent="Cutscenes/TestEnemy001 argument and battle/Move TestEnemy001" index="3"]
+position = Vector2( 160, 272 )
+
+[node name="Delay 50 ms -006" parent="Cutscenes/TestEnemy001 argument and battle" index="14" instance=ExtResource( 7 )]
 _delay = 0.05
 
-[node name="Trigger battle with TestEnemy001" parent="CommandPrograms/Intro" index="15" instance=ExtResource( 12 )]
+[node name="Trigger battle with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="15" instance=ExtResource( 12 )]
 _battleground_scene_path = NodePath("../../../Battleground")
 
 

@@ -209,7 +209,7 @@ func _gather_cell_info():
 
 #-------------------------------------------------------------------------------
 
-func _gather_battle_info(initiator):
+func _gather_battleground_info(initiator):
 	"""
 	Creates a dictionary of battle targets for the actor that has initiated a 
 	target-based action.
@@ -223,26 +223,27 @@ func _gather_battle_info(initiator):
 			map cell can be used for determining distances. The overall map from
 			the Battleground is also provided.
 	"""
-	var battle_info = {
+	var battleground_info = {
 		'initiator': {},
 		'targets': {},
 		'map_cells': [],
 		'move_cells': [],
 	}
 	
-	battle_info['initiator'][initiator] = world_to_map(initiator.position)
+	battleground_info['initiator'][initiator] = world_to_map(initiator.position)
 	
 	for battler in _battlers.get_children():
 		if battler != initiator:
-			battle_info['targets'][battler] = world_to_map(battler.position)
+			battleground_info['targets'][battler] = \
+				world_to_map(battler.position)
 	for destructable in _destructables.get_children():
-		battle_info['target'][destructable] = \
+		battleground_info['target'][destructable] = \
 			world_to_map(destructable.position)
 	
-	battle_info['map_cells'] = provide_used_cells('map')
-	battle_info['move_cells'] = _allowed_move_cells
+	battleground_info['map_cells'] = provide_used_cells('map')
+	battleground_info['move_cells'] = _allowed_move_cells
 	
-	return battle_info
+	return battleground_info
 
 #-------------------------------------------------------------------------------
 
@@ -490,16 +491,16 @@ func update_actors_on_grid(actor, operation):
 	match operation:
 		'add':
 			if not actor in _actors_on_grid:
-				actor.connect('ai_battle_actions_set', self, 
-					'_on_Actor_ai_battle_actions_set')
+				actor.connect('ai_actions_set', self, 
+					'_on_Actor_ai_actions_set')
 				actor.connect('attack_cells_requested', self, 
 					'_on_Actor_attack_cells_requested')
 				actor.connect('attack_started', self, 
 					'_on_Actor_attack_started')
 				actor.connect('battle_action_cancelled', self,
 					'_on_Actor_battle_action_cancelled')
-				actor.connect('battle_info_requested', self, 
-					'_on_Actor_battle_info_requested')
+				actor.connect('battleground_info_requested', self, 
+					'_on_Actor_battleground_info_requested')
 				actor.connect('hide_target_gui_requested', self, 
 					'_on_Actor_hide_target_gui_requested')
 				actor.connect('move_cells_requested', self, 
@@ -523,9 +524,9 @@ func update_actors_on_grid(actor, operation):
 # SIGNAL HANDLING
 ################################################################################
 
-func _on_Actor_ai_battle_actions_set(actor):
-	var battle_info = _gather_battle_info(actor)
-	actor.update_ai_battle_info(battle_info)
+func _on_Actor_ai_actions_set(actor):
+	var battleground_info = _gather_battleground_info(actor)
+	actor.update_ai_battleground_info(battleground_info)
 
 #-------------------------------------------------------------------------------
 
@@ -535,8 +536,8 @@ func _on_Actor_attack_cells_requested(actor, attack_range):
 #-------------------------------------------------------------------------------
 
 func _on_Actor_attack_started(actor):
-	var battle_info = _gather_battle_info(actor)
-	actor.search_for_attack_targets(battle_info)
+	var battleground_info = _gather_battleground_info(actor)
+	actor.search_for_attack_targets(battleground_info)
 
 #-------------------------------------------------------------------------------
 
@@ -546,9 +547,9 @@ func _on_Actor_battle_action_cancelled():
 
 #-------------------------------------------------------------------------------
 
-func _on_Actor_battle_info_requested(actor):
-	var battle_info = _gather_battle_info(actor)
-	actor.update_ai_battle_info(battle_info)
+func _on_Actor_battleground_info_requested(actor):
+	var battle_info = _gather_battleground_info(actor)
+	actor.update_ai_battleground_info(battle_info)
 
 #-------------------------------------------------------------------------------
 
@@ -591,23 +592,6 @@ func _on_Actor_target_selected(target):
 func _on_Actor_weapon_reloaded():
 	if _current_state == _state_map['battle']:
 		_current_state.setup_for_next_turn(self)
-
-#-------------------------------------------------------------------------------
-
-func _on_AStarInstance_initialized(astar_node):
-	astar_node.calculate_astar_path()
-
-#-------------------------------------------------------------------------------
-
-func _on_AStarInstance_pathing_completed(astar_node, path, actor):
-	astar_node.disconnect('initialized', self, '_on_AStarInstance_initialized')
-	astar_node.disconnect('pathing_completed', self, 
-		'_on_AStarInstance_pathing_completed')
-	_pathing.remove_child(astar_node)
-	astar_node.queue_free()
-	
-	if _current_state == _state_map['battle']:
-		_current_state._on_AStarInstance_pathing_completed(self, path)
 
 #-------------------------------------------------------------------------------
 

@@ -21,10 +21,33 @@ var _weapon_focus = null
 # VIRTUAL METHODS
 ################################################################################
 
+func _input(event):
+	if Input.is_action_just_pressed('swap_weapon') and _weapon_swap.can_swap:
+		_swap_weapons()
+
+#-------------------------------------------------------------------------------
+
 func _ready():
 	_target_panel.box_alignment = 'right'
 	_weapon_focus = _weapon_status1
 	_weapon_status2.deactivate()
+
+################################################################################
+# PRIVATE METHODS
+################################################################################
+
+func _swap_weapons():
+	_weapon_focus.deactivate()
+	
+	if _weapon_focus == _weapon_status1:
+		_current_weapon = _weapon_status2.current_weapon
+		_weapon_focus = _weapon_status2
+	elif _weapon_focus == _weapon_status2:
+		_current_weapon = _weapon_status1.current_weapon
+		_weapon_focus = _weapon_status1
+
+	_weapon_focus.activate()
+	_active_actor.swap_weapons()
 
 ################################################################################
 # PUBLIC METHODS
@@ -126,17 +149,7 @@ func update_squad_status(type):
 ################################################################################
 
 func _on_WeaponSwap_pressed():
-	_weapon_focus.deactivate()
-	
-	if _weapon_focus == _weapon_status1:
-		_current_weapon = _weapon_status2.current_weapon
-		_weapon_focus = _weapon_status2
-	elif _weapon_focus == _weapon_status2:
-		_current_weapon = _weapon_status1.current_weapon
-		_weapon_focus = _weapon_status1
-
-	_weapon_focus.activate()
-	_active_actor.swap_weapons()
+	_swap_weapons()
 
 #-------------------------------------------------------------------------------
 

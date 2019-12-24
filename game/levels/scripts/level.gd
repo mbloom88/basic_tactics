@@ -9,7 +9,7 @@ onready var _battleground = $Battleground
 onready var _guis = $GUIs
 onready var _battle_gui = $GUIs/BattleGUI
 onready var _cell_vectors = $Debug/CellVectors
-onready var _command = $CommandPrograms
+onready var _cutscenes = $Cutscenes
 
 ################################################################################
 # VIRTUAL METHODS
@@ -18,8 +18,8 @@ onready var _command = $CommandPrograms
 func _ready():
 	_provide_debug_info()
 	
-	if _command.get_children():
-		_command.get_child(0).initialize()
+	if _cutscenes.get_children():
+		_cutscenes.get_child(0).initialize()
 
 ################################################################################
 # SIGNAL HANDLING

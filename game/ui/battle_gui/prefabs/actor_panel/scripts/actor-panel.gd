@@ -47,8 +47,15 @@ func load_actor(actor):
 	Args:
 		- actor (Object)
 	"""
+	# Check if cyling back to previous actor
 	if current_actor == actor:
 		return
+	
+	# If moving from previous actor, disconnect previous actor
+	if current_actor:
+		current_actor.disconnect('stats_modified', self, 
+			'_on_Actor_stats_modified')
+		
 	
 	current_actor = actor
 	current_actor.connect('stats_modified', self, '_on_Actor_stats_modified')

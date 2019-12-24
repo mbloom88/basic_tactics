@@ -6,7 +6,7 @@
 [ext_resource path="res://actors/scripts/move.gd" type="Script" id=4]
 [ext_resource path="res://actors/scripts/menu.gd" type="Script" id=5]
 [ext_resource path="res://actors/scripts/attack.gd" type="Script" id=6]
-[ext_resource path="res://actors/scripts/battle_ai.gd" type="Script" id=7]
+[ext_resource path="res://actors/scripts/ai.gd" type="Script" id=7]
 [ext_resource path="res://actors/prefabs/astar_pathfinder/AStarPathfinder.tscn" type="PackedScene" id=8]
 [ext_resource path="res://actors/scripts/job.gd" type="Script" id=9]
 [ext_resource path="res://actors/scripts/stats.gd" type="Script" id=10]
@@ -47,7 +47,7 @@ script = ExtResource( 5 )
 [node name="Attack" type="Node" parent="State"]
 script = ExtResource( 6 )
 
-[node name="BattleAI" type="Node" parent="State"]
+[node name="AI" type="Node" parent="State"]
 script = ExtResource( 7 )
 
 [node name="AStarPathfinder" parent="." instance=ExtResource( 8 )]

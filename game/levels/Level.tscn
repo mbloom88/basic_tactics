@@ -44,7 +44,7 @@ margin_right = 40.0
 margin_bottom = 40.0
 script = ExtResource( 10 )
 
-[node name="CommandPrograms" type="Node" parent="."]
+[node name="Cutscenes" type="Node" parent="."]
 
 [connection signal="active_actor_selected" from="Battleground" to="." method="_on_Battleground_active_actor_selected"]
 [connection signal="allies_ready_for_placement" from="Battleground" to="." method="_on_Battleground_allies_ready_for_placement"]

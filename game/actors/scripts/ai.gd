@@ -4,7 +4,7 @@ var _action_list = []
 var _weapon1 = null
 var _weapon2 = null
 var _current_weapon = null
-var _battle_info = {}
+var _battleground_info = {}
 
 ################################################################################
 # CLASSES
@@ -30,7 +30,6 @@ class CustomSorter:
 func _enter(host):
 	host.set_process(false)
 	_update_weapon_info(host)
-	
 	_determine_actions(host)
 
 ################################################################################
@@ -39,18 +38,18 @@ func _enter(host):
 
 func _determine_actions(host):
 	"""
-	Determines the type of battle actions that the current Enemy or NPC
-	Battler will take based on their behavioral profile.
+	Determines the type of actions that the current Enemy or NPC will take
+	based on their behavioral profile or CommandProgram scripting status.
 	"""
 	if _action_list.empty():
 		match host.battle_ai_behavior:
 			'aggressive_melee':
 				_action_list = [
 					'move_to_attack',
-					'update_battle_info', 
+					'update_battleground_info', 
 					'attack']
 
-	host.emit_signal('ai_battle_actions_set', host)
+	host.emit_signal('ai_actions_set', host)
 
 #-------------------------------------------------------------------------------
 
@@ -61,21 +60,21 @@ func _find_attack_target_for_ai(host):
 
 	# Look for Allies and NPCs if Enemy
 	if current_type == 'enemy':
-		for target in _battle_info['targets'].keys():
+		for target in _battleground_info['targets'].keys():
 			var target_type = ActorDatabase.lookup_type(target.reference)
 			if target_type in ['ally', 'npc']:
 				attack_targets.append(target)
 	# Look for Enemies if NPC
 	elif current_type == 'npc':
-		for target in _battle_info['targets'].keys():
+		for target in _battleground_info['targets'].keys():
 			var target_type = ActorDatabase.lookup_type(target.reference)
 			if target_type == 'enemy':
 				attack_targets.append(target)
 
 	# Find the closest target from targets list
-	var origin_cell = _battle_info['initiator'][host]
+	var origin_cell = _battleground_info['initiator'][host]
 	for target in attack_targets:
-		var target_cell = _battle_info['targets'][target]
+		var target_cell = _battleground_info['targets'][target]
 		var distance = origin_cell.distance_to(target_cell)
 		if not closest_target:
 			closest_target['target'] = target
@@ -91,8 +90,8 @@ func _find_attack_target_for_ai(host):
 
 func _find_closest_cell_near_target(host, action):
 	var action_range = 0
-	var origin_cell = _battle_info['initiator'][host]
-	var target_cell = _battle_info['targets'][host._ai_target]
+	var origin_cell = _battleground_info['initiator'][host]
+	var target_cell = _battleground_info['targets'][host._ai_target]
 	var closest_cell = origin_cell
 	var target_distance = origin_cell.distance_to(target_cell)
 
@@ -128,7 +127,7 @@ func _find_closest_cell_near_target(host, action):
 				Vector2(current_cell.x + 1, current_cell.y)] # right
 
 			for neighbor in neighbors:
-				if not neighbor in _battle_info['move_cells']:
+				if not neighbor in _battleground_info['move_cells']:
 					continue
 				if neighbor in visited:
 					continue
@@ -173,7 +172,7 @@ func _update_weapon_info(host):
 # PUBLIC METHODS
 ################################################################################
 
-func next_ai_battle_action(host):
+func next_ai_action(host):
 	if _action_list.empty():
 		return
 
@@ -183,32 +182,34 @@ func next_ai_battle_action(host):
 	match next_action:
 		'attack':
 			var attack_range = _current_weapon.provide_stats()['attack_range']
-			var current_cell = _battle_info['initiator'][host]
-			var target_cell = _battle_info['targets'][host._ai_target]
+			var current_cell = _battleground_info['initiator'][host]
+			var target_cell = _battleground_info['targets'][host._ai_target]
 			var distance = current_cell.distance_to(target_cell)
 			if distance <= attack_range:
 				host.emit_signal('attack_cells_requested', host, attack_range)
 				host._change_state('attack')
 			else:
-				next_ai_battle_action(host)
+				next_ai_action(host)
 		'move_to_attack':
 			_find_attack_target_for_ai(host)
 			var closest_cell = _find_closest_cell_near_target(host, 'attack')
-			if closest_cell == _battle_info['initiator'][host]:
-				next_ai_battle_action(host)
+			if closest_cell == _battleground_info['initiator'][host]:
+				next_ai_action(host)
 			else:
 				var pathing_info = {}
 				pathing_info['actor'] = host
-				pathing_info['actor_cell'] = _battle_info['initiator'][host]
+				pathing_info['actor_cell'] = \
+					_battleground_info['initiator'][host]
 				pathing_info['goal_cell'] = closest_cell
-				pathing_info['walkable_cells'] = _battle_info['move_cells']
+				pathing_info['walkable_cells'] = \
+					_battleground_info['move_cells']
 				host._astar.initialize(pathing_info)
-		'update_battle_info':
-			host.emit_signal('battle_info_requested', host)
+		'update_battleground_info':
+			host.emit_signal('battleground_info_requested', host)
 
 #-------------------------------------------------------------------------------
 
-func update_ai_battle_info(host, battle_info):
+func update_ai_battleground_info(host, battleground_info):
 	"""
 	Args:
 		- battle_info (Dictionary): A dictionary that holds the requesting actor
@@ -216,8 +217,8 @@ func update_ai_battle_info(host, battle_info):
 			as keys and their associated map cells are their values. The map
 			cells can be used for determining distances.
 	"""
-	_battle_info = battle_info
-	next_ai_battle_action(host)
+	_battleground_info = battleground_info
+	next_ai_action(host)
 
 ################################################################################
 # SIGNAL HANDLING
