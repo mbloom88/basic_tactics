@@ -52,7 +52,7 @@ func load_actor(actor):
 		return
 	
 	# If moving from previous actor, disconnect previous actor
-	if current_actor:
+	if is_instance_valid(current_actor):
 		current_actor.disconnect('stats_modified', self, 
 			'_on_Actor_stats_modified')
 		

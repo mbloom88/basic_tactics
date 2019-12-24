@@ -50,6 +50,7 @@ func add_skills_to_list(host, skills):
 		skill_option.connect('skill_selected', host, 
 			'_on_SkillOption_skill_selected')
 	
+	yield(get_tree().create_timer(0.1), 'timeout') # slow down menu activation
 	for skill_button in get_tree().get_nodes_in_group('skills_menu_buttons'):
 		skill_button.disabled = false
 		skill_button.focus_mode = Control.FOCUS_ALL
@@ -64,7 +65,7 @@ func add_skills_to_list(host, skills):
 		host._description.bbcode_text = \
 			'%s' % SkillsDatabase.lookup_description(skill_ref)
 		host._current_focus.grab_focus()
-		host.visible = true
+		host.show()
 	else:
 		host._description.bbcode_text = ""
 	

@@ -4,7 +4,6 @@ Base 'Actor' scene.
 extends KinematicBody2D
 
 # Signals 
-signal ai_actions_set(actor)
 signal alpha_modulate_completed
 signal attack_cells_requested(actor, attack_range)
 signal attack_started(actor)

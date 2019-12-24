@@ -491,8 +491,6 @@ func update_actors_on_grid(actor, operation):
 	match operation:
 		'add':
 			if not actor in _actors_on_grid:
-				actor.connect('ai_actions_set', self, 
-					'_on_Actor_ai_actions_set')
 				actor.connect('attack_cells_requested', self, 
 					'_on_Actor_attack_cells_requested')
 				actor.connect('attack_started', self, 
@@ -523,12 +521,6 @@ func update_actors_on_grid(actor, operation):
 ################################################################################
 # SIGNAL HANDLING
 ################################################################################
-
-func _on_Actor_ai_actions_set(actor):
-	var battleground_info = _gather_battleground_info(actor)
-	actor.update_ai_battleground_info(battleground_info)
-
-#-------------------------------------------------------------------------------
 
 func _on_Actor_attack_cells_requested(actor, attack_range):
 	_show_action_cells(actor, attack_range)

@@ -45,11 +45,12 @@ func _determine_actions(host):
 		match host.battle_ai_behavior:
 			'aggressive_melee':
 				_action_list = [
+					'update_battleground_info', 
 					'move_to_attack',
 					'update_battleground_info', 
 					'attack']
 
-	host.emit_signal('ai_actions_set', host)
+		next_ai_action(host)
 
 #-------------------------------------------------------------------------------
 
