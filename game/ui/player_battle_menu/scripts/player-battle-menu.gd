@@ -99,4 +99,3 @@ func _on_Skills_pressed():
 
 func _on_Wait_pressed():
 	emit_signal('player_waiting')
-	_change_state('exit')

@@ -92,8 +92,7 @@ func remove_all_menus():
 	var menu_list = _menus.get_children()
 	for menu in range(_menus.get_child_count()):
 		var exiting_menu = menu_list.pop_back()
-		_menus.remove_child(exiting_menu)
-		exiting_menu.queue_free()
+		exiting_menu.exit()
 
 #-------------------------------------------------------------------------------
 

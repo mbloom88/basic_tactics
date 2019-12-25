@@ -10,12 +10,15 @@ signal attack_started(actor)
 signal battle_action_cancelled
 signal battleground_info_requested(actor)
 signal camera_move_requested(location, move_speed)
+signal cutscene_info_requested
+signal cutscene_operation_completed
 signal hide_target_gui_requested
 signal move_cells_requested
 signal move_completed(actor)
 signal move_requested(actor, direction)
 signal player_menu_requested(actor)
 signal reaction_completed(actor)
+signal ready_for_cutscene
 signal state_changed(state)
 signal stats_modified
 signal target_selected(target)
@@ -49,7 +52,13 @@ onready var _state_map = {
 # Actor info
 export (String) var reference = "" setget , get_reference
 export (bool) var onready_invisible = true
-var has_script_running = false setget set_has_script_running, get_has_script_running
+
+# Cutscene info
+var has_cutscene_running = false setget set_has_cutscene_running, \
+	get_has_cutscene_running
+var _cutscene_type = ""
+var _movement_type = ""
+
 
 # Battle Info
 export (String, 'aggressive_melee') var battle_ai_behavior = 'aggressive_melee'
@@ -137,8 +146,10 @@ func activate_for_battle():
 
 #-------------------------------------------------------------------------------
 
-func activate_for_script():
-	pass
+func activate_for_cutscene(type):
+	has_cutscene_running = true
+	_cutscene_type = type
+	_change_state('ai')
 
 #-------------------------------------------------------------------------------
 
@@ -208,6 +219,18 @@ func modulate_alpha_channel(fade_type, mode, speed=0.5):
 
 #-------------------------------------------------------------------------------
 
+func perform_cutscene_move(goal_cell, movement_type):
+	"""
+	Args:
+		- goal_cell (Vector2): Map cell
+		- movement_type (String): Movement can eithe be 'run' or 'walk.'
+	"""
+	if _current_state == _state_map['ai']:
+		_movement_type = movement_type
+		_current_state.setup_for_cutscene_move(self, goal_cell)
+
+#-------------------------------------------------------------------------------
+
 func perform_move(world_position):
 	"""
 	Move command that tells the Actor the next world position to move into. 
@@ -219,19 +242,6 @@ func perform_move(world_position):
 	"""
 	if _current_state == _state_map['move']:
 		_current_state.move_to_position(self, world_position)
-
-#-------------------------------------------------------------------------------
-
-func perform_scripted_move(next_direction, movement_type):
-	"""
-	Move command that tells the Actor the next direction to move into and 
-	whether to walk or run in that direction. This function is generally called
-	from a Command Program during cutscenes.
-	"""
-	if not _current_state.has_method("determine_next_cell"):
-		return
-	
-	_current_state.determine_next_cell(self, next_direction, movement_type)
 
 #-------------------------------------------------------------------------------
 
@@ -260,23 +270,6 @@ func resume_from_player_menu():
 	Commands the Actor to resume processing after exiting from the Player Menu.
 	"""
 	_change_state('idle')
-
-#-------------------------------------------------------------------------------
-
-func scripted_state_change(new_state):
-	"""
-	Tells the Actor to change states. Generally called from a Command Program
-	during cutscenes.
-	
-	Args:
-		- new_state (String): The name of the state to change into.
-	"""
-	if new_state == 'inactive':
-		has_script_running = false
-	else:
-		has_script_running = true
-		
-	_change_state(new_state)
 
 #-------------------------------------------------------------------------------
 
@@ -323,8 +316,8 @@ func update_level(value):
 # SETTERS
 ################################################################################
 
-func set_has_script_running(value):
-	has_script_running = value
+func set_has_cutscene_running(value):
+	has_cutscene_running = value
 
 ################################################################################
 # GETTERS
@@ -335,8 +328,8 @@ func get_has_ai_running():
 
 #-------------------------------------------------------------------------------
 
-func get_has_script_running():
-	return has_script_running
+func get_has_cutscene_running():
+	return has_cutscene_running
 
 #-------------------------------------------------------------------------------
 

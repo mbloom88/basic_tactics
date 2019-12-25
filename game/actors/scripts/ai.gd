@@ -41,6 +41,13 @@ func _determine_actions(host):
 	Determines the type of actions that the current Enemy or NPC will take
 	based on their behavioral profile or CommandProgram scripting status.
 	"""
+	if host.has_cutscene_running:
+		match host._cutscene_type:
+			'move':
+				_action_list = [
+					'update_battleground_info',
+					'request_cutscene_info']
+	
 	if _action_list.empty():
 		match host.battle_ai_behavior:
 			'aggressive_melee':
@@ -49,8 +56,8 @@ func _determine_actions(host):
 					'move_to_attack',
 					'update_battleground_info', 
 					'attack']
-
-		next_ai_action(host)
+	
+	next_ai_action(host)
 
 #-------------------------------------------------------------------------------
 
@@ -175,7 +182,15 @@ func _update_weapon_info(host):
 
 func next_ai_action(host):
 	if _action_list.empty():
-		return
+		if host.has_cutscene_running:
+			host.has_cutscene_running = false
+			host._cutscene_type = ""
+			host._movement_type = ""
+			host.emit_signal('cutscene_operation_completed')
+		elif host.has_ai_running:
+			host.has_ai_running = false
+			var _ai_movements = []
+			var _ai_target = null
 
 	var next_action = _action_list.pop_front()
 	yield(get_tree().create_timer(0.25), 'timeout') # Slows the AI down
@@ -205,8 +220,20 @@ func next_ai_action(host):
 				pathing_info['walkable_cells'] = \
 					_battleground_info['move_cells']
 				host._astar.initialize(pathing_info)
+		'request_cutscene_info':
+			host.emit_signal('cutscene_info_requested')
 		'update_battleground_info':
 			host.emit_signal('battleground_info_requested', host)
+
+#-------------------------------------------------------------------------------
+
+func setup_for_cutscene_move(host, goal_cell):
+	var pathing_info = {}
+	pathing_info['actor'] = host
+	pathing_info['actor_cell'] = _battleground_info['initiator'][host]
+	pathing_info['goal_cell'] = goal_cell
+	pathing_info['walkable_cells'] = _battleground_info['map_cells']
+	host._astar.initialize(pathing_info)
 
 #-------------------------------------------------------------------------------
 

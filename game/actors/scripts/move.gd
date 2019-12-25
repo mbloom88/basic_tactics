@@ -10,10 +10,10 @@ export (String, 'run', 'walk') var move_type = 'run'
 ################################################################################
 
 func _enter(host):
-	if not host.has_script_running and not host.has_ai_running:
+	if not host.has_cutscene_running and not host.has_ai_running:
 		host.set_process(true)
 		move_type = 'run'
-	elif host.has_ai_running:
+	else:
 		_perform_next_ai_movement(host)
 
 #-------------------------------------------------------------------------------
@@ -31,7 +31,10 @@ func _update(host, delta):
 ################################################################################
 
 func _perform_next_ai_movement(host):
-	move_type = 'run'
+	if host._movement_type:
+		move_type = host._movement_type
+	else:
+		move_type = 'run'
 	var next_direction = host._ai_movements.pop_front()
 	host.emit_signal('move_requested', host, next_direction)
 
@@ -59,15 +62,6 @@ func check_move_directions():
 		direction = Vector2(1, 0)
 	
 	return direction
-
-#-------------------------------------------------------------------------------
-
-func determine_next_cell(host, next_direction, movement_type):
-	"""
-	Used to move the actor during cutscenes.
-	"""
-	move_type = movement_type
-	host.emit_signal('move_requested', host, next_direction)
 
 #-------------------------------------------------------------------------------
 
@@ -100,7 +94,7 @@ func move_to_position(host, world_position):
 		host._tween_move.start()
 		host.emit_signal('camera_move_requested', world_position, move_speed)
 	else:
-		if not host.has_script_running and not host.has_ai_running:
+		if not host.has_cutscene_running and not host.has_ai_running:
 			host.set_process(true)
 
 ################################################################################
@@ -108,9 +102,7 @@ func move_to_position(host, world_position):
 ################################################################################
 
 func _on_TweenMove_tween_completed(host, object, key):
-	if host.has_script_running:
-		host.emit_signal('move_completed', host)
-	elif host.has_ai_running:
+	if host.has_cutscene_running or host.has_ai_running:
 		if not host._ai_movements.empty():
 			_perform_next_ai_movement(host)
 		else:
