@@ -1,7 +1,7 @@
 """
-Waypoint system that moves a designated actor between each waypoint
-specified by the user. Waypoints are designated by setting Position2D nodes
-as children of this command program. 
+Moves a designated actor to a goal pointspecified by the user. Enable 'Editable
+Children' in the right-click menu within the scene to be able to move the child
+Position2D node to set the target position to move to.
 """
 extends Node
 

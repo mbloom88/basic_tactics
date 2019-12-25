@@ -1,8 +1,12 @@
 """
-Moves a camera in the level to a specified location. The location is established
-by adding a Position2D node as a child of this command program node.
+Moves a camera in the level to a specified location. Enable 'Editable Children'
+in the right-click menu within the scene to be able to move the child Position2D
+node to set the target position to move to.
 """
 extends Node
+
+# Child nodes
+onready var _world_position = $WorldPosition.position
 
 var _manager = null
 export (NodePath) var _camera_scene_path
@@ -25,7 +29,7 @@ func end():
 #-------------------------------------------------------------------------------
 
 func move_camera():
-	_camera.move_to_location(get_child(0).position, _move_speed)
+	_camera.move_to_location(_world_position, _move_speed)
 
 #-------------------------------------------------------------------------------
 
