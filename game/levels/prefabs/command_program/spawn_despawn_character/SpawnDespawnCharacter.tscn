@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=2]
-
-[ext_resource path="res://levels/command_programs/spawn_despawn_character/spawn-despawn-character.gd" type="Script" id=1]
-
-
-[node name="SpawnDespawnCharacter" type="Node"]
-script = ExtResource( 1 )
-

@@ -8,6 +8,7 @@ signal alpha_modulate_completed
 signal attack_cells_requested(actor, attack_range)
 signal attack_started(actor)
 signal battle_action_cancelled
+signal battle_actions_completed
 signal battleground_info_requested(actor)
 signal camera_move_requested(location, move_speed)
 signal cutscene_info_requested
@@ -22,6 +23,7 @@ signal ready_for_cutscene
 signal state_changed(state)
 signal stats_modified
 signal target_selected(target)
+signal waiting
 signal weapon_reloaded
 
 # Child nodes

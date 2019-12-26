@@ -58,7 +58,7 @@ func _check_actions(host):
 		map_position += direction
 		
 		if map_position in host._start_cells.values():
-			world_position = host._offset_world_position(map_position)
+			world_position = host.offset_world_position(map_position)
 			host._actor_to_place.position = world_position
 	
 	return action

@@ -26,7 +26,6 @@ signal state_changed(state)
 signal target_selected(target)
 
 # Child nodes
-onready var _pathing = $Pathing
 onready var _battle_positions = $AllyBattlePositions
 onready var _blinking_cells = $BlinkingCells
 onready var _battlers = $Battlers
@@ -92,35 +91,6 @@ func _ready():
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
-
-func _add_astar_instance(actor, goal_cell):
-	var walkable_cells = []
-	var actor_type = ActorDatabase.lookup_type(actor.reference)
-	
-	for map_cell in provide_used_cells('map'):
-		var obstacle = _check_obstacle(map_cell)
-		if obstacle:
-			var obstacle_type = ActorDatabase.lookup_type(obstacle.reference)
-			if actor_type == obstacle_type:
-				walkable_cells.append(map_cell)
-		else:
-			walkable_cells.append(map_cell)
-	
-	var pathing_info = {
-		'actor': actor,
-		'actor_cell': world_to_map(actor.position),
-		'goal_cell': goal_cell,
-		'walkable_cells': walkable_cells,
-	}
-	
-	var astar_node = astar_instance.instance()
-	_pathing.add_child(astar_node)
-	astar_node.connect('initialized', self, '_on_AStarInstance_initialized')
-	astar_node.connect('pathing_completed', self, 
-		'_on_AStarInstance_pathing_completed')
-	astar_node.initialize(pathing_info)
-
-#-------------------------------------------------------------------------------
 
 func _add_blinking_cells(cells):
 	"""
@@ -247,23 +217,6 @@ func _gather_battleground_info(initiator):
 
 #-------------------------------------------------------------------------------
 
-func _offset_world_position(map_cell):
-	"""
-	Converts a map cell to a world position with a positional offset.
-	
-	Args:
-		- map_cell (Vector2): The map cell location within the TileMap.
-	Returns:
-		- world_position (Vector2): The new world position with an offset.
-	"""
-	var world_position = map_to_world(map_cell)
-	world_position.x +=cell_size.x * cell_offset_x
-	world_position.y +=cell_size.y * cell_offset_y
-	
-	return world_position
-
-#-------------------------------------------------------------------------------
-
 func _reload_move_cells():
 	_remove_blinking_cells()
 	_add_blinking_cells(_allowed_move_cells)
@@ -377,10 +330,10 @@ func determine_move_path(actor, direction):
 	
 	if _current_state == _state_map['battle']:
 		if new_map_cell in _allowed_move_cells:
-			new_world_position = _offset_world_position(new_map_cell)
+			new_world_position = offset_world_position(new_map_cell)
 	else:
 		if new_map_cell in _used_map_cells and not obstacle:
-			new_world_position = _offset_world_position(new_map_cell)
+			new_world_position = offset_world_position(new_map_cell)
 	
 	return new_world_position
 
@@ -409,6 +362,23 @@ func provide_battlers():
 	Returns a list of Battlers.
 	"""
 	return _battlers.get_children()
+
+#-------------------------------------------------------------------------------
+
+func offset_world_position(map_cell):
+	"""
+	Converts a map cell to a world position with a positional offset.
+	
+	Args:
+		- map_cell (Vector2): The map cell location within the TileMap.
+	Returns:
+		- world_position (Vector2): The new world position with an offset.
+	"""
+	var world_position = map_to_world(map_cell)
+	world_position.x +=cell_size.x * cell_offset_x
+	world_position.y +=cell_size.y * cell_offset_y
+	
+	return world_position
 
 #-------------------------------------------------------------------------------
 
@@ -511,6 +481,8 @@ func update_actors_on_grid(actor, operation):
 					'_on_Actor_reaction_completed')
 				actor.connect('target_selected', self, 
 					'_on_Actor_target_selected')
+				actor.connect('waiting', self, 
+					'_on_Actor_waiting')
 				actor.connect('weapon_reloaded', self, 
 					'_on_Actor_weapon_reloaded')
 				_actors_on_grid.append(actor)
@@ -580,6 +552,11 @@ func _on_Actor_target_selected(target):
 	emit_signal('target_selected', target)
 #-------------------------------------------------------------------------------
 
+func _on_Actor_waiting():
+	if _current_state == _state_map['battle']:
+		_current_state.setup_for_next_turn(self)
+
+#-------------------------------------------------------------------------------
 
 func _on_Actor_weapon_reloaded():
 	if _current_state == _state_map['battle']:

@@ -59,7 +59,7 @@ func _calculate_astar_path():
 	
 	emit_signal('pathing_completed', directions)
 	_astar.clear()
-
+	
 #-------------------------------------------------------------------------------
 
 func _calculate_point_index(point):

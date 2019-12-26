@@ -28,8 +28,6 @@ script = ExtResource( 6 )
 [node name="Battle" type="Node" parent="State"]
 script = ExtResource( 7 )
 
-[node name="Pathing" type="Node" parent="."]
-
 [node name="AllyBattlePositions" type="Node2D" parent="."]
 
 [node name="BlinkingCells" type="Node2D" parent="."]

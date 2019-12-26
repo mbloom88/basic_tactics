@@ -10,10 +10,6 @@ onready var _actor_level_job = \
 	$HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ActorLevelJob
 onready var _hp = \
 	$HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/HPContainer
-onready var _armor = \
-	$HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ArmorContainer
-onready var _shields = \
-	$HBoxContainer/VBoxContainer/StatPanel/VBoxContainer/ShieldContainer
 
 # Box alignments
 export (String, 'left', 'right') var box_alignment = 'left' \
@@ -28,8 +24,6 @@ var current_actor = null setget set_current_actor, get_current_actor
 
 func _refresh_actor_stats(info):
 	_hp.update_info(info)
-	_armor.update_info(info)
-	_shields.update_info(info)
 
 ################################################################################
 # PUBLIC METHODS

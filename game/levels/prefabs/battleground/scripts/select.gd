@@ -64,7 +64,7 @@ func _check_actions(host):
 		var ally_to_place = _active_allies[_index]
 		if squad_count < squad_limit:
 			host._actor_to_place = ally_to_place
-			var spawn_point = host._offset_world_position(_spawn_cell)
+			var spawn_point = host.offset_world_position(_spawn_cell)
 			ally_to_place.position = spawn_point
 			ally_to_place.modulate_alpha_channel('in', 'instant')
 			if ally_to_place in host._actors_on_grid:

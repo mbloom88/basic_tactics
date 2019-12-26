@@ -143,25 +143,18 @@ func _find_closest_cell_near_target(host, action):
 				visited.append(neighbor)
 				frontier.append([neighbor, distance])
 
-		# If no cell is in range, get AI as close to target as possible
-		if closest_cell == origin_cell:
-			var cell_info = {}
-			var neighbors = [
-				Vector2(target_cell.x, target_cell.y - 1), # up
-				Vector2(target_cell.x, target_cell.y + 1), # down
-				Vector2(target_cell.x - 1, target_cell.y), # left
-				Vector2(target_cell.x + 1, target_cell.y)] # right
-
-			for neighbor in neighbors:
-				var distance = origin_cell.distance_to(neighbor)
-				if cell_info.empty():
-					cell_info['cell'] = neighbor
+		# If no cell puts the actor in range for action, get AI as close to 
+		# target as possible
+		var cell_info = {}
+		for cell in _battleground_info['move_cells']:
+			var distance = target_cell.distance_to(cell)
+			if cell_info.empty():
+				cell_info['cell'] = cell
+				cell_info['distance'] = distance
+			else:
+				if distance < cell_info['distance']:
+					cell_info['cell'] = cell
 					cell_info['distance'] = distance
-				else:
-					if distance < cell_info['distance']:
-						cell_info['cell'] = neighbor
-						cell_info['distance'] = distance
-
 			closest_cell = cell_info['cell']
 	else:
 		closest_cell = origin_cell
@@ -186,11 +179,12 @@ func next_ai_action(host):
 			host.has_cutscene_running = false
 			host._cutscene_type = ""
 			host._movement_type = ""
+			host._ai_movements = []
 			host.emit_signal('cutscene_operation_completed')
 		elif host.has_ai_running:
 			host.has_ai_running = false
-			var _ai_movements = []
-			var _ai_target = null
+			host._ai_movements = []
+			host._ai_target = null
 
 	var next_action = _action_list.pop_front()
 	yield(get_tree().create_timer(0.25), 'timeout') # Slows the AI down
@@ -205,6 +199,7 @@ func next_ai_action(host):
 				host.emit_signal('attack_cells_requested', host, attack_range)
 				host._change_state('attack')
 			else:
+				host.emit_signal('waiting')
 				next_ai_action(host)
 		'move_to_attack':
 			_find_attack_target_for_ai(host)
