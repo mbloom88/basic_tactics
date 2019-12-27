@@ -61,7 +61,7 @@ func _determine_actions(host):
 
 #-------------------------------------------------------------------------------
 
-func _find_attack_target_for_ai(host):
+func _find_closest_attack_target(host):
 	var attack_targets = []
 	var closest_target = {}
 	var current_type = ActorDatabase.lookup_type(host.reference)
@@ -100,7 +100,7 @@ func _find_closest_cell_near_target(host, action):
 	var action_range = 0
 	var origin_cell = _battleground_info['initiator'][host]
 	var target_cell = _battleground_info['targets'][host._ai_target]
-	var closest_cell = origin_cell
+	var closest_cell = null
 	var target_distance = origin_cell.distance_to(target_cell)
 
 	match action:
@@ -145,17 +145,18 @@ func _find_closest_cell_near_target(host, action):
 
 		# If no cell puts the actor in range for action, get AI as close to 
 		# target as possible
-		var cell_info = {}
-		for cell in _battleground_info['move_cells']:
-			var distance = target_cell.distance_to(cell)
-			if cell_info.empty():
-				cell_info['cell'] = cell
-				cell_info['distance'] = distance
-			else:
-				if distance < cell_info['distance']:
+		if not closest_cell:
+			var cell_info = {}
+			for cell in _battleground_info['move_cells']:
+				var distance = target_cell.distance_to(cell)
+				if cell_info.empty():
 					cell_info['cell'] = cell
 					cell_info['distance'] = distance
-			closest_cell = cell_info['cell']
+				else:
+					if distance < cell_info['distance']:
+						cell_info['cell'] = cell
+						cell_info['distance'] = distance
+				closest_cell = cell_info['cell']
 	else:
 		closest_cell = origin_cell
 
@@ -202,7 +203,7 @@ func next_ai_action(host):
 				host.emit_signal('waiting')
 				next_ai_action(host)
 		'move_to_attack':
-			_find_attack_target_for_ai(host)
+			_find_closest_attack_target(host)
 			var closest_cell = _find_closest_cell_near_target(host, 'attack')
 			if closest_cell == _battleground_info['initiator'][host]:
 				next_ai_action(host)
