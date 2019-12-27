@@ -1,0 +1,13 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://jobs/job_template.gd" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+name = "Medium Sized Object"
+max_health = 3
+aim = 0
+speed = 0
+move = 0
+skill_references = [  ]
+

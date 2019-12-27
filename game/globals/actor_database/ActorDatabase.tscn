@@ -4,5 +4,8 @@
 
 [node name="ActorDatabase" type="Node"]
 script = ExtResource( 1 )
-_actor_ref_directory = "res://globals/actor_database/references"
+_ally_ref_directory = "res://globals/actor_database/references/characters/allies"
+_enemy_ref_directory = "res://globals/actor_database/references/characters/enemies"
+_npc_ref_directory = "res://globals/actor_database/references/characters/npcs"
+_object_ref_directory = "res://globals/actor_database/references/objects"
 

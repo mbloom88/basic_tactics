@@ -207,7 +207,7 @@ func _gather_battleground_info(initiator):
 			battleground_info['targets'][battler] = \
 				world_to_map(battler.position)
 	for destructable in _destructables.get_children():
-		battleground_info['target'][destructable] = \
+		battleground_info['targets'][destructable] = \
 			world_to_map(destructable.position)
 	
 	battleground_info['map_cells'] = provide_used_cells('map')
@@ -264,17 +264,40 @@ func _show_move_cells(battler):
 	var move_range = battler.provide_job_info()['move']
 	var mover_type = ActorDatabase.lookup_type(battler.reference)
 	var origin_cell = world_to_map(battler.position)
+	var temp_cells1 = []
+	var temp_cells2 = []
 	_allowed_move_cells = []
 	
 	for cell in provide_used_cells('map'):
 		if cell.distance_to(origin_cell) <= move_range:
-			_allowed_move_cells.append(cell)
+			temp_cells1.append(cell)
 	
-	for cell in _allowed_move_cells:
+	# Check for obstacles
+	for cell in temp_cells1:
 		var obstacle = _check_obstacle(cell)
 		if obstacle:
 			if ActorDatabase.lookup_type(obstacle.reference) != mover_type:
-				_allowed_move_cells.erase(cell)
+				continue
+			else:
+				temp_cells2.append(cell)
+		else:
+			temp_cells2.append(cell)
+	
+	# Remove orphan cells
+	for cell in temp_cells2:
+		var neighbors = [
+			Vector2(cell.x, cell.y - 1), # up
+			Vector2(cell.x, cell.y + 1), # down
+			Vector2(cell.x - 1, cell.y), # left
+			Vector2(cell.x + 1, cell.y)] # right
+		var neighbor_count = 0
+		
+		for neighbor in neighbors:
+			if neighbor in temp_cells2:
+				neighbor_count += 1
+		
+		if neighbor_count >= 1:
+			_allowed_move_cells.append(cell)
 	
 	_reload_move_cells()
 

@@ -25,6 +25,39 @@ var current_actor = null setget set_current_actor, get_current_actor
 func _refresh_actor_stats(info):
 	_hp.update_info(info)
 
+#-------------------------------------------------------------------------------
+
+func _setup_character():
+	var actor_name = ActorDatabase.lookup_name(current_actor.reference)
+	var info = current_actor.provide_job_info()
+		
+	# Set name, level, job
+	if actor_name['nick']:
+		_actor_name.text = '%s "%s" %s' % [actor_name['first'], 
+			actor_name['nick'], actor_name['last']]
+	else:
+		_actor_name.text = '%s %s' % [actor_name['first'], actor_name['last']]
+	
+	_actor_level_job.text = 'Level %s - %s' % [info['level'], info['job_name']]
+	_refresh_actor_stats(info)
+	
+	# Set portrait
+	_portrait.texture = ActorDatabase.lookup_portrait(current_actor.reference)
+
+#-------------------------------------------------------------------------------
+
+func _setup_object():
+	var actor_name = ActorDatabase.lookup_name(current_actor.reference)
+	var info = current_actor.provide_job_info()
+	
+	# Set name, level, job
+	_actor_name.text = '%s' % actor_name['first']
+	_actor_level_job.text = ""
+	_refresh_actor_stats(info)
+	
+	# Set portrait
+	_portrait.texture = null
+
 ################################################################################
 # PUBLIC METHODS
 ################################################################################
@@ -49,25 +82,15 @@ func load_actor(actor):
 	if is_instance_valid(current_actor):
 		current_actor.disconnect('stats_modified', self, 
 			'_on_Actor_stats_modified')
-		
 	
 	current_actor = actor
 	current_actor.connect('stats_modified', self, '_on_Actor_stats_modified')
-	var actor_name  = ActorDatabase.lookup_name(actor.reference)
-	var info = actor.provide_job_info()
+	var actor_type = ActorDatabase.lookup_type(current_actor.reference)
 	
-	# Set name, level, job
-	if actor_name['nick']:
-		_actor_name.text = '%s "%s" %s' % [actor_name['first'], 
-			actor_name['nick'], actor_name['last']]
-	else:
-		_actor_name.text = '%s %s' % [actor_name['first'], actor_name['last']]
-	
-	_actor_level_job.text = 'Level %s - %s' % [info['level'], info['job_name']]
-	_refresh_actor_stats(info)
-	
-	# Set portrait
-	_portrait.texture = ActorDatabase.lookup_portrait(actor.reference)
+	if actor_type in ['ally', 'enemy', 'npc']:
+		_setup_character()
+	elif actor_type == 'object':
+		_setup_object()
 
 ################################################################################
 # SETTERS

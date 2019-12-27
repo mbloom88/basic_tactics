@@ -30,13 +30,17 @@ func _update(host, delta):
 
 func _ai_attack_target(host):
 	var current_weapon = host.provide_weapons()['current']
+	var weapon_stats = current_weapon.provide_stats()
 	
-	host.emit_signal('target_selected', host._ai_target)
-	host._ai_target.show_battle_cursor()
-	
-	yield(get_tree().create_timer(1), 'timeout') # Slows the AI down
-	host._ai_target.hide_battle_cursor()
-	host._ai_target.take_damage(current_weapon)
+	if weapon_stats['ammo'] >= weapon_stats['ammo_per_attack']:
+		host.emit_signal('target_selected', host._ai_target)
+		host._ai_target.show_battle_cursor()
+		yield(get_tree().create_timer(1), 'timeout') # Slows the AI down
+		host._ai_target.hide_battle_cursor()
+		host._ai_target.take_damage(current_weapon)
+		current_weapon.consume_ammo()
+	else:
+		current_weapon.reload()
 	
 	host._change_state('previous')
 

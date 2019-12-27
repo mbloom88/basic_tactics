@@ -7,6 +7,10 @@
 [ext_resource path="res://actors/prefabs/reaction_number/animations/show.anim" type="Animation" id=5]
 
 
+
+
+
+
 [node name="ReactionNumber" type="Label"]
 margin_left = -25.0
 margin_top = -20.0

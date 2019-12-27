@@ -55,12 +55,15 @@ onready var _state_map = {
 export (String) var reference = "" setget , get_reference
 export (bool) var onready_invisible = true
 
+# Object info
+export (String, 'half', 'full') var cover_type = 'full'
+export (int, FLAGS, 'up', 'down', 'left', 'right') var cover_sides = 0
+
 # Cutscene info
 var has_cutscene_running = false setget set_has_cutscene_running, \
 	get_has_cutscene_running
 var _cutscene_type = ""
 var _movement_type = ""
-
 
 # Battle Info
 export (String, 'aggressive_melee') var battle_ai_behavior = 'aggressive_melee'
@@ -90,9 +93,11 @@ func _process(delta):
 
 func _ready():
 	hide_battle_cursor()
-	_weapon_label.update_label(_inventory.provide_weapons()['current'])
-	_job.load_job_skills()
-	_inventory.load_item_skills()
+	
+	if ActorDatabase.lookup_type(reference) in ['ally', 'enemy', 'npc']:
+		_weapon_label.update_label(_inventory.provide_weapons()['current'])
+		_job.load_job_skills()
+		_inventory.load_item_skills()
 	
 	if onready_invisible:
 		modulate_alpha_channel('out', 'instant')

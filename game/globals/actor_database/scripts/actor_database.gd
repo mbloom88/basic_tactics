@@ -4,7 +4,10 @@ A database for looking up actor references.
 extends Node
 
 # Ally references
-export (String, DIR) var _actor_ref_directory = ""
+export (String, DIR) var _ally_ref_directory = ""
+export (String, DIR) var _enemy_ref_directory = ""
+export (String, DIR) var _npc_ref_directory = ""
+export (String, DIR) var _object_ref_directory = ""
 var _actors = {}
 
 ################################################################################
@@ -12,23 +15,26 @@ var _actors = {}
 ################################################################################
 
 func _ready() -> void:
-	_load_actor_references()
+	_load_actor_references(_ally_ref_directory)
+	_load_actor_references(_enemy_ref_directory)
+	_load_actor_references(_npc_ref_directory)
+	_load_actor_references(_object_ref_directory)
 
 ################################################################################
 # PRIVATE METHODS
 ################################################################################
 
-func _load_actor_references():
+func _load_actor_references(directory):
 	"""
 	Loads all actor .tres files and stores them in a local dictionary for
 	reference purposes. Afterwards, the database can be called upon to provide
 	actor information such as names and portraits.
 	"""
 	var dir = Directory.new()
-	assert dir.dir_exists(_actor_ref_directory)
+	assert dir.dir_exists(directory)
 	
-	if not dir.open(_actor_ref_directory) == OK:
-		print("Could not read directory %s" %_actor_ref_directory)
+	if not dir.open(directory) == OK:
+		print("Could not read directory %s" % directory)
 	
 	dir.list_dir_begin()
 	var file_name = ""
@@ -42,8 +48,7 @@ func _load_actor_references():
 		if not file_name.ends_with(".tres"):
 			continue
 		
-		_actors[file_name.get_basename()] = \
-			load(_actor_ref_directory.plus_file(file_name))
+		_actors[file_name.get_basename()] = load(directory.plus_file(file_name))
 
 ################################################################################
 # PUBLIC METHODS

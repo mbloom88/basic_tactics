@@ -1,18 +1,419 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://levels/Level.tscn" type="PackedScene" id=1]
 [ext_resource path="res://assets/tilesets/greybox_tiles.tres" type="TileSet" id=2]
 [ext_resource path="res://actors/allies/TestAlly001.tscn" type="PackedScene" id=3]
 [ext_resource path="res://actors/enemies/TestEnemy001.tscn" type="PackedScene" id=4]
-[ext_resource path="res://levels/prefabs/command_program/CommandProgram.tscn" type="PackedScene" id=5]
-[ext_resource path="res://levels/prefabs/command_program/move_camera/MoveCamera.tscn" type="PackedScene" id=6]
-[ext_resource path="res://levels/prefabs/command_program/delay/Delay.tscn" type="PackedScene" id=7]
-[ext_resource path="res://levels/prefabs/command_program/spawn_despawn_character/SpawnDespawnActor.tscn" type="PackedScene" id=8]
-[ext_resource path="res://levels/prefabs/command_program/camera_track_actor/CameraTrackActor.tscn" type="PackedScene" id=9]
-[ext_resource path="res://levels/prefabs/command_program/move_actor/MoveActor.tscn" type="PackedScene" id=10]
-[ext_resource path="res://levels/prefabs/command_program/configure_dialogue/ConfigureDialogue.tscn" type="PackedScene" id=11]
-[ext_resource path="res://levels/prefabs/command_program/start_dialogue/StartDialogue.tscn" type="PackedScene" id=12]
-[ext_resource path="res://levels/prefabs/command_program/trigger_battle/TriggerBattle.tscn" type="PackedScene" id=13]
+[ext_resource path="res://actors/objects/Boulder.tscn" type="PackedScene" id=5]
+[ext_resource path="res://levels/prefabs/command_program/CommandProgram.tscn" type="PackedScene" id=6]
+[ext_resource path="res://levels/prefabs/command_program/move_camera/MoveCamera.tscn" type="PackedScene" id=7]
+[ext_resource path="res://levels/prefabs/command_program/delay/Delay.tscn" type="PackedScene" id=8]
+[ext_resource path="res://levels/prefabs/command_program/spawn_despawn_character/SpawnDespawnActor.tscn" type="PackedScene" id=9]
+[ext_resource path="res://levels/prefabs/command_program/camera_track_actor/CameraTrackActor.tscn" type="PackedScene" id=10]
+[ext_resource path="res://levels/prefabs/command_program/move_actor/MoveActor.tscn" type="PackedScene" id=11]
+[ext_resource path="res://levels/prefabs/command_program/configure_dialogue/ConfigureDialogue.tscn" type="PackedScene" id=12]
+[ext_resource path="res://levels/prefabs/command_program/start_dialogue/StartDialogue.tscn" type="PackedScene" id=13]
+[ext_resource path="res://levels/prefabs/command_program/trigger_battle/TriggerBattle.tscn" type="PackedScene" id=14]
+
+[sub_resource type="GDScript" id=1]
+script/source = "\"\"\"
+Base 'Actor' scene.
+\"\"\"
+extends KinematicBody2D
+
+# Signals 
+signal alpha_modulate_completed
+signal attack_cells_requested(actor, attack_range)
+signal attack_started(actor)
+signal battle_action_cancelled
+signal battle_actions_completed
+signal battleground_info_requested(actor)
+signal camera_move_requested(location, move_speed)
+signal cutscene_info_requested
+signal cutscene_operation_completed
+signal hide_target_gui_requested
+signal move_cells_requested
+signal move_completed(actor)
+signal move_requested(actor, direction)
+signal player_menu_requested(actor)
+signal reaction_completed(actor)
+signal ready_for_cutscene
+signal state_changed(state)
+signal stats_modified
+signal target_selected(target)
+signal waiting
+signal weapon_reloaded
+
+# Child nodes
+onready var _astar = $AStarPathfinder
+onready var _job = $Job
+onready var _inventory = $Inventory
+onready var _tween_alpha = $TweenAlpha
+onready var _tween_move = $TweenMove
+onready var _cursor = $BattleCursor
+onready var _skin = $Skin
+onready var _reaction = $ReactionPoint/ReactionNumber
+onready var _state_label = $Debug/StateLabel
+onready var _weapon_label = $Debug/WeaponLabel
+
+# State machine
+var _current_state = null
+var _state_stack = []
+
+onready var _state_map = {
+	'inactive': $State/Inactive,
+	'idle': $State/Idle,
+	'move': $State/Move,
+	'menu': $State/Menu,
+	'attack': $State/Attack,
+	'ai': $State/AI,
+}
+
+# Actor info
+export (String) var reference = \"\" setget , get_reference
+export (bool) var onready_invisible = true
+
+# Cutscene info
+var has_cutscene_running = false setget set_has_cutscene_running, \\
+	get_has_cutscene_running
+var _cutscene_type = \"\"
+var _movement_type = \"\"
+
+
+# Battle Info
+export (String, 'aggressive_melee') var battle_ai_behavior = 'aggressive_melee'
+var has_ai_running = false setget , get_has_ai_running
+var _ai_movements = []
+var _ai_target = null
+
+################################################################################
+# VIRTUAL METHODS
+################################################################################
+
+func _input(event):
+	var state_name = _current_state._handle_input(self, event)
+	
+	if state_name:
+		_change_state(state_name)
+
+#-------------------------------------------------------------------------------
+
+func _process(delta):
+	var state_name = _current_state._update(self, delta)
+	
+	if state_name:
+		_change_state(state_name)
+
+#-------------------------------------------------------------------------------
+
+func _ready():
+	hide_battle_cursor()
+	_weapon_label.update_label(_inventory.provide_weapons()['current'])
+	_job.load_job_skills()
+	_inventory.load_item_skills()
+	
+	if onready_invisible:
+		modulate_alpha_channel('out', 'instant')
+	
+	_state_stack.push_front($State/Inactive)
+	_current_state = _state_stack[0]
+	_change_state('inactive')
+
+################################################################################
+# PRIVATE METHODS
+################################################################################
+
+func _change_state(state_name):
+	if state_name != 'previous':
+		if _state_map[state_name] != _current_state:
+			_current_state._exit(self)
+
+	if state_name == 'previous':
+		_state_stack.pop_front()
+	elif state_name in ['attack', 'move']:
+		_state_stack.push_front(_state_map[state_name])
+	else:
+		var new_state = _state_map[state_name]
+		_state_stack[0] = new_state
+	
+	# Set new state
+	_current_state = _state_stack[0]
+	
+	if state_name != 'previous':
+		_current_state._enter(self)
+	else:
+		if _current_state == _state_map['ai']:
+			_current_state.next_ai_action(self)
+	
+	_state_label.update_label(_current_state.name)
+	emit_signal(\"state_changed\", state_name)
+
+################################################################################
+# PUBLIC METHODS
+################################################################################
+
+func activate_for_battle():
+	\"\"\"
+	Sets the Actor to the 'idle' state if activating an Ally. Doing so enables
+	Actor input processing by the Player on the Ally. Enemy and NPC
+	activations will be handled by the Actor's AI.
+	\"\"\"
+	if ActorDatabase.lookup_type(reference) == 'ally':
+		_change_state('idle')
+	elif ActorDatabase.lookup_type(reference) in ['enemy', 'npc']:
+		has_ai_running = true
+		_change_state('ai')
+
+#-------------------------------------------------------------------------------
+
+func activate_for_cutscene(type):
+	has_cutscene_running = true
+	_cutscene_type = type
+	_change_state('ai')
+
+#-------------------------------------------------------------------------------
+
+func deactivate():
+	\"\"\"
+	Sets the Actor to the 'inactive' state. Doing so disables Actor input 
+	processing.
+	\"\"\"
+	_change_state('inactive')
+
+#-------------------------------------------------------------------------------
+
+func hide_battle_cursor():
+	_cursor.visible = false
+
+#-------------------------------------------------------------------------------
+
+func initiate_attack():
+	if _current_state == _state_map['menu']:
+		_change_state('attack')
+
+#-------------------------------------------------------------------------------
+
+func modulate_alpha_channel(fade_type, mode, speed=0.5):
+	\"\"\"
+	Args:
+		- fade_type (String): The type of scene fade that the character will
+			perform.
+			* in: Character will fade into the scene.
+			* out: Character will fade out of the scene.
+		- mode (String): Determines whether the character will fade instantly
+			of over time.
+			* instant: Character fades instantly.
+			* slow: Character fades slowly over a set duration.
+		- speed (float): The speed at which the character fades into/from the
+			scene. Ignored if mode is set to 'instant.'
+	\"\"\"
+	var start_alpha = modulate
+	var end_alpha = modulate
+	
+	match [fade_type, mode]:
+		['in', 'instant']:
+			modulate.a = 1
+			emit_signal(\"alpha_modulate_completed\")
+			return
+		['out', 'instant']:
+			modulate.a = 0
+			emit_signal(\"alpha_modulate_completed\")
+			return
+		['in', 'slow']:
+			start_alpha.a = 0
+			end_alpha.a = 1
+		['out', 'slow']:
+			start_alpha.a = 1
+			end_alpha.a = 0
+	
+	_tween_alpha.interpolate_property(
+		self,
+		\"modulate\",
+		start_alpha,
+		end_alpha,
+		speed,
+		Tween.TRANS_LINEAR,
+		Tween.EASE_IN)
+	
+	_tween_alpha.start()
+
+#-------------------------------------------------------------------------------
+
+func perform_cutscene_move(goal_cell, movement_type):
+	\"\"\"
+	Args:
+		- goal_cell (Vector2): Map cell
+		- movement_type (String): Movement can eithe be 'run' or 'walk.'
+	\"\"\"
+	if _current_state == _state_map['ai']:
+		_movement_type = movement_type
+		_current_state.setup_for_cutscene_move(self, goal_cell)
+
+#-------------------------------------------------------------------------------
+
+func perform_move(world_position):
+	\"\"\"
+	Move command that tells the Actor the next world position to move into. 
+	Generally called from the 'Level/Ground' node after an Actor has made a move
+	request.
+	
+	Args:
+		- world_position (Vector2): World position for the Actor to move into.
+	\"\"\"
+	if _current_state == _state_map['move']:
+		_current_state.move_to_position(self, world_position)
+
+#-------------------------------------------------------------------------------
+
+func provide_job_info():
+	return _job.provide_job_info()
+
+#-------------------------------------------------------------------------------
+
+func provide_skills():
+	return _job.provide_skills()
+
+#-------------------------------------------------------------------------------
+
+func provide_weapons():
+	return _inventory.provide_weapons()
+
+#-------------------------------------------------------------------------------
+
+func reload_current_weapon():
+	_inventory.reload_current_weapon()
+
+#-------------------------------------------------------------------------------
+
+func resume_from_player_menu():
+	\"\"\"
+	Commands the Actor to resume processing after exiting from the Player Menu.
+	\"\"\"
+	_change_state('idle')
+
+#-------------------------------------------------------------------------------
+
+func search_for_attack_targets(target_info):
+	\"\"\"
+	Args:
+		target_info (Dictionary): A dictionary that holds the requesting actor
+			as a key within its current map cell as a value. Targets are listed 
+			as keys and their associated map cells are their values. The map
+			cells can be used for determining distances.
+	\"\"\"
+	if _current_state == _state_map['attack']:
+		_current_state.search_for_attack_targets(self, target_info)
+
+#-------------------------------------------------------------------------------
+
+func show_battle_cursor():
+	_cursor.visible = true
+
+#-------------------------------------------------------------------------------
+
+func swap_weapons():
+	_inventory.swap_weapons()
+
+#-------------------------------------------------------------------------------
+
+func take_damage(weapon):
+	_job.take_damage(weapon)
+	_skin.take_damage()
+	_reaction.take_damage(weapon.provide_stats()['attack_damage'])
+
+#-------------------------------------------------------------------------------
+
+func update_ai_battleground_info(target_info):
+	if _current_state == _state_map['ai']:
+		_current_state.update_ai_battleground_info(self, target_info)
+
+#-------------------------------------------------------------------------------
+
+func update_level(value):
+	_job.level = value
+
+################################################################################
+# SETTERS
+################################################################################
+
+func set_has_cutscene_running(value):
+	has_cutscene_running = value
+
+################################################################################
+# GETTERS
+################################################################################
+
+func get_has_ai_running():
+	return has_ai_running
+
+#-------------------------------------------------------------------------------
+
+func get_has_cutscene_running():
+	return has_cutscene_running
+
+#-------------------------------------------------------------------------------
+
+func get_reference():
+	return reference
+
+################################################################################
+# SIGNAL HANDLING
+################################################################################
+
+func _on_AStarPathfinder_pathing_completed(path):
+	if _current_state == _state_map['ai']:
+		_current_state._on_AStarPathfinder_pathing_completed(self, path)
+
+#-------------------------------------------------------------------------------
+
+func _on_Inventory_current_weapon_updated(current_weapon):
+	_weapon_label.update_label(current_weapon)
+
+#-------------------------------------------------------------------------------
+
+func _on_Inventory_new_skills_loaded(skill_refs):
+	_job.load_weapon_skills(skill_refs)
+
+#-------------------------------------------------------------------------------
+
+func _on_Inventory_weapon_reloaded():
+	emit_signal('weapon_reloaded')
+
+#-------------------------------------------------------------------------------
+
+func _on_Job_stats_modified():
+	emit_signal('stats_modified')
+
+#-------------------------------------------------------------------------------
+
+func _on_Job_item_skills_requested():
+	_inventory.load_item_skills()
+
+#-------------------------------------------------------------------------------
+
+func _on_Job_weapon_reload_requested():
+	_inventory.reload_current_weapon()
+
+#-------------------------------------------------------------------------------
+
+func _on_ReactionNumber_animation_completed():
+	emit_signal('reaction_completed', self)
+
+#-------------------------------------------------------------------------------
+
+func _on_TweenMove_tween_completed(object, key):
+	if _current_state == _state_map['move']:
+		var state_name = _current_state._on_TweenMove_tween_completed(self, \\
+		object, key)
+		
+		if state_name:
+			_change_state(state_name)
+
+#-------------------------------------------------------------------------------
+
+func _on_TweenAlpha_tween_completed(object, key):
+	emit_signal(\"alpha_modulate_completed\")
+"
 
 [node name="TestLevel" instance=ExtResource( 1 )]
 
@@ -21,6 +422,9 @@ tile_set = ExtResource( 2 )
 tile_data = PoolIntArray( 0, 0, 0, 1, 0, 1, 2, 0, 0, 3, 0, 1, 4, 0, 0, 5, 0, 1, 6, 0, 0, 7, 0, 1, 8, 0, 0, 9, 0, 1, 65536, 0, 1, 65537, 0, 0, 65538, 0, 1, 65539, 0, 0, 65540, 0, 1, 65541, 0, 0, 65542, 0, 1, 65543, 0, 0, 65544, 0, 1, 65545, 0, 0, 131072, 0, 0, 131073, 0, 1, 131074, 0, 0, 131075, 0, 1, 131076, 0, 0, 131077, 0, 1, 131078, 0, 0, 131079, 0, 1, 131080, 0, 0, 131081, 0, 1, 196608, 0, 1, 196609, 0, 0, 196610, 0, 1, 196611, 0, 0, 196612, 0, 1, 196613, 0, 0, 196614, 0, 1, 196615, 0, 0, 196616, 0, 1, 196617, 0, 0, 262144, 0, 0, 262145, 0, 1, 262146, 0, 0, 262147, 0, 1, 262148, 0, 0, 262149, 0, 1, 262150, 0, 0, 262151, 0, 1, 262152, 0, 0, 262153, 0, 1, 327680, 0, 1, 327681, 0, 0, 327682, 0, 1, 327683, 0, 0, 327684, 0, 1, 327685, 0, 0, 327686, 0, 1, 327687, 0, 0, 327688, 0, 1, 327689, 0, 0, 393216, 0, 0, 393217, 0, 1, 393218, 0, 0, 393219, 0, 1, 393220, 0, 0, 393221, 0, 1, 393222, 0, 0, 393223, 0, 1, 393224, 0, 0, 393225, 0, 1, 458752, 0, 1, 458753, 0, 0, 458754, 0, 1, 458755, 0, 0, 458756, 0, 1, 458757, 0, 0, 458758, 0, 1, 458759, 0, 0, 458760, 0, 1, 458761, 0, 0, 524288, 0, 0, 524289, 0, 1, 524290, 0, 0, 524291, 0, 1, 524292, 0, 0, 524293, 0, 1, 524294, 0, 0, 524295, 0, 1, 524296, 0, 0, 524297, 0, 1, 589824, 0, 1, 589825, 0, 0, 589826, 0, 1, 589827, 0, 0, 589828, 0, 1, 589829, 0, 0, 589830, 0, 1, 589831, 0, 0, 589832, 0, 1, 589833, 0, 0 )
 
 [node name="State" parent="Battleground" index="0"]
+editor/display_folded = true
+
+[node name="AllyBattlePositions" parent="Battleground" index="1"]
 editor/display_folded = true
 
 [node name="Spawn" type="Position2D" parent="Battleground/AllyBattlePositions" index="0"]
@@ -39,10 +443,15 @@ position = Vector2( 224, 96 )
 position = Vector2( 352, 96 )
 
 [node name="TestAlly001" parent="Battleground/Battlers" index="0" instance=ExtResource( 3 )]
+script = SubResource( 1 )
 
 [node name="TestEnemy001" parent="Battleground/Battlers" index="1" instance=ExtResource( 4 )]
 position = Vector2( 288, 272 )
+script = SubResource( 1 )
 onready_invisible = false
+
+[node name="Boulder" parent="Battleground/Destructables" index="0" instance=ExtResource( 5 )]
+position = Vector2( 352, 208 )
 
 [node name="Camera" parent="." index="1"]
 position = Vector2( 0, 320 )
@@ -50,18 +459,18 @@ position = Vector2( 0, 320 )
 [node name="Debug" parent="." index="3"]
 editor/display_folded = true
 
-[node name="TestEnemy001 argument and battle" parent="Cutscenes" index="0" instance=ExtResource( 5 )]
+[node name="TestEnemy001 argument and battle" parent="Cutscenes" index="0" instance=ExtResource( 6 )]
 
-[node name="Move camera to TestAlly001 spawn" parent="Cutscenes/TestEnemy001 argument and battle" index="0" instance=ExtResource( 6 )]
+[node name="Move camera to TestAlly001 spawn" parent="Cutscenes/TestEnemy001 argument and battle" index="0" instance=ExtResource( 7 )]
 _camera_scene_path = NodePath("../../../Camera")
 
 [node name="WorldPosition" parent="Cutscenes/TestEnemy001 argument and battle/Move camera to TestAlly001 spawn" index="0"]
 position = Vector2( 288, 16 )
 
-[node name="Delay 50 ms -001" parent="Cutscenes/TestEnemy001 argument and battle" index="1" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -001" parent="Cutscenes/TestEnemy001 argument and battle" index="1" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Spawn TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="2" instance=ExtResource( 8 )]
+[node name="Spawn TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="2" instance=ExtResource( 9 )]
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 _battleground_scene_path = NodePath("../../../Battleground")
 _fade_mode = "slow"
@@ -69,17 +478,17 @@ _fade_mode = "slow"
 [node name="SpawnLocation" parent="Cutscenes/TestEnemy001 argument and battle/Spawn TestAlly001" index="0"]
 position = Vector2( 288, 32 )
 
-[node name="Delay 50 ms -002" parent="Cutscenes/TestEnemy001 argument and battle" index="3" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -002" parent="Cutscenes/TestEnemy001 argument and battle" index="3" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Camera track TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="4" instance=ExtResource( 9 )]
+[node name="Camera track TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="4" instance=ExtResource( 10 )]
 _camera_scene_path = NodePath("../../../Camera")
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 
-[node name="Delay 50 ms -003" parent="Cutscenes/TestEnemy001 argument and battle" index="5" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -003" parent="Cutscenes/TestEnemy001 argument and battle" index="5" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Move TestAlly001 -001" parent="Cutscenes/TestEnemy001 argument and battle" index="6" instance=ExtResource( 10 )]
+[node name="Move TestAlly001 -001" parent="Cutscenes/TestEnemy001 argument and battle" index="6" instance=ExtResource( 11 )]
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 _battleground_scene_path = NodePath("../../../Battleground")
 _movement_type = "walk"
@@ -87,40 +496,40 @@ _movement_type = "walk"
 [node name="GoalPosition" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -001" index="0"]
 position = Vector2( 288, 225 )
 
-[node name="Delay 50 ms -004" parent="Cutscenes/TestEnemy001 argument and battle" index="7" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -004" parent="Cutscenes/TestEnemy001 argument and battle" index="7" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Configure dialogue with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="8" instance=ExtResource( 11 )]
+[node name="Configure dialogue with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="8" instance=ExtResource( 12 )]
 _dialogue_handler_scene_path = NodePath("../../../GUIs/DialogueHandler")
 _json_file = "res://levels/test_level/dialogue/test_enemy_001.json"
 
-[node name="Delay 50 ms -005" parent="Cutscenes/TestEnemy001 argument and battle" index="9" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -005" parent="Cutscenes/TestEnemy001 argument and battle" index="9" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Start dialogue with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="10" instance=ExtResource( 12 )]
+[node name="Start dialogue with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="10" instance=ExtResource( 13 )]
 _dialogue_handler_scene_path = NodePath("../../../GUIs/DialogueHandler")
 
-[node name="Delay 50 ms -006" parent="Cutscenes/TestEnemy001 argument and battle" index="11" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -006" parent="Cutscenes/TestEnemy001 argument and battle" index="11" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Camera untrack TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="12" instance=ExtResource( 9 )]
+[node name="Camera untrack TestAlly001" parent="Cutscenes/TestEnemy001 argument and battle" index="12" instance=ExtResource( 10 )]
 _camera_scene_path = NodePath("../../../Camera")
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 _untrack_actor = true
 
-[node name="Delay 50 ms -007" parent="Cutscenes/TestEnemy001 argument and battle" index="13" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -007" parent="Cutscenes/TestEnemy001 argument and battle" index="13" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Move camera to ally starting positions" parent="Cutscenes/TestEnemy001 argument and battle" index="14" instance=ExtResource( 6 )]
+[node name="Move camera to ally starting positions" parent="Cutscenes/TestEnemy001 argument and battle" index="14" instance=ExtResource( 7 )]
 _camera_scene_path = NodePath("../../../Camera")
 
 [node name="WorldPosition" parent="Cutscenes/TestEnemy001 argument and battle/Move camera to ally starting positions" index="0"]
 position = Vector2( 288, 96 )
 
-[node name="Delay 50 ms -008" parent="Cutscenes/TestEnemy001 argument and battle" index="15" instance=ExtResource( 7 )]
+[node name="Delay 50 ms -008" parent="Cutscenes/TestEnemy001 argument and battle" index="15" instance=ExtResource( 8 )]
 _delay = 0.05
 
-[node name="Move TestAlly001 -002" parent="Cutscenes/TestEnemy001 argument and battle" index="16" instance=ExtResource( 10 )]
+[node name="Move TestAlly001 -002" parent="Cutscenes/TestEnemy001 argument and battle" index="16" instance=ExtResource( 11 )]
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestAlly001")
 _battleground_scene_path = NodePath("../../../Battleground")
 _quickrun_next_program = true
@@ -128,14 +537,14 @@ _quickrun_next_program = true
 [node name="GoalPosition" parent="Cutscenes/TestEnemy001 argument and battle/Move TestAlly001 -002" index="0"]
 position = Vector2( 288, 32 )
 
-[node name="Move TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="17" instance=ExtResource( 10 )]
+[node name="Move TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="17" instance=ExtResource( 11 )]
 _actor_scene_path = NodePath("../../../Battleground/Battlers/TestEnemy001")
 _battleground_scene_path = NodePath("../../../Battleground")
 
 [node name="GoalPosition" parent="Cutscenes/TestEnemy001 argument and battle/Move TestEnemy001" index="0"]
 position = Vector2( 288, 608 )
 
-[node name="Trigger battle with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="18" instance=ExtResource( 13 )]
+[node name="Trigger battle with TestEnemy001" parent="Cutscenes/TestEnemy001 argument and battle" index="18" instance=ExtResource( 14 )]
 _battleground_scene_path = NodePath("../../../Battleground")
 
 

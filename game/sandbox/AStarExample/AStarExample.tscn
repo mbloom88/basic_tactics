@@ -6,6 +6,8 @@
 [ext_resource path="res://actors/allies/TestAlly001.tscn" type="PackedScene" id=4]
 [ext_resource path="res://actors/enemies/TestEnemy001.tscn" type="PackedScene" id=5]
 
+
+
 [node name="AStarExample" index="0" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
