@@ -4,7 +4,6 @@
 [ext_resource path="res://ui/dialogue_handler/prefabs/dialogue_box/DialogueBox.tscn" type="PackedScene" id=2]
 [ext_resource path="res://ui/dialogue_handler/prefabs/dialogue_response/DialogueResponse.tscn" type="PackedScene" id=3]
 
-
 [node name="DialogueHandler" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -16,6 +15,8 @@ _character_display_speed = 0.025
 
 [node name="DialogueResponseTop" parent="." instance=ExtResource( 3 )]
 visible = false
+box_alignment = "top"
+portrait_alignment = "left"
 _button_spacing = 4
 
 [node name="DialogueBoxBot" parent="." instance=ExtResource( 2 )]
@@ -27,6 +28,8 @@ _character_display_speed = 0.025
 visible = false
 margin_top = 691.063
 margin_bottom = 1051.06
+box_alignment = "top"
+portrait_alignment = "left"
 _button_spacing = 4
 
 [connection signal="dialogue_finished" from="DialogueBoxTop" to="." method="_on_DialogueBox_dialogue_finished"]
