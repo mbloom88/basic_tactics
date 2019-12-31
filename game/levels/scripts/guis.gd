@@ -90,9 +90,9 @@ func load_weapon_gui(actor):
 
 func remove_all_menus():
 	var menu_list = _menus.get_children()
-	for menu in range(_menus.get_child_count()):
-		var exiting_menu = menu_list.pop_back()
-		exiting_menu.exit()
+	
+	while not menu_list.empty():
+		menu_list.pop_back().exit()
 
 #-------------------------------------------------------------------------------
 
@@ -163,22 +163,13 @@ func _on_Menu_state_changed(menu, state):
 		match menu.name:
 			'SkillsMenu':
 				menu.add_skills_to_list(_actor_in_menu)
-	if state == 'exit':
+	elif state == 'exit':
 		match menu.name:
-			'PlayerWorldMenu':
-				menu.disconnect('menu_requested', self,
-					'_on_Menu_menu_requested')
 			'PlayerBattleMenu':
 				_battle_gui.activate_weapon_swap()
-				menu.disconnect('menu_requested', self, 
-					'_on_Menu_menu_requested')
-				menu.disconnect('player_browsing_skills', self, 
-				'_on_PlayerBattleMenu_player_browsing_skills')
-				menu.disconnect('player_waiting', self, 
-					'_on_PlayerBattleMenu_player_waiting')
 				if _actor_in_menu:
 					_actor_in_menu.resume_from_player_menu()
-		menu.disconnect('state_changed', self, '_on_Menu_state_changed')
+		
 		_menus.remove_child(menu)
 		menu.queue_free()
 		resume_last_menu()

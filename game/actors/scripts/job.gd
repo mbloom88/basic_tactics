@@ -3,7 +3,6 @@ extends Node
 # Signals
 signal item_skills_requested
 signal stats_modified
-signal weapon_reload_requested
 
 # Child nodes
 onready var _stats = $Stats
@@ -95,10 +94,3 @@ func use_skill(skill):
 
 func set_level(value):
 	level = value
-
-################################################################################
-# SIGNAL HANDLING
-################################################################################
-
-func _on_Skills_weapon_reload_requested():
-	emit_signal('weapon_reload_requested')

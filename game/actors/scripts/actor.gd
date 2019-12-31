@@ -378,11 +378,6 @@ func _on_Job_item_skills_requested():
 
 #-------------------------------------------------------------------------------
 
-func _on_Job_weapon_reload_requested():
-	_inventory.reload_current_weapon()
-
-#-------------------------------------------------------------------------------
-
 func _on_ReactionNumber_animation_completed():
 	emit_signal('reaction_completed', self)
 

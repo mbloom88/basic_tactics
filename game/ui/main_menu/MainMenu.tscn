@@ -97,7 +97,6 @@ margin_right = -20.0
 margin_bottom = -20.0
 grow_horizontal = 0
 text = "Version x.x.x"
-
 [connection signal="pressed" from="MenuButtons/Continue" to="." method="_on_Continue_pressed"]
 [connection signal="pressed" from="MenuButtons/NewGame" to="." method="_on_NewGame_pressed"]
 [connection signal="pressed" from="MenuButtons/LoadGame" to="." method="_on_LoadGame_pressed"]

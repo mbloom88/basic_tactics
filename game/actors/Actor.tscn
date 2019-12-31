@@ -22,7 +22,6 @@
 [ext_resource path="res://actors/scripts/state_label.gd" type="Script" id=20]
 [ext_resource path="res://actors/scripts/weapon_label.gd" type="Script" id=21]
 
-
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
 
@@ -54,7 +53,6 @@ script = ExtResource( 7 )
 [node name="AStarPathfinder" parent="." instance=ExtResource( 8 )]
 
 [node name="Job" type="Node" parent="."]
-editor/display_folded = true
 script = ExtResource( 9 )
 
 [node name="Stats" type="Node" parent="Job"]
@@ -64,12 +62,11 @@ script = ExtResource( 10 )
 script = ExtResource( 11 )
 
 [node name="Inventory" type="Node" parent="."]
-editor/display_folded = true
 script = ExtResource( 12 )
 
-[node name="Weapon1" type="Node" parent="Inventory"]
+[node name="WeaponSlot1" type="Node" parent="Inventory"]
 
-[node name="Weapon2" type="Node" parent="Inventory"]
+[node name="WeaponSlot2" type="Node" parent="Inventory"]
 
 [node name="TweenAlpha" type="Tween" parent="."]
 
@@ -126,12 +123,9 @@ grow_horizontal = 2
 text = "Weapon Label"
 align = 1
 script = ExtResource( 21 )
-
 [connection signal="pathing_completed" from="AStarPathfinder" to="." method="_on_AStarPathfinder_pathing_completed"]
 [connection signal="item_skills_requested" from="Job" to="." method="_on_Job_item_skills_requested"]
 [connection signal="stats_modified" from="Job" to="." method="_on_Job_stats_modified"]
-[connection signal="weapon_reload_requested" from="Job" to="." method="_on_Job_weapon_reload_requested"]
-[connection signal="weapon_reload_requested" from="Job/Skills" to="Job" method="_on_Skills_weapon_reload_requested"]
 [connection signal="current_weapon_updated" from="Inventory" to="." method="_on_Inventory_current_weapon_updated"]
 [connection signal="new_skills_loaded" from="Inventory" to="." method="_on_Inventory_new_skills_loaded"]
 [connection signal="weapon_reloaded" from="Inventory" to="." method="_on_Inventory_weapon_reloaded"]

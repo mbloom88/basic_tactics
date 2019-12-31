@@ -1,8 +1,5 @@
 extends Node
 
-# Signals
-signal weapon_reload_requested
-
 # Skill info
 var _job_skills = []
 var _weapon_skills = []

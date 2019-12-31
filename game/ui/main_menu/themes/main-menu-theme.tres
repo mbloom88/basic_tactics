@@ -37,4 +37,3 @@ Label/constants/shadow_offset_x = 1
 Label/constants/shadow_offset_y = 1
 Label/fonts/font = SubResource( 4 )
 Label/styles/normal = null
-

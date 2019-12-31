@@ -17,5 +17,4 @@ _new_game_level = ExtResource( 3 )
 layer = 2
 script = ExtResource( 4 )
 _main_menu = ExtResource( 5 )
-
 [connection signal="new_game_requested" from="Menus" to="." method="_on_Menus_new_game_requested"]

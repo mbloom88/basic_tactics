@@ -6,10 +6,12 @@ signal new_skills_loaded(skill_refs)
 signal weapon_reloaded
 
 # Child nodes
-onready var _weapon1 = $Weapon1.get_child(0)
-onready var _weapon2 = $Weapon2.get_child(0)
+onready var _weapon_slot1 = $WeaponSlot1
+onready var _weapon_slot2 = $WeaponSlot2
 
 # Weapon info 
+var _weapon1 = null
+var _weapon2 = null
 var _current_weapon = null
 
 ################################################################################
@@ -17,10 +19,20 @@ var _current_weapon = null
 ################################################################################
 
 func _ready():
-	_current_weapon = _weapon1
-	if _weapon1:
+	_initialize_weapons()
+
+################################################################################
+# PRIVATE METHODS
+################################################################################
+
+func _initialize_weapons():
+	if _weapon_slot1.get_children():
+		_weapon1 = _weapon_slot1.get_child(0)
+		_current_weapon = _weapon1
 		_weapon1.connect('reloaded', self, '_on_Weapon_reloaded')
-	if _weapon2:
+	
+	if _weapon_slot2.get_children():
+		_weapon2 = _weapon_slot2.get_child(0)
 		_weapon2.connect('reloaded', self, '_on_Weapon_reloaded')
 
 ################################################################################

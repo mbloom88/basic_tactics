@@ -9,16 +9,14 @@ flags = 4
 atlas = ExtResource( 3 )
 region = Rect2( 0, 0, 64, 64 )
 
-[node name="Boulder" instance=ExtResource( 1 )]
+[node name="Boulder" index="0" instance=ExtResource( 1 )]
 reference = "boulder"
 onready_invisible = false
 cover_type = "half"
 cover_sides = 15
 
 [node name="Job" parent="." index="2"]
-editor/display_folded = false
 job_loadout = ExtResource( 2 )
 
 [node name="Skin" parent="." index="7"]
 texture = SubResource( 1 )
-

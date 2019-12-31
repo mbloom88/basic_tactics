@@ -52,4 +52,3 @@ RichTextLabel/fonts/mono_font = null
 RichTextLabel/fonts/normal_font = SubResource( 3 )
 RichTextLabel/styles/focus = null
 RichTextLabel/styles/normal = null
-

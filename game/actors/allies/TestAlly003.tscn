@@ -5,21 +5,12 @@
 [ext_resource path="res://items/weapons/ranged/OldPistol.tscn" type="PackedScene" id=3]
 [ext_resource path="res://items/weapons/melee/CombatKnife.tscn" type="PackedScene" id=4]
 
-
-
-
-
-
 [node name="TestAlly003" index="0" instance=ExtResource( 1 )]
 reference = "test_ally_003"
 
 [node name="Job" parent="." index="2"]
 job_loadout = ExtResource( 2 )
 
-[node name="Inventory" parent="." index="3"]
-editor/display_folded = false
+[node name="OldPistol" parent="Inventory/WeaponSlot1" index="0" instance=ExtResource( 3 )]
 
-[node name="OldPistol" parent="Inventory/Weapon1" index="0" instance=ExtResource( 3 )]
-
-[node name="CombatKnife" parent="Inventory/Weapon2" index="0" instance=ExtResource( 4 )]
-
+[node name="CombatKnife" parent="Inventory/WeaponSlot2" index="0" instance=ExtResource( 4 )]

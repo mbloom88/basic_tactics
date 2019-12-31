@@ -5,4 +5,4 @@ extends "res://assets/scripts/state.gd"
 ################################################################################
 
 func _enter(host):
-	host.queue_free()
+	pass
